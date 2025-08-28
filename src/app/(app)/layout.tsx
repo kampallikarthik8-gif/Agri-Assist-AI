@@ -29,6 +29,7 @@ const navItems = [
   { href: "/plant-health", label: "Plant Health", icon: Icons.PlantHealth },
   { href: "/crop-recommendation", label: "Crop AI", icon: Icons.CropRecommendation },
   { href: "/market-insights", label: "Market Insights", icon: Icons.MarketInsights },
+  { href: "/government-schemes", label: "Govt. Schemes", icon: Icons.GovernmentSchemes },
   { href: "/ai-assistant", label: "AI Assistant", icon: Icons.Assistant },
 ];
 

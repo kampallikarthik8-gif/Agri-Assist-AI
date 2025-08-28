@@ -13,7 +13,8 @@ import {
   Thermometer,
   Wind,
   Bug,
-  TrendingUp
+  TrendingUp,
+  Landmark
 } from "lucide-react";
 
 export const Icons = {
@@ -33,4 +34,5 @@ export const Icons = {
   Assistant: Bot,
   Pest: Bug,
   MarketInsights: TrendingUp,
+  GovernmentSchemes: Landmark,
 };

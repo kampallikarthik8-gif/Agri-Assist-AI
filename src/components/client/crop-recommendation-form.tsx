@@ -13,12 +13,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Icons } from "../icons";
 import { Badge } from "../ui/badge";
+import { Input } from "../ui/input";
 
 const formSchema = z.object({
   soilAnalysis: z.string().min(10, "Soil analysis is required."),
-  locationData: z.string().min(10, "Location data is required."),
-  climateData: z.string().min(10, "Climate data is required."),
-  marketDemand: z.string().min(10, "Market demand information is required."),
+  location: z.string().min(3, "Location is required."),
 });
 
 export function CropRecommendationForm() {
@@ -30,9 +29,7 @@ export function CropRecommendationForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       soilAnalysis: "",
-      locationData: "",
-      climateData: "",
-      marketDemand: "",
+      location: "",
     },
   });
 
@@ -64,7 +61,20 @@ export function CropRecommendationForm() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 md:grid-cols-1">
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Location</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Fresno, California" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="soilAnalysis"
@@ -72,46 +82,7 @@ export function CropRecommendationForm() {
                     <FormItem>
                       <FormLabel>Soil Analysis</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="e.g., pH: 6.5, Nitrogen: High, Potassium: Medium..." {...field} rows={4} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="locationData"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Location Data</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="e.g., Latitude: 37.3, Longitude: -121.9, Altitude: 100m" {...field} rows={4} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="climateData"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Climate Data</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="e.g., Avg. rainfall: 500mm/year, Temp: 50-85°F" {...field} rows={4} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="marketDemand"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Market Demand</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="e.g., High demand for organic strawberries, stable for corn." {...field} rows={4} />
+                        <Textarea placeholder="e.g., pH: 6.5, Nitrogen: High, Potassium: Medium..." {...field} rows={8} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -10,20 +10,15 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { getWeather } from './weather-service';
 
 const CropRecommendationEngineInputSchema = z.object({
   soilAnalysis: z
     .string()
     .describe('Detailed soil analysis data, including pH, nitrogen, phosphorus, potassium, and micronutrient levels.'),
-  locationData: z
+  location: z
     .string()
-    .describe('Geographic location data, including latitude, longitude, and altitude.'),
-  climateData: z
-    .string()
-    .describe('Climate data for the location, including average rainfall, temperature ranges, and growing season length.'),
-  marketDemand: z
-    .string()
-    .describe('Information on current market demand for various crops in the region.'),
+    .describe('Geographic location for the farm (e.g., "Napa Valley, CA").'),
 });
 
 export type CropRecommendationEngineInput = z.infer<
@@ -53,12 +48,14 @@ const prompt = ai.definePrompt({
   name: 'cropRecommendationEnginePrompt',
   input: {schema: CropRecommendationEngineInputSchema},
   output: {schema: CropRecommendationEngineOutputSchema},
-  prompt: `You are an expert agricultural advisor. Based on the provided soil analysis, location data, climate data, and market demand, recommend the most suitable crops to plant.
+  tools: [getWeather],
+  prompt: `You are an expert agricultural advisor. 
+  
+First, get the current weather for the user's location: {{{location}}}.
+
+Then, based on the provided soil analysis and the weather data you fetched, recommend the most suitable crops to plant. Also consider general market demand for commodity crops in your recommendation.
 
 Soil Analysis: {{{soilAnalysis}}}
-Location Data: {{{locationData}}}
-Climate Data: {{{climateData}}}
-Market Demand: {{{marketDemand}}}
 
 Consider all factors to provide a well-reasoned recommendation.
 

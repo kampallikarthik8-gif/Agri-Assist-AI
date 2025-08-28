@@ -15,3 +15,5 @@ import '@/ai/flows/pest-spraying-advisor.ts';
 import '@/ai/flows/seed-quality-scanner.ts';
 import '@/ai/flows/fertilizer-calculator.ts';
 import '@/ai/flows/rainfall-alert.ts';
+import '@/ai/flows/yield-prediction.ts';
+import '@/ai/flows/pest-disease-alert.ts';

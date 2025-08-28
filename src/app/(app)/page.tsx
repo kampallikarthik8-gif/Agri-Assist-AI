@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BarChart as BarChartIcon, LineChart as LineChartIcon, Cloud, Sun, Wind, Cloudy, SunMoon, CloudRain, Snowflake } from "lucide-react";
+import { BarChart as BarChartIcon, LineChart as LineChartIcon, Cloud, Sun, Wind, Cloudy, SunMoon, CloudRain, Snowflake, Bug } from "lucide-react";
 import {
   ChartContainer,
   ChartTooltip,
@@ -27,16 +27,9 @@ import {
 import { Icons } from "@/components/icons";
 import { useState, useEffect } from "react";
 import { getWeather, WeatherOutput } from "@/ai/flows/weather-service";
+import { yieldPrediction, type YieldPredictionOutput } from "@/ai/flows/yield-prediction";
+import { pestDiseaseAlert, type PestDiseaseAlertOutput } from "@/ai/flows/pest-disease-alert";
 import { Skeleton } from "@/components/ui/skeleton";
-
-const cropYieldData = [
-    { month: "Jan", yield: 80 },
-    { month: "Feb", yield: 95 },
-    { month: "Mar", yield: 110 },
-    { month: "Apr", yield: 120 },
-    { month: "May", yield: 140 },
-    { month: "Jun", yield: 155 },
-];
 
 const newsFeed = [
     {
@@ -94,7 +87,9 @@ const weatherIconMap: { [key: string]: React.FC<any> } = {
 export default function DashboardPage() {
     const [waterUsageData, setWaterUsageData] = useState<any[]>([]);
     const [weather, setWeather] = useState<WeatherOutput | null>(null);
-    const [weatherLoading, setWeatherLoading] = useState(true);
+    const [yieldData, setYieldData] = useState<YieldPredictionOutput['forecast'] | null>(null);
+    const [pestAlerts, setPestAlerts] = useState<PestDiseaseAlertOutput['alerts'] | null>(null);
+    const [loading, setLoading] = useState(true);
     const [locationError, setLocationError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -108,35 +103,46 @@ export default function DashboardPage() {
           { date: "Sun", usage: Math.floor(Math.random() * 200) + 50 },
         ]);
 
-        async function fetchWeather(lat: number, lon: number) {
+        async function fetchDashboardData(lat: number, lon: number) {
             try {
-                setWeatherLoading(true);
+                setLoading(true);
                 setLocationError(null);
                 const weatherData = await getWeather({ lat, lon });
                 setWeather(weatherData);
+
+                const location = weatherData.locationName;
+                const cropType = 'Wheat'; // Default crop for prediction
+
+                const [yieldRes, pestRes] = await Promise.all([
+                    yieldPrediction({ location, cropType }),
+                    pestDiseaseAlert({ location })
+                ]);
+                
+                setYieldData(yieldRes.forecast);
+                setPestAlerts(pestRes.alerts);
+
             } catch (error) {
-                console.error("Failed to fetch weather:", error);
-                setLocationError("Could not fetch weather data.");
+                console.error("Failed to fetch dashboard data:", error);
+                setLocationError("Could not fetch dashboard data.");
             } finally {
-                setWeatherLoading(false);
+                setLoading(false);
             }
         }
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    fetchWeather(position.coords.latitude, position.coords.longitude);
+                    fetchDashboardData(position.coords.latitude, position.coords.longitude);
                 },
                 (error) => {
                     console.error("Geolocation error:", error);
-                    setLocationError("Location access denied. Showing weather for a default location.");
-                    // Fallback to default location
-                    getWeather({ location: "Sunnyvale, CA" }).then(setWeather).finally(() => setWeatherLoading(false));
+                    setLocationError("Location access denied. Using default data.");
+                    fetchDashboardData(37.3875, -122.0575); // Fallback to Sunnyvale
                 }
             );
         } else {
-            setLocationError("Geolocation is not supported by this browser.");
-            getWeather({ location: "Sunnyvale, CA" }).then(setWeather).finally(() => setWeatherLoading(false));
+            setLocationError("Geolocation is not supported. Using default data.");
+            fetchDashboardData(37.3875, -122.0575); // Fallback to Sunnyvale
         }
     }, []);
 
@@ -145,19 +151,19 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Icons.Weather className="size-6 text-accent" />
               Current Weather
             </CardTitle>
             <CardDescription>
-                {weather && !weatherLoading ? weather.locationName : (locationError || "Loading location...")}
+                {weather && !loading ? weather.locationName : (locationError || "Loading location...")}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex items-center justify-around">
-            {weatherLoading ? (
+            {loading ? (
                 <div className="flex w-full items-center gap-4">
                     <Skeleton className="h-16 w-16 rounded-full" />
                     <div className="space-y-2">
@@ -182,57 +188,64 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-                <BarChartIcon className="size-6 text-primary" />
-                Water Usage
-            </CardTitle>
-            <CardDescription>Last 7 Days (Liters)</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={chartConfig} className="h-40 w-full">
-              <BarChart accessibilityLayer data={waterUsageData}>
-                 <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="date"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                />
-                <YAxis hide />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent indicator="dot" />}
-                />
-                <Bar dataKey="usage" fill="var(--color-usage)" radius={4} />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
+        <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
                 <LineChartIcon className="size-6 text-primary"/>
                 Projected Crop Yield
             </CardTitle>
-            <CardDescription>Next 6 Months (Tons)</CardDescription>
+            <CardDescription>AI-powered 6-Month Forecast (Tons)</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-40 w-full">
-                <LineChart accessibilityLayer data={cropYieldData}>
-                    <CartesianGrid vertical={false} />
-                    <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} />
-                    <YAxis hide />
-                    <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-                    <Line dataKey="yield" type="natural" fill="var(--color-yield)" stroke="var(--color-yield)" strokeWidth={2} dot={false} />
-                </LineChart>
+                {loading ? <Skeleton className="h-full w-full" /> : (
+                    <LineChart accessibilityLayer data={yieldData || []}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} tickFormatter={(value) => value.substring(0,3)} />
+                        <YAxis hide />
+                        <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                        <Line dataKey="yield" type="natural" fill="var(--color-yield)" stroke="var(--color-yield)" strokeWidth={2} dot={false} />
+                    </LineChart>
+                )}
             </ChartContainer>
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-2 lg:col-span-3">
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+                <Bug className="size-6 text-destructive" />
+                Pest & Disease Alerts
+            </CardTitle>
+            <CardDescription>Current risk factors</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {loading ? <Skeleton className="h-40 w-full" /> : (
+                pestAlerts && pestAlerts.length > 0 ? (
+                    <ul className="space-y-3">
+                        {pestAlerts.map((alert, index) => (
+                            <li key={index} className="flex items-start gap-3">
+                                <div className="mt-1">
+                                    <Bug className="size-4 text-destructive" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold">{alert.name}</p>
+                                    <p className="text-sm text-muted-foreground">{alert.riskLevel}</p>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+                        <Icons.PlantHealth className="size-10 mb-2"/>
+                        <p className="text-sm">No immediate pest or disease threats detected.</p>
+                    </div>
+                )
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2 lg:col-span-4">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Icons.News className="size-6 text-primary" />

@@ -1,5 +1,7 @@
 
 "use client"
+
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -7,124 +9,153 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getWeather, WeatherOutput } from "@/ai/flows/weather-service";
 import { Icons } from "@/components/icons";
+import { Cloud, Cloudy, CloudRain, Snowflake, Sun, SunMoon, Wind } from "lucide-react";
 
-const forecastData = [
-  { day: "Mon", temp: 72, icon: Icons.Sun },
-  { day: "Tue", temp: 75, icon: Icons.Sun },
-  { day: "Wed", temp: 70, icon: Icons.Cloud },
-  { day: "Thu", temp: 68, icon: Icons.Cloud },
-  { day: "Fri", temp: 78, icon: Icons.Sun },
-  { day: "Sat", temp: 80, icon: Icons.Sun },
-  { day: "Sun", temp: 76, icon: Icons.Cloud },
-];
-
-const hourlyData = [
-    { time: "3 PM", temp: 72, icon: Icons.Sun },
-    { time: "4 PM", temp: 71, icon: Icons.Sun },
-    { time: "5 PM", temp: 69, icon: Icons.Sun },
-    { time: "6 PM", temp: 65, icon: Icons.Cloud },
-    { time: "7 PM", temp: 62, icon: Icons.Cloud },
-    { time: "8 PM", temp: 60, icon: Icons.Cloud },
-]
-
-const chartConfig = {
-  temperature: {
-    label: "Temp (°F)",
-    color: "hsl(var(--chart-1))",
-  },
-};
+const weatherIconMap: { [key: string]: React.FC<any> } = {
+    "01d": Sun,
+    "01n": SunMoon,
+    "02d": Sun,
+    "02n": SunMoon,
+    "03d": Cloud,
+    "03n": Cloud,
+    "04d": Cloudy,
+    "04n": Cloudy,
+    "09d": CloudRain,
+    "09n": CloudRain,
+    "10d": CloudRain,
+    "10n": CloudRain,
+    "11d": CloudRain,
+    "11n": CloudRain,
+    "13d": Snowflake,
+    "13n": Snowflake,
+    "50d": Cloud,
+    "50n": Cloud,
+  };
 
 const UVIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
 )
 
 export default function WeatherPage() {
+  const [weather, setWeather] = useState<WeatherOutput | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchWeatherByCoords(lat: number, lon: number) {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getWeather({ lat, lon });
+        setWeather(data);
+      } catch (e) {
+        console.error("Failed to fetch weather by coordinates:", e);
+        setError("Could not fetch weather for your location.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function fetchWeatherByCity(city: string) {
+        try {
+            setLoading(true);
+            setError(null);
+            const data = await getWeather({ location: city });
+            setWeather(data);
+        } catch (e) {
+            console.error("Failed to fetch weather by city:", e);
+            setError("Could not fetch weather data.");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          fetchWeatherByCoords(position.coords.latitude, position.coords.longitude);
+        },
+        (geoError) => {
+          console.error("Geolocation error:", geoError);
+          setError("Location access denied. Showing weather for a default location.");
+          fetchWeatherByCity("Sunnyvale, CA");
+        }
+      );
+    } else {
+      setError("Geolocation is not supported. Showing weather for a default location.");
+      fetchWeatherByCity("Sunnyvale, CA");
+    }
+  }, []);
+
+  const WeatherIcon = weather ? weatherIconMap[weather.icon] || Sun : Sun;
+
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-3xl font-bold tracking-tight">Weather</h1>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Current Conditions</CardTitle>
-            <CardDescription>Sunnyvale, CA - As of 2:30 PM</CardDescription>
-          </CardHeader>
-          <CardContent className="grid grid-cols-2 gap-6">
-            <div className="flex flex-col items-center justify-center gap-2">
-              <Icons.Sun className="size-24 text-warning" />
-              <span className="text-6xl font-bold">72°F</span>
-              <span className="text-muted-foreground">Sunny</span>
-            </div>
-            <div className="space-y-4 text-lg">
-              <p className="flex items-center gap-3">
-                <Icons.Wind className="size-6 text-muted-foreground" />
-                <span>Wind: 5 mph</span>
-              </p>
-              <p className="flex items-center gap-3">
-                <Icons.Cloud className="size-6 text-muted-foreground" />
-                <span>Humidity: 45%</span>
-              </p>
-              <p className="flex items-center gap-3">
-                <UVIcon className="size-6 text-muted-foreground" />
-                <span>UV Index: 7 (High)</span>
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="lg:col-span-2">
-            <CardHeader>
-                <CardTitle>Hourly Forecast</CardTitle>
-                <CardDescription>Next 6 hours</CardDescription>
-            </CardHeader>
-            <CardContent className="flex justify-between">
-                {hourlyData.map(hour => (
-                    <div key={hour.time} className="flex flex-col items-center gap-2">
-                        <span className="text-sm text-muted-foreground">{hour.time}</span>
-                        <hour.icon className="size-8 text-accent"/>
-                        <span className="font-semibold">{hour.temp}°F</span>
+      <h1 className="text-3xl font-bold tracking-tight">Live Weather</h1>
+      <Card>
+        <CardHeader>
+          <CardTitle>Current Conditions</CardTitle>
+          <CardDescription>
+            {loading && "Loading location..."}
+            {weather && weather.locationName}
+            {error && !weather && error}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {loading ? (
+                <>
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <Skeleton className="size-24 rounded-full" />
+                        <Skeleton className="h-14 w-32" />
+                        <Skeleton className="h-6 w-20" />
                     </div>
-                ))}
-            </CardContent>
-        </Card>
-
-        <Card className="lg:col-span-4">
-          <CardHeader>
-            <CardTitle>7-Day Forecast</CardTitle>
-            <CardDescription>Temperature (°F)</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={chartConfig} className="h-64 w-full">
-              <BarChart data={forecastData}>
-                <CartesianGrid vertical={false} />
-                <XAxis
-                  dataKey="day"
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                />
-                <YAxis
-                  tickLine={false}
-                  axisLine={false}
-                  tickMargin={10}
-                  width={30}
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent indicator="dot" />}
-                />
-                <Bar dataKey="temp" fill="var(--color-temperature)" radius={8} />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-      </div>
+                    <div className="space-y-4 text-lg">
+                        <Skeleton className="h-8 w-40" />
+                        <Skeleton className="h-8 w-36" />
+                        <Skeleton className="h-8 w-32" />
+                    </div>
+                </>
+            ) : weather ? (
+                 <>
+                    <div className="flex flex-col items-center justify-center gap-2">
+                        <WeatherIcon className="size-24 text-warning" />
+                        <span className="text-6xl font-bold">{weather.temperature}°F</span>
+                        <span className="text-muted-foreground">{weather.description}</span>
+                    </div>
+                    <div className="space-y-4 text-lg">
+                        <p className="flex items-center gap-3">
+                            <Wind className="size-6 text-muted-foreground" />
+                            <span>Wind: {weather.windSpeed} mph</span>
+                        </p>
+                        <p className="flex items-center gap-3">
+                            <Cloud className="size-6 text-muted-foreground" />
+                            <span>Humidity: {weather.humidity}%</span>
+                        </p>
+                        <p className="flex items-center gap-3">
+                            <UVIcon className="size-6 text-muted-foreground" />
+                            <span>UV Index: N/A</span>
+                        </p>
+                    </div>
+                </>
+            ) : (
+                <div className="col-span-2 text-center text-muted-foreground">
+                    <p>{error}</p>
+                </div>
+            )}
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+            <CardTitle>Forecast</CardTitle>
+            <CardDescription>Hourly and 7-day forecasts are not available in this version.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <p className="text-muted-foreground">The current weather API does not support detailed forecasts. Please check back later for updates.</p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

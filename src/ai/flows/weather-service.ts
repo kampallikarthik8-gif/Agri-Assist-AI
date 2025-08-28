@@ -30,8 +30,15 @@ const WeatherOutputSchema = z.object({
   uvIndex: z.number().describe('The current UV index.'),
   visibility: z.number().describe('The visibility in miles.'),
   pressure: z.number().describe('The atmospheric pressure in hPa.'),
+  sunrise: z.string().describe('The time of sunrise.'),
+  sunset: z.string().describe('The time of sunset.'),
 });
 export type WeatherOutput = z.infer<typeof WeatherOutputSchema>;
+
+function formatTime(timestamp: number, timezone: number): string {
+    const date = new Date((timestamp + timezone) * 1000);
+    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'UTC', hour12: true });
+}
 
 async function fetchWeatherData(input: WeatherInput): Promise<WeatherOutput> {
   const apiKey = process.env.OPENWEATHER_API_KEY;
@@ -78,6 +85,8 @@ async function fetchWeatherData(input: WeatherInput): Promise<WeatherOutput> {
       uvIndex: uvIndex,
       visibility: Math.round(data.visibility / 1609), // meters to miles
       pressure: data.main.pressure,
+      sunrise: formatTime(data.sys.sunrise, data.timezone),
+      sunset: formatTime(data.sys.sunset, data.timezone),
     };
   } catch (error) {
     console.error('Error fetching weather:', error);

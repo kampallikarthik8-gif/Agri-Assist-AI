@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getWeather, WeatherOutput } from "@/ai/flows/weather-service";
 import { weatherForecast, type WeatherForecastOutput } from "@/ai/flows/weather-forecast";
 import { Icons } from "@/components/icons";
-import { Cloud, Cloudy, CloudRain, Snowflake, Sun, SunMoon, Wind, Gauge, Eye } from "lucide-react";
+import { Cloud, Cloudy, CloudRain, Snowflake, Sun, SunMoon, Wind, Gauge, Eye, Sunrise, Sunset } from "lucide-react";
 
 const weatherIconMap: { [key: string]: React.FC<any> } = {
     "01d": Sun, "clear sky": Sun,
@@ -120,7 +120,7 @@ export default function WeatherPage() {
                         <Skeleton className="h-6 w-20" />
                     </div>
                     <div className="grid grid-cols-2 gap-4 text-lg lg:col-span-2">
-                        {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-8 w-40" />)}
+                        {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-8 w-40" />)}
                     </div>
                 </>
             ) : weather ? (
@@ -154,6 +154,14 @@ export default function WeatherPage() {
                         <p className="flex items-center gap-3">
                             <Gauge className="size-6 text-muted-foreground" />
                             <span>Pressure: {weather.pressure} hPa</span>
+                        </p>
+                        <p className="flex items-center gap-3">
+                            <Sunrise className="size-6 text-muted-foreground" />
+                            <span>Sunrise: {weather.sunrise}</span>
+                        </p>
+                         <p className="flex items-center gap-3">
+                            <Sunset className="size-6 text-muted-foreground" />
+                            <span>Sunset: {weather.sunset}</span>
                         </p>
                     </div>
                 </>

@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -21,10 +22,14 @@ export type WeatherInput = z.infer<typeof WeatherInputSchema>;
 const WeatherOutputSchema = z.object({
   locationName: z.string().describe('The name of the location.'),
   temperature: z.number().describe('The current temperature in Fahrenheit.'),
+  feelsLike: z.number().describe('The "feels like" temperature in Fahrenheit.'),
   humidity: z.number().describe('The current humidity percentage.'),
   windSpeed: z.number().describe('The current wind speed in miles per hour.'),
   description: z.string().describe('A brief description of the current weather conditions.'),
   icon: z.string().describe('An identifier for the weather icon (e.g., "01d" for clear sky day).'),
+  uvIndex: z.number().describe('The current UV index.'),
+  visibility: z.number().describe('The visibility in miles.'),
+  pressure: z.number().describe('The atmospheric pressure in hPa.'),
 });
 export type WeatherOutput = z.infer<typeof WeatherOutputSchema>;
 
@@ -51,14 +56,28 @@ async function fetchWeatherData(input: WeatherInput): Promise<WeatherOutput> {
       throw new Error(`Failed to fetch weather data: ${errorData.message}`);
     }
     const data = await response.json();
+    
+    // Fetch UV index using lat/lon from the first response
+    const { lat, lon } = data.coord;
+    const uvUrl = `https://api.openweathermap.org/data/2.5/uvi?appid=${apiKey}&lat=${lat}&lon=${lon}`;
+    const uvResponse = await fetch(uvUrl);
+    let uvIndex = 0;
+    if (uvResponse.ok) {
+        const uvData = await uvResponse.json();
+        uvIndex = Math.round(uvData.value);
+    }
 
     return {
       locationName: data.name,
       temperature: Math.round(data.main.temp),
+      feelsLike: Math.round(data.main.feels_like),
       humidity: data.main.humidity,
       windSpeed: Math.round(data.wind.speed),
       description: data.weather[0].main,
       icon: data.weather[0].icon,
+      uvIndex: uvIndex,
+      visibility: Math.round(data.visibility / 1609), // meters to miles
+      pressure: data.main.pressure,
     };
   } catch (error) {
     console.error('Error fetching weather:', error);

@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getWeather, WeatherOutput } from "@/ai/flows/weather-service";
 import { weatherForecast, type WeatherForecastOutput } from "@/ai/flows/weather-forecast";
 import { Icons } from "@/components/icons";
-import { Cloud, Cloudy, CloudRain, Snowflake, Sun, SunMoon, Wind } from "lucide-react";
+import { Cloud, Cloudy, CloudRain, Snowflake, Sun, SunMoon, Wind, Gauge, Eye } from "lucide-react";
 
 const weatherIconMap: { [key: string]: React.FC<any> } = {
     "01d": Sun, "clear sky": Sun,
@@ -35,10 +35,6 @@ const weatherIconMap: { [key: string]: React.FC<any> } = {
     "50d": Cloud, "mist": Cloud,
     "50n": Cloud,
   };
-
-const UVIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
-)
 
 type Forecast = WeatherForecastOutput["forecast"];
 
@@ -115,29 +111,31 @@ export default function WeatherPage() {
             {error && !weather && error}
           </CardDescription>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <CardContent className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             {loading ? (
                 <>
-                    <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="flex flex-col items-center justify-center gap-2 lg:col-span-1">
                         <Skeleton className="size-24 rounded-full" />
                         <Skeleton className="h-14 w-32" />
                         <Skeleton className="h-6 w-20" />
                     </div>
-                    <div className="space-y-4 text-lg">
-                        <Skeleton className="h-8 w-40" />
-                        <Skeleton className="h-8 w-36" />
-                        <Skeleton className="h-8 w-32" />
+                    <div className="grid grid-cols-2 gap-4 text-lg lg:col-span-2">
+                        {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-8 w-40" />)}
                     </div>
                 </>
             ) : weather ? (
                  <>
-                    <div className="flex flex-col items-center justify-center gap-2">
+                    <div className="flex flex-col items-center justify-center gap-2 border-b md:border-b-0 md:border-r pb-6 md:pb-0 md:pr-6">
                         <WeatherIcon className="size-24 text-warning" />
                         <span className="text-6xl font-bold">{weather.temperature}°F</span>
-                        <span className="text-muted-foreground">{weather.description}</span>
+                        <span className="text-muted-foreground capitalize">{weather.description}</span>
                     </div>
-                    <div className="space-y-4 text-lg">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-6 text-lg lg:col-span-2">
                         <p className="flex items-center gap-3">
+                            <Icons.Thermometer className="size-6 text-muted-foreground" />
+                            <span>Feels like: {weather.feelsLike}°F</span>
+                        </p>
+                         <p className="flex items-center gap-3">
                             <Wind className="size-6 text-muted-foreground" />
                             <span>Wind: {weather.windSpeed} mph</span>
                         </p>
@@ -146,13 +144,21 @@ export default function WeatherPage() {
                             <span>Humidity: {weather.humidity}%</span>
                         </p>
                         <p className="flex items-center gap-3">
-                            <UVIcon className="size-6 text-muted-foreground" />
-                            <span>UV Index: N/A</span>
+                            <Icons.UV className="size-6 text-muted-foreground" />
+                            <span>UV Index: {weather.uvIndex}</span>
+                        </p>
+                         <p className="flex items-center gap-3">
+                            <Eye className="size-6 text-muted-foreground" />
+                            <span>Visibility: {weather.visibility} mi</span>
+                        </p>
+                        <p className="flex items-center gap-3">
+                            <Gauge className="size-6 text-muted-foreground" />
+                            <span>Pressure: {weather.pressure} hPa</span>
                         </p>
                     </div>
                 </>
             ) : (
-                <div className="col-span-2 text-center text-muted-foreground">
+                <div className="col-span-full text-center text-muted-foreground">
                     <p>{error}</p>
                 </div>
             )}

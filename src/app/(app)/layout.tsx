@@ -46,7 +46,7 @@ function AppName() {
 
     return (
         <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">
-            AgriAssist Ai
+            TerraGrowth AI
         </span>
     );
 }

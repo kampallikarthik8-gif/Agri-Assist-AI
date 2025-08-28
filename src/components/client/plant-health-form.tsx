@@ -64,13 +64,21 @@ export function PlantHealthForm() {
     try {
       const res = await plantHealthDiagnostics(values);
       setResult(res);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to diagnose plant health. Please try again.",
-      });
+      if (error.message && error.message.includes('403 Forbidden')) {
+          toast({
+              variant: "destructive",
+              title: "API Access Error",
+              description: "The Generative Language API is disabled or blocked. Please enable it in your Google Cloud project.",
+          });
+      } else {
+          toast({
+              variant: "destructive",
+              title: "Error",
+              description: "Failed to diagnose plant health. Please try again.",
+          });
+      }
     } finally {
       setLoading(false);
     }

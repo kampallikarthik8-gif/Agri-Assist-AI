@@ -17,6 +17,7 @@ import { Icons } from "@/components/icons";
 import { AlertCircle, Cloud, Cloudy, CloudRain, Snowflake, Sun, SunMoon, Wind, Gauge, Eye, Sunrise, Sunset } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 const weatherIconMap: { [key: string]: React.FC<any> } = {
     "01d": Sun, "clear sky": Sun,
@@ -52,6 +53,7 @@ export default function WeatherPage() {
   const [alerts, setAlerts] = useState<RainfallAlertOutput['alerts'] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchAllWeatherData(lat?: number, lon?: number, location?: string) {
@@ -72,8 +74,15 @@ export default function WeatherPage() {
         const meaningfulAlerts = alertData.alerts.filter(a => a.type !== 'none');
         setAlerts(meaningfulAlerts);
 
-      } catch (e) {
+      } catch (e: any) {
         console.error("Failed to fetch weather data:", e);
+        if (e.message && e.message.includes('403 Forbidden')) {
+          toast({
+              variant: "destructive",
+              title: "API Access Error",
+              description: "The Generative Language API is disabled or blocked. Please enable it in your Google Cloud project.",
+          });
+        }
         setError("Could not fetch weather data. Please try refreshing the page.");
       } finally {
         setLoading(false);
@@ -95,7 +104,7 @@ export default function WeatherPage() {
       setError("Geolocation is not supported. Showing weather for a default location.");
       fetchAllWeatherData(undefined, undefined, "Sunnyvale, CA");
     }
-  }, []);
+  }, [toast]);
 
   const WeatherIcon = weather ? weatherIconMap[weather.icon.toLowerCase()] || Sun : Sun;
 

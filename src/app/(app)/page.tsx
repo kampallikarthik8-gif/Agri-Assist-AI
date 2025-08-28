@@ -30,6 +30,7 @@ import { getWeather, WeatherOutput } from "@/ai/flows/weather-service";
 import { yieldPrediction, type YieldPredictionOutput } from "@/ai/flows/yield-prediction";
 import { pestDiseaseAlert, type PestDiseaseAlertOutput } from "@/ai/flows/pest-disease-alert";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 
 const newsFeed = [
     {
@@ -91,6 +92,7 @@ export default function DashboardPage() {
     const [pestAlerts, setPestAlerts] = useState<PestDiseaseAlertOutput['alerts'] | null>(null);
     const [loading, setLoading] = useState(true);
     const [locationError, setLocationError] = useState<string | null>(null);
+    const { toast } = useToast();
 
     useEffect(() => {
         setWaterUsageData([
@@ -121,8 +123,15 @@ export default function DashboardPage() {
                 setYieldData(yieldRes.forecast);
                 setPestAlerts(pestRes.alerts);
 
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Failed to fetch dashboard data:", error);
+                 if (error.message && error.message.includes('403 Forbidden')) {
+                    toast({
+                        variant: "destructive",
+                        title: "API Access Error",
+                        description: "The Generative Language API is disabled or blocked. Please enable it in your Google Cloud project.",
+                    });
+                }
                 setLocationError("Could not fetch dashboard data.");
             } finally {
                 setLoading(false);
@@ -144,7 +153,7 @@ export default function DashboardPage() {
             setLocationError("Geolocation is not supported. Using default data.");
             fetchDashboardData(37.3875, -122.0575); // Fallback to Sunnyvale
         }
-    }, []);
+    }, [toast]);
 
     const WeatherIcon = weather ? weatherIconMap[weather.icon] || Sun : Sun;
 

@@ -12,4 +12,5 @@ import '@/ai/flows/market-insights.ts';
 import '@/ai/flows/government-schemes.ts';
 import '@/ai/flows/weather-forecast.ts';
 import '@/ai/flows/pest-spraying-advisor.ts';
+import '@/ai/flows/seed-quality-scanner.ts';
 

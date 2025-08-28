@@ -17,7 +17,7 @@ import { Icons } from "../icons";
 import { getWeather } from "@/ai/flows/weather-service";
 
 const formSchema = z.object({
-  region: z.string().min(2, "Region is required."),
+  region: z.string().min(2, "Region/State is required."),
 });
 
 export function GovernmentSchemesForm() {
@@ -28,7 +28,7 @@ export function GovernmentSchemesForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      region: "",
+      region: "India",
     },
   });
 
@@ -86,8 +86,8 @@ export function GovernmentSchemesForm() {
     <div className="grid gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>Find Government Schemes</CardTitle>
-          <CardDescription>Enter your region to find relevant agricultural support schemes.</CardDescription>
+          <CardTitle>Find Government Schemes & Subsidies</CardTitle>
+          <CardDescription>Enter your state or region in India to find relevant agricultural support programs.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -99,7 +99,7 @@ export function GovernmentSchemesForm() {
                   <FormItem className="w-full">
                     <FormLabel className="sr-only">Region</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., California, USA or Maharashtra, India" {...field} />
+                      <Input placeholder="e.g., Maharashtra, Punjab, or India for national schemes" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -129,7 +129,7 @@ export function GovernmentSchemesForm() {
           <>
             {result.schemes.length === 0 ? (
               <div className="text-center text-muted-foreground pt-10">
-                <p>No specific schemes found for the entered region. Try a broader search (e.g., country name).</p>
+                <p>No specific schemes found for the entered region. Try a broader search (e.g., just "India").</p>
               </div>
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -156,7 +156,7 @@ export function GovernmentSchemesForm() {
          {!result && !loading && (
              <div className="flex flex-col items-center justify-center text-center text-muted-foreground pt-10">
                 <Icons.GovernmentSchemes className="size-12 mb-4"/>
-                <p>Enter a region above to find relevant government schemes.</p>
+                <p>Enter a region or state to find relevant government schemes.</p>
             </div>
           )}
       </div>

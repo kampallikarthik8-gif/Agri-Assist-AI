@@ -34,22 +34,22 @@ import { useToast } from "@/hooks/use-toast";
 
 const newsFeed = [
     {
-        title: "New Study Reveals Drought-Resistant Wheat Variety",
-        summary: "Researchers have developed a new wheat strain that requires 30% less water...",
+        title: "PM-Kisan Scheme: Next installment to be released soon",
+        summary: "The government is preparing to release the next installment of the Pradhan Mantri Kisan Samman Nidhi (PM-KISAN) scheme...",
         image: "https://picsum.photos/seed/news1/600/400",
-        aiHint: "wheat field"
+        aiHint: "indian farmer government"
     },
     {
-        title: "Market Trends: Organic Produce Demand Soars",
-        summary: "The demand for organic fruits and vegetables has seen a 20% increase this quarter...",
+        title: "Monsoon arrives in Kerala, good rainfall expected",
+        summary: "The Southwest Monsoon has made its onset over Kerala, with the IMD forecasting a normal to above-normal rainy season this year...",
         image: "https://picsum.photos/seed/news2/600/400",
-        aiHint: "organic vegetables"
+        aiHint: "monsoon rain india"
     },
     {
-        title: "Advanced Drone Technology for Crop Monitoring",
-        summary: "New drones equipped with multispectral cameras are changing the game for precision agriculture...",
+        title: "New subsidy announced for solar-powered irrigation pumps",
+        summary: "Under the PM-KUSUM scheme, farmers can now avail a higher subsidy for installing solar-powered water pumps...",
         image: "https://picsum.photos/seed/news3/600/400",
-        aiHint: "farm drone"
+        aiHint: "solar panel farm"
     }
 ];
 
@@ -59,7 +59,7 @@ const chartConfig = {
     color: "hsl(var(--chart-2))",
   },
   yield: {
-    label: "Yield (Tons)",
+    label: "Yield (Quintal)",
     color: "hsl(var(--chart-1))",
   },
 };
@@ -152,12 +152,12 @@ export default function DashboardPage() {
                 (error) => {
                     console.error("Geolocation error:", error);
                     setLocationError("Location access denied. Using default data.");
-                    fetchDashboardData(37.3875, -122.0575); // Fallback to Sunnyvale
+                    fetchDashboardData(28.6139, 77.2090); // Fallback to Delhi
                 }
             );
         } else {
             setLocationError("Geolocation is not supported. Using default data.");
-            fetchDashboardData(37.3875, -122.0575); // Fallback to Sunnyvale
+            fetchDashboardData(28.6139, 77.2090); // Fallback to Delhi
         }
     }, [toast]);
 
@@ -165,7 +165,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+      <h1 className="text-3xl font-bold tracking-tight">Kisan Mitra AI Dashboard</h1>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card className="lg:col-span-1">
           <CardHeader>
@@ -190,10 +190,10 @@ export default function DashboardPage() {
               <>
                 <div className="flex items-center gap-4">
                   <WeatherIcon className="size-16 text-warning" />
-                  <span className="text-5xl font-bold">{weather.temperature}°F</span>
+                  <span className="text-5xl font-bold">{weather.temperature}°C</span>
                 </div>
                 <div className="space-y-2 text-sm">
-                    <p className="flex items-center gap-2"><Wind className="size-4 text-muted-foreground" /> Wind: {weather.windSpeed} mph</p>
+                    <p className="flex items-center gap-2"><Wind className="size-4 text-muted-foreground" /> Wind: {weather.windSpeed} km/h</p>
                     <p className="flex items-center gap-2"><Cloud className="size-4 text-muted-foreground" /> Humidity: {weather.humidity}%</p>
                 </div>
               </>
@@ -209,7 +209,7 @@ export default function DashboardPage() {
                 <LineChartIcon className="size-6 text-primary"/>
                 Projected Crop Yield
             </CardTitle>
-            <CardDescription>AI-powered 6-Month Forecast (Tons)</CardDescription>
+            <CardDescription>AI-powered 6-Month Forecast (Quintal/Acre)</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-40 w-full">
@@ -264,9 +264,9 @@ export default function DashboardPage() {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Icons.News className="size-6 text-primary" />
-                    Agricultural News Feed
+                    Agricultural News & Updates
                 </CardTitle>
-                <CardDescription>Latest updates from the world of agriculture</CardDescription>
+                <CardDescription>Latest news and updates for Indian farmers</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6">
                 {newsFeed.map((item, index) => (
@@ -292,4 +292,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

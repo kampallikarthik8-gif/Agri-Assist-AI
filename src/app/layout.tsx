@@ -7,8 +7,8 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'TerraGrowth AI',
-  description: 'AI-powered farming assistant to optimize crop management.',
+  title: 'Kisan Mitra AI',
+  description: 'Latest agricultural subsidies and easy access to government programs for all farmers in India.',
 };
 
 export default function RootLayout({

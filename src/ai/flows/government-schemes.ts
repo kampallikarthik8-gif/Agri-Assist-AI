@@ -2,7 +2,7 @@
 'use server';
 
 /**
- * @fileOverview An AI agent for providing information about government schemes for farmers.
+ * @fileOverview An AI agent for providing information about government schemes for farmers in India.
  * 
  * - governmentSchemes - A function that handles the scheme discovery process.
  * - GovernmentSchemesInput - The input type for the governmentSchemes function.
@@ -13,7 +13,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GovernmentSchemesInputSchema = z.object({
-  region: z.string().describe('The geographical region to search for schemes (e.g., California, Midwest, India).'),
+  region: z.string().describe('The state or region in India to search for schemes (e.g., Punjab, Maharashtra, Southern India).'),
 });
 
 export type GovernmentSchemesInput = z.infer<typeof GovernmentSchemesInputSchema>;
@@ -40,18 +40,18 @@ const prompt = ai.definePrompt({
   name: 'governmentSchemesPrompt',
   input: {schema: GovernmentSchemesInputSchema},
   output: {schema: GovernmentSchemesOutputSchema},
-  prompt: `You are an expert on agricultural policies and government support programs for farmers.
+  prompt: `You are an expert on Indian agricultural policies and government support programs for farmers.
   
-  Based on the user-provided region, find relevant government schemes available to farmers.
+  Based on the user-provided state or region within India, find relevant government schemes (both central and state-level) available to farmers.
   
   For each scheme, provide:
   - The official name of the scheme.
   - A concise description covering its main benefits and eligibility requirements.
   - A valid, official URL where the user can find more information or apply.
   
-  Region: {{{region}}}
+  Region: {{{region}}}, India
   
-  Provide a list of the most important schemes.`,
+  Provide a list of the most important and relevant schemes. Prioritize schemes directly related to subsidies, loans, and crop insurance.`,
 });
 
 const governmentSchemesFlow = ai.defineFlow(

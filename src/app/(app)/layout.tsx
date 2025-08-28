@@ -26,6 +26,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: Icons.Dashboard },
+  { href: "/government-schemes", label: "Govt. Schemes & Subsidies", icon: Icons.GovernmentSchemes },
   { href: "/weather", label: "Weather", icon: Icons.Weather },
   { href: "/farm-map", label: "Farm Map", icon: Icons.FarmMap },
   { href: "/irrigation-planner", label: "Irrigation Planner", icon: Icons.Irrigation },
@@ -34,7 +35,6 @@ const navItems = [
   { href: "/fertilizer-calculator", label: "Fertilizer Calculator", icon: Icons.Calculator },
   { href: "/seed-quality", label: "Seed Quality", icon: Icons.SeedScanner },
   { href: "/market-insights", label: "Market Insights", icon: Icons.MarketInsights },
-  { href: "/government-schemes", label: "Govt. Schemes", icon: Icons.GovernmentSchemes },
   { href: "/ai-assistant", label: "AI Assistant", icon: Icons.Assistant },
 ];
 
@@ -51,7 +51,7 @@ function AppName() {
 
     return (
         <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">
-            TerraGrowth AI
+            Kisan Mitra AI
         </span>
     );
 }
@@ -96,12 +96,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <SidebarFooter className="p-4">
           <div className="flex items-center gap-3">
             <Avatar className="size-9">
-              <AvatarImage src="https://picsum.photos/100" alt="User Avatar" data-ai-hint="user avatar" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarImage src="https://picsum.photos/seed/indian-farmer/100" alt="User Avatar" data-ai-hint="indian farmer" />
+              <AvatarFallback>RS</AvatarFallback>
             </Avatar>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
               <span className="text-sm font-medium text-sidebar-foreground">
-                John Doe
+                Ram Singh
               </span>
               <span className="text-xs text-sidebar-foreground/70">
                 Farmer

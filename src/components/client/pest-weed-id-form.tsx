@@ -6,21 +6,21 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { z } from "zod";
-import { plantHealthDiagnostics, type PlantHealthDiagnosticsOutput } from "@/ai/flows/plant-health-diagnostics";
+import { pestWeedIdentification, type PestWeedIdentificationOutput } from "@/ai/flows/pest-weed-identification";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload } from "lucide-react";
 import { Icons } from "../icons";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
+import { Badge } from "../ui/badge";
 
 const formSchema = z.object({
   photoDataUri: z.string().refine(val => val.startsWith('data:image/'), {
-    message: "A plant photo is required.",
+    message: "An image of the pest or weed is required.",
   }),
-  description: z.string().min(10, "A detailed description is required."),
 });
 
 const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
@@ -30,9 +30,9 @@ const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) 
     reader.onerror = reject;
 });
 
-export function PlantHealthForm() {
+export function PestWeedIdForm() {
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<PlantHealthDiagnosticsOutput | null>(null);
+  const [result, setResult] = useState<PestWeedIdentificationOutput | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -40,7 +40,6 @@ export function PlantHealthForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       photoDataUri: "",
-      description: "",
     },
   });
 
@@ -62,14 +61,14 @@ export function PlantHealthForm() {
     setLoading(true);
     setResult(null);
     try {
-      const res = await plantHealthDiagnostics(values);
+      const res = await pestWeedIdentification(values);
       setResult(res);
     } catch (error) {
       console.error(error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to diagnose plant health. Please try again.",
+        description: "Failed to identify the pest or weed. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -80,8 +79,8 @@ export function PlantHealthForm() {
     <div className="grid gap-6 md:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle>Diagnose Plant Health</CardTitle>
-          <CardDescription>Upload a photo and describe the symptoms to get an AI diagnosis.</CardDescription>
+          <CardTitle>Identify Pest or Weed</CardTitle>
+          <CardDescription>Upload a photo to get an AI-powered identification and control strategy.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -91,14 +90,14 @@ export function PlantHealthForm() {
                 name="photoDataUri"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Plant Photo</FormLabel>
+                    <FormLabel>Pest/Weed Photo</FormLabel>
                     <FormControl>
-                        <div className="relative flex justify-center items-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted">
+                        <div className="relative flex justify-center items-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted">
                             {preview ? (
-                                <Image src={preview} alt="Plant preview" fill className="object-contain rounded-lg p-2" />
+                                <Image src={preview} alt="Pest or weed preview" fill className="object-contain rounded-lg p-2" />
                             ) : (
                                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                                    <Upload className="size-8" />
+                                    <Icons.Pest className="size-8" />
                                     <span>Click to upload or drag & drop</span>
                                     <span className="text-xs">PNG, JPG, or WEBP (max 4MB)</span>
                                 </div>
@@ -110,26 +109,13 @@ export function PlantHealthForm() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Symptoms Description</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="e.g., Yellow leaves with brown spots, wilting, stunted growth..." {...field} rows={4} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={loading} className="w-full">
+              <Button type="submit" disabled={loading || !preview} className="w-full">
                 {loading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
-                  <Icons.PlantHealth className="mr-2 h-4 w-4" />
+                  <Icons.Pest className="mr-2 h-4 w-4" />
                 )}
-                Diagnose Plant
+                Identify Image
               </Button>
             </form>
           </Form>
@@ -138,28 +124,61 @@ export function PlantHealthForm() {
       
       <Card>
         <CardHeader>
-          <CardTitle>AI Diagnosis Report</CardTitle>
-          <CardDescription>Identified issues and suggested remedies.</CardDescription>
+          <CardTitle>AI Identification Report</CardTitle>
+          <CardDescription>Detailed information and control methods.</CardDescription>
         </CardHeader>
         <CardContent className="min-h-[28rem] overflow-y-auto">
           {loading && (
             <div className="flex flex-col items-center justify-center h-full gap-4">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              <p className="text-muted-foreground">Analyzing photo and symptoms...</p>
+              <p className="text-muted-foreground">Analyzing image...</p>
             </div>
           )}
           {result && !loading && (
             <div className="space-y-4">
-              <DiagnosisSection title="Identified Diseases" items={result.diagnosis.diseases} />
-              <DiagnosisSection title="Identified Pests" items={result.diagnosis.pests} />
-              <DiagnosisSection title="Nutrient Deficiencies" items={result.diagnosis.nutrientDeficiencies} />
-              <DiagnosisSection title="Suggested Remedies" items={result.diagnosis.remedies} isRemedy />
+                {result.identification.type === 'unknown' ? (
+                    <div className="text-center text-muted-foreground">
+                        <p>Could not identify a pest or weed in the image.</p>
+                    </div>
+                ) : (
+                <>
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <h2 className="text-2xl font-bold">{result.identification.commonName}</h2>
+                            <p className="text-sm text-muted-foreground italic">{result.identification.scientificName}</p>
+                        </div>
+                         <Badge variant={result.identification.type === 'pest' ? 'destructive' : 'secondary'} className="capitalize">{result.identification.type}</Badge>
+                    </div>
+                    <p className="text-sm">{result.identification.description}</p>
+                    
+                    <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="chemical">
+                            <AccordionTrigger>Chemical Controls</AccordionTrigger>
+                            <AccordionContent>
+                                <ControlMethodList items={result.controlMethods.chemical} />
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="biological">
+                            <AccordionTrigger>Biological Controls</AccordionTrigger>
+                            <AccordionContent>
+                                <ControlMethodList items={result.controlMethods.biological} />
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="cultural">
+                            <AccordionTrigger>Cultural Controls</AccordionTrigger>
+                            <AccordionContent>
+                                <ControlMethodList items={result.controlMethods.cultural} />
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                </>
+                )}
             </div>
           )}
           {!result && !loading && (
              <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
-                <Icons.PlantHealth className="size-12 mb-4"/>
-                <p>Your diagnosis report will appear here.</p>
+                <Icons.Pest className="size-12 mb-4"/>
+                <p>Your identification report will appear here.</p>
             </div>
           )}
         </CardContent>
@@ -168,15 +187,12 @@ export function PlantHealthForm() {
   );
 }
 
-function DiagnosisSection({ title, items, isRemedy = false }: { title: string; items: string[]; isRemedy?: boolean }) {
-  if (!items || items.length === 0) return null;
-  return (
-    <div>
-      <h3 className="font-semibold text-lg mb-2">{title}</h3>
-      <ul className={`list-disc pl-5 space-y-1 ${isRemedy ? 'text-primary' : 'text-destructive'}`}>
-        {items.map((item, index) => <li key={index} className="text-foreground">{item}</li>)}
-      </ul>
-    </div>
-  );
+function ControlMethodList({ items }: { items: string[] }) {
+    if (items.length === 0) return <p className="text-sm text-muted-foreground">No specific methods listed.</p>;
+    return (
+        <ul className="list-disc pl-5 space-y-1 text-sm">
+            {items.map((item, index) => <li key={index}>{item}</li>)}
+        </ul>
+    );
 }
 

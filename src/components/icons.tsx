@@ -11,6 +11,7 @@ import {
   Sun,
   Thermometer,
   Wind,
+  Bug
 } from "lucide-react";
 
 export const Icons = {
@@ -28,4 +29,6 @@ export const Icons = {
   Wind,
   Leaf,
   Assistant: Bot,
+  Pest: Bug,
 };
+

@@ -30,6 +30,24 @@ const navItems = [
   { href: "/crop-recommendation", label: "Crop AI", icon: Icons.CropRecommendation },
 ];
 
+function AppName() {
+    const [isMounted, setIsMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    if (!isMounted) {
+        return null;
+    }
+
+    return (
+        <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">
+            AgriAssist Ai
+        </span>
+    );
+}
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
@@ -42,9 +60,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <Icons.Logo className="size-5" />
              </Button>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-              <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">
-                AgriAssist Ai
-              </span>
+              <AppName />
             </div>
           </div>
         </SidebarHeader>

@@ -1,6 +1,7 @@
 import type { LucideProps } from "lucide-react";
 import {
   Bot,
+  BrainCircuit,
   Cloud,
   Droplets,
   HeartPulse,
@@ -19,11 +20,12 @@ export const Icons = {
   Dashboard: LayoutDashboard,
   Irrigation: Droplets,
   PlantHealth: HeartPulse,
-  CropRecommendation: Bot,
+  CropRecommendation: BrainCircuit,
   News: Newspaper,
   Weather: Thermometer,
   Sun,
   Cloud,
   Wind,
   Leaf,
+  Assistant: Bot,
 };

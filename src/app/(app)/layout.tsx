@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import * as React from "react";
@@ -17,6 +18,7 @@ import {
   SidebarFooter,
   SidebarTrigger,
   SidebarInset,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
@@ -85,6 +87,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             ))}
           </SidebarMenu>
         </SidebarContent>
+
+        <SidebarSeparator />
 
         <SidebarFooter className="p-4">
           <div className="flex items-center gap-3">

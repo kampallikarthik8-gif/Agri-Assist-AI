@@ -1,3 +1,6 @@
+
+"use client";
+
 import Image from "next/image";
 import {
   Card,
@@ -6,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BarChart, LineChart } from "lucide-react";
+import { BarChart as BarChartIcon, LineChart as LineChartIcon } from "lucide-react";
 import {
   ChartContainer,
   ChartTooltip,
@@ -14,24 +17,15 @@ import {
 } from "@/components/ui/chart";
 import {
   Bar,
-  BarChart as RechartsBarChart,
+  BarChart,
   Line,
-  LineChart as RechartsLineChart,
+  LineChart,
   XAxis,
   YAxis,
   CartesianGrid,
 } from "recharts";
 import { Icons } from "@/components/icons";
-
-const waterUsageData = [
-  { date: "Mon", usage: Math.floor(Math.random() * 200) + 50 },
-  { date: "Tue", usage: Math.floor(Math.random() * 200) + 50 },
-  { date: "Wed", usage: Math.floor(Math.random() * 200) + 50 },
-  { date: "Thu", usage: Math.floor(Math.random() * 200) + 50 },
-  { date: "Fri", usage: Math.floor(Math.random() * 200) + 50 },
-  { date: "Sat", usage: Math.floor(Math.random() * 200) + 50 },
-  { date: "Sun", usage: Math.floor(Math.random() * 200) + 50 },
-];
+import { useState, useEffect } from "react";
 
 const cropYieldData = [
     { month: "Jan", yield: 80 },
@@ -75,6 +69,21 @@ const chartConfig = {
 };
 
 export default function DashboardPage() {
+    const [waterUsageData, setWaterUsageData] = useState<any[]>([]);
+
+    useEffect(() => {
+        setWaterUsageData([
+          { date: "Mon", usage: Math.floor(Math.random() * 200) + 50 },
+          { date: "Tue", usage: Math.floor(Math.random() * 200) + 50 },
+          { date: "Wed", usage: Math.floor(Math.random() * 200) + 50 },
+          { date: "Thu", usage: Math.floor(Math.random() * 200) + 50 },
+          { date: "Fri", usage: Math.floor(Math.random() * 200) + 50 },
+          { date: "Sat", usage: Math.floor(Math.random() * 200) + 50 },
+          { date: "Sun", usage: Math.floor(Math.random() * 200) + 50 },
+        ]);
+    }, []);
+
+
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
@@ -102,14 +111,14 @@ export default function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-                <BarChart className="size-6 text-primary" />
+                <BarChartIcon className="size-6 text-primary" />
                 Water Usage
             </CardTitle>
             <CardDescription>Last 7 Days (Liters)</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-40 w-full">
-              <RechartsBarChart accessibilityLayer data={waterUsageData}>
+              <BarChart accessibilityLayer data={waterUsageData}>
                  <CartesianGrid vertical={false} />
                 <XAxis
                   dataKey="date"
@@ -123,7 +132,7 @@ export default function DashboardPage() {
                   content={<ChartTooltipContent indicator="dot" />}
                 />
                 <Bar dataKey="usage" fill="var(--color-usage)" radius={4} />
-              </RechartsBarChart>
+              </BarChart>
             </ChartContainer>
           </CardContent>
         </Card>
@@ -131,20 +140,20 @@ export default function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-                <LineChart className="size-6 text-primary"/>
+                <LineChartIcon className="size-6 text-primary"/>
                 Projected Crop Yield
             </CardTitle>
             <CardDescription>Next 6 Months (Tons)</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-40 w-full">
-                <RechartsLineChart accessibilityLayer data={cropYieldData}>
+                <LineChart accessibilityLayer data={cropYieldData}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} />
                     <YAxis hide />
                     <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                     <Line dataKey="yield" type="natural" fill="var(--color-yield)" stroke="var(--color-yield)" strokeWidth={2} dot={false} />
-                </RechartsLineChart>
+                </LineChart>
             </ChartContainer>
           </CardContent>
         </Card>

@@ -11,27 +11,28 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getWeather, WeatherOutput } from "@/ai/flows/weather-service";
+import { weatherForecast, Forecast } from "@/ai/flows/weather-forecast";
 import { Icons } from "@/components/icons";
 import { Cloud, Cloudy, CloudRain, Snowflake, Sun, SunMoon, Wind } from "lucide-react";
 
 const weatherIconMap: { [key: string]: React.FC<any> } = {
-    "01d": Sun,
+    "01d": Sun, "clear sky": Sun,
     "01n": SunMoon,
-    "02d": Sun,
+    "02d": Sun, "few clouds": Sun,
     "02n": SunMoon,
-    "03d": Cloud,
+    "03d": Cloud, "scattered clouds": Cloud,
     "03n": Cloud,
-    "04d": Cloudy,
+    "04d": Cloudy, "broken clouds": Cloudy, "overcast clouds": Cloudy,
     "04n": Cloudy,
-    "09d": CloudRain,
+    "09d": CloudRain, "shower rain": CloudRain,
     "09n": CloudRain,
-    "10d": CloudRain,
+    "10d": CloudRain, "rain": CloudRain,
     "10n": CloudRain,
-    "11d": CloudRain,
+    "11d": CloudRain, "thunderstorm": CloudRain,
     "11n": CloudRain,
-    "13d": Snowflake,
+    "13d": Snowflake, "snow": Snowflake,
     "13n": Snowflake,
-    "50d": Cloud,
+    "50d": Cloud, "mist": Cloud,
     "50n": Cloud,
   };
 
@@ -41,66 +42,74 @@ const UVIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function WeatherPage() {
   const [weather, setWeather] = useState<WeatherOutput | null>(null);
+  const [forecast, setForecast] = useState<Forecast[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchWeatherByCoords(lat: number, lon: number) {
+    async function fetchWeatherAndForecast(lat: number, lon: number, location?: string) {
       try {
         setLoading(true);
         setError(null);
-        const data = await getWeather({ lat, lon });
-        setWeather(data);
+        const weatherData = await getWeather({ lat, lon, location });
+        setWeather(weatherData);
+
+        const forecastData = await weatherForecast({ location: weatherData.locationName });
+        setForecast(forecastData.forecast);
+
       } catch (e) {
-        console.error("Failed to fetch weather by coordinates:", e);
-        setError("Could not fetch weather for your location.");
+        console.error("Failed to fetch weather data:", e);
+        setError("Could not fetch weather data.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    async function fetchByCity(city: string) {
+       try {
+        setLoading(true);
+        setError(null);
+        const weatherData = await getWeather({ location: city });
+        setWeather(weatherData);
+        
+        const forecastData = await weatherForecast({ location: weatherData.locationName });
+        setForecast(forecastData.forecast);
+      } catch (e) {
+        console.error("Failed to fetch weather by city:", e);
+        setError("Could not fetch weather data for the specified city.");
       } finally {
         setLoading(false);
       }
     }
 
-    async function fetchWeatherByCity(city: string) {
-        try {
-            setLoading(true);
-            setError(null);
-            const data = await getWeather({ location: city });
-            setWeather(data);
-        } catch (e) {
-            console.error("Failed to fetch weather by city:", e);
-            setError("Could not fetch weather data.");
-        } finally {
-            setLoading(false);
-        }
-    }
-
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          fetchWeatherByCoords(position.coords.latitude, position.coords.longitude);
+          fetchWeatherAndForecast(position.coords.latitude, position.coords.longitude);
         },
         (geoError) => {
           console.error("Geolocation error:", geoError);
           setError("Location access denied. Showing weather for a default location.");
-          fetchWeatherByCity("Sunnyvale, CA");
+          fetchByCity("Sunnyvale, CA");
         }
       );
     } else {
       setError("Geolocation is not supported. Showing weather for a default location.");
-      fetchWeatherByCity("Sunnyvale, CA");
+      fetchByCity("Sunnyvale, CA");
     }
   }, []);
 
-  const WeatherIcon = weather ? weatherIconMap[weather.icon] || Sun : Sun;
+  const WeatherIcon = weather ? weatherIconMap[weather.icon.toLowerCase()] || Sun : Sun;
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-3xl font-bold tracking-tight">Live Weather</h1>
+      <h1 className="text-3xl font-bold tracking-tight">Live Weather & Forecast</h1>
       <Card>
         <CardHeader>
           <CardTitle>Current Conditions</CardTitle>
           <CardDescription>
             {loading && "Loading location..."}
-            {weather && weather.locationName}
+            {weather && !loading && weather.locationName}
             {error && !weather && error}
           </CardDescription>
         </CardHeader>
@@ -131,7 +140,7 @@ export default function WeatherPage() {
                             <span>Wind: {weather.windSpeed} mph</span>
                         </p>
                         <p className="flex items-center gap-3">
-                            <Cloud className="size-6 text-muted-foreground" />
+                            <Icons.Cloud className="size-6 text-muted-foreground" />
                             <span>Humidity: {weather.humidity}%</span>
                         </p>
                         <p className="flex items-center gap-3">
@@ -149,11 +158,38 @@ export default function WeatherPage() {
       </Card>
       <Card>
         <CardHeader>
-            <CardTitle>Forecast</CardTitle>
-            <CardDescription>Hourly and 7-day forecasts are not available in this version.</CardDescription>
+            <CardTitle>7-Day AI Forecast</CardTitle>
+            <CardDescription>AI-generated forecast based on current conditions.</CardDescription>
         </CardHeader>
         <CardContent>
-            <p className="text-muted-foreground">The current weather API does not support detailed forecasts. Please check back later for updates.</p>
+            {loading && (
+                <div className="flex justify-around gap-4">
+                    {[...Array(7)].map((_, i) => (
+                        <div key={i} className="flex flex-col items-center gap-2">
+                            <Skeleton className="h-6 w-12" />
+                            <Skeleton className="size-10 rounded-full" />
+                            <Skeleton className="h-6 w-16" />
+                        </div>
+                    ))}
+                </div>
+            )}
+            {forecast && !loading && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
+                    {forecast.map((day, index) => {
+                        const DailyWeatherIcon = weatherIconMap[day.condition.toLowerCase()] || Sun;
+                        return (
+                            <div key={index} className="flex flex-col items-center p-2 rounded-lg bg-muted/50">
+                                <p className="font-semibold">{day.day}</p>
+                                <DailyWeatherIcon className="size-10 my-2 text-primary" />
+                                <p className="font-medium">{day.high}° / {day.low}°</p>
+                            </div>
+                        )
+                    })}
+                </div>
+            )}
+             {!forecast && !loading && (
+                <p className="text-muted-foreground">Could not generate a forecast at this time.</p>
+            )}
         </CardContent>
       </Card>
     </div>

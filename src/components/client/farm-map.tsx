@@ -45,7 +45,7 @@ export function FarmMap() {
           });
         },
         () => {
-          console.log("Error: The Geolocation service failed.");
+          console.log("Error: The Geolocation service failed. Using default location.");
         }
       );
     }

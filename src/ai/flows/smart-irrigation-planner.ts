@@ -10,11 +10,11 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { getWeather } from './weather-service';
 
 const SmartIrrigationPlannerInputSchema = z.object({
-  location: z.string().describe('The location of the field.'),
+  location: z.string().describe("The location of the field (e.g. 'San Francisco, CA')."),
   cropType: z.string().describe('The type of crop being grown.'),
-  weatherData: z.string().describe('The real-time weather data for the location.'),
 });
 export type SmartIrrigationPlannerInput = z.infer<typeof SmartIrrigationPlannerInputSchema>;
 
@@ -31,9 +31,12 @@ const prompt = ai.definePrompt({
   name: 'smartIrrigationPlannerPrompt',
   input: {schema: SmartIrrigationPlannerInputSchema},
   output: {schema: SmartIrrigationPlannerOutputSchema},
+  tools: [getWeather],
   prompt: `You are an expert agricultural advisor specializing in irrigation planning.
 
-  Based on the field's location: {{{location}}}, the type of crop being grown: {{{cropType}}}, and real-time weather data: {{{weatherData}}}, generate a customized irrigation plan that optimizes water usage and crop yield. Consider current and future weather conditions in your plan.
+  First, get the current weather for the user's location.
+  
+  Then, based on the field's location: {{{location}}}, the type of crop being grown: {{{cropType}}}, and the real-time weather data you fetched, generate a customized irrigation plan that optimizes water usage and crop yield. Consider current and future weather conditions in your plan.
   The plan should include frequency, duration, and amount of water needed. Output the plan in a clear and concise manner.
   `,
 });

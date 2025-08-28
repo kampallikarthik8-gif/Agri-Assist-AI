@@ -28,7 +28,7 @@ const WeatherOutputSchema = z.object({
 });
 export type WeatherOutput = z.infer<typeof WeatherOutputSchema>;
 
-export async function getWeather(input: WeatherInput): Promise<WeatherOutput> {
+async function fetchWeatherData(input: WeatherInput): Promise<WeatherOutput> {
   const apiKey = process.env.OPENWEATHER_API_KEY;
   if (!apiKey) {
     throw new Error('OPENWEATHER_API_KEY is not set in the environment variables.');
@@ -66,6 +66,19 @@ export async function getWeather(input: WeatherInput): Promise<WeatherOutput> {
   }
 }
 
+export const getWeather = ai.defineTool(
+  {
+    name: 'getWeather',
+    description: 'Get the current weather conditions for a specified location.',
+    inputSchema: WeatherInputSchema,
+    outputSchema: WeatherOutputSchema,
+  },
+  async (input) => {
+    return await fetchWeatherData(input);
+  }
+);
+
+
 ai.defineFlow(
     {
         name: 'weatherServiceFlow',
@@ -73,6 +86,6 @@ ai.defineFlow(
         outputSchema: WeatherOutputSchema,
     },
     async (input) => {
-        return await getWeather(input);
+        return await fetchWeatherData(input);
     }
 )

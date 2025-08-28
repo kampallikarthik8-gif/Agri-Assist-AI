@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Icons } from "../icons";
@@ -17,7 +16,6 @@ import { Icons } from "../icons";
 const formSchema = z.object({
   location: z.string().min(2, "Location is required."),
   cropType: z.string().min(2, "Crop type is required."),
-  weatherData: z.string().min(10, "Weather data is required."),
 });
 
 export function IrrigationPlannerForm() {
@@ -30,7 +28,6 @@ export function IrrigationPlannerForm() {
     defaultValues: {
       location: "",
       cropType: "",
-      weatherData: "",
     },
   });
 
@@ -90,20 +87,6 @@ export function IrrigationPlannerForm() {
                   )}
                 />
               </div>
-
-               <FormField
-                control={form.control}
-                name="weatherData"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Current Weather & Forecast</FormLabel>
-                    <FormControl>
-                      <Textarea placeholder="e.g., Currently 72°F, sunny. 5-day forecast: clear skies, temps in mid-70s." {...field} rows={3} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
               <Button type="submit" disabled={loading} className="w-full">
                 {loading ? (

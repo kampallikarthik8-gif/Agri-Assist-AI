@@ -82,6 +82,12 @@ export default function WeatherPage() {
               title: "API Access Error",
               description: "The Generative Language API is disabled or blocked by restrictions. Please check your Google Cloud project settings.",
           });
+        } else if (e.message && e.message.includes('OPENWEATHER_API_KEY')) {
+            toast({
+                variant: "destructive",
+                title: "Weather API Key Missing",
+                description: "Please add your OpenWeatherMap API key to the .env file.",
+            });
         }
         setError("Could not fetch weather data. Please try refreshing the page.");
       } finally {
@@ -242,3 +248,4 @@ export default function WeatherPage() {
     </div>
   );
 }
+

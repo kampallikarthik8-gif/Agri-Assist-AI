@@ -88,9 +88,14 @@ async function fetchWeatherData(input: WeatherInput): Promise<WeatherOutput> {
       sunrise: formatTime(data.sys.sunrise, data.timezone),
       sunset: formatTime(data.sys.sunset, data.timezone),
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching weather:', error);
-    throw new Error('Could not retrieve weather information.');
+    // Re-throw a more generic error to avoid leaking implementation details to the client-side AI flows.
+    // The detailed error is logged to the server console.
+    if (error.message && (error.message.includes('403 Forbidden') || error.message.includes('API_KEY_SERVICE_BLOCKED'))) {
+        throw new Error("The API key is blocked or disabled. Please check your cloud project settings.");
+    }
+    throw new Error('Could not retrieve weather information at this time.');
   }
 }
 
@@ -117,3 +122,4 @@ ai.defineFlow(
         return await fetchWeatherData(input);
     }
 )
+

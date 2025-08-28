@@ -20,7 +20,7 @@ const formSchema = z.object({
   photoDataUri: z.string().refine(val => val.startsWith('data:image/'), {
     message: "A plant photo is required.",
   }),
-  description: z.string().min(10, "A detailed description is required."),
+  description: z.string().min(10, "A detailed description of at least 10 characters is required."),
 });
 
 const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
@@ -169,14 +169,23 @@ export function PlantHealthForm() {
 }
 
 function DiagnosisSection({ title, items, isRemedy = false }: { title: string; items: string[]; isRemedy?: boolean }) {
-  if (!items || items.length === 0) return null;
+  if (!items || items.length === 0) {
+    if (!isRemedy) {
+       return (
+        <div>
+            <h3 className="font-semibold text-lg mb-2">{title}</h3>
+            <p className="text-sm text-muted-foreground">None detected.</p>
+        </div>
+       )
+    }
+    return null;
+  }
   return (
     <div>
       <h3 className="font-semibold text-lg mb-2">{title}</h3>
-      <ul className={`list-disc pl-5 space-y-1 ${isRemedy ? 'text-primary' : 'text-destructive'}`}>
+      <ul className={`list-disc pl-5 space-y-1`}>
         {items.map((item, index) => <li key={index} className="text-foreground">{item}</li>)}
       </ul>
     </div>
   );
 }
-

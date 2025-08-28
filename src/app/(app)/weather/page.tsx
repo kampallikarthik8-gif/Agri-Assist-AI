@@ -12,8 +12,11 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { getWeather, WeatherOutput } from "@/ai/flows/weather-service";
 import { weatherForecast, type WeatherForecastOutput } from "@/ai/flows/weather-forecast";
+import { rainfallAlert, type RainfallAlertOutput } from "@/ai/flows/rainfall-alert";
 import { Icons } from "@/components/icons";
-import { Cloud, Cloudy, CloudRain, Snowflake, Sun, SunMoon, Wind, Gauge, Eye, Sunrise, Sunset } from "lucide-react";
+import { AlertCircle, Cloud, Cloudy, CloudRain, Snowflake, Sun, SunMoon, Wind, Gauge, Eye, Sunrise, Sunset } from "lucide-react";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
 
 const weatherIconMap: { [key: string]: React.FC<any> } = {
     "01d": Sun, "clear sky": Sun,
@@ -36,43 +39,42 @@ const weatherIconMap: { [key: string]: React.FC<any> } = {
     "50n": Cloud,
   };
 
+const alertSeverityColors = {
+    'High': 'border-red-500/50 bg-red-500/10 text-red-700',
+    'Medium': 'border-yellow-500/50 bg-yellow-500/10 text-yellow-700',
+    'Low': 'border-blue-500/50 bg-blue-500/10 text-blue-700',
+    'None': 'border-gray-500/50 bg-gray-500/10 text-gray-700',
+};
+
 export default function WeatherPage() {
   const [weather, setWeather] = useState<WeatherOutput | null>(null);
   const [forecast, setForecast] = useState<WeatherForecastOutput['forecast'] | null>(null);
+  const [alerts, setAlerts] = useState<RainfallAlertOutput['alerts'] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchWeatherAndForecast(lat: number, lon: number, location?: string) {
+    async function fetchAllWeatherData(lat?: number, lon?: number, location?: string) {
       try {
         setLoading(true);
         setError(null);
+
         const weatherData = await getWeather({ lat, lon, location });
         setWeather(weatherData);
 
-        const forecastData = await weatherForecast({ location: weatherData.locationName });
+        const locationName = weatherData.locationName;
+
+        const forecastData = await weatherForecast({ location: locationName });
         setForecast(forecastData.forecast);
+        
+        const alertData = await rainfallAlert({ location: locationName });
+        // Filter out 'none' type alerts before setting state
+        const meaningfulAlerts = alertData.alerts.filter(a => a.type !== 'none');
+        setAlerts(meaningfulAlerts);
 
       } catch (e) {
         console.error("Failed to fetch weather data:", e);
-        setError("Could not fetch weather data.");
-      } finally {
-        setLoading(false);
-      }
-    }
-    
-    async function fetchByCity(city: string) {
-       try {
-        setLoading(true);
-        setError(null);
-        const weatherData = await getWeather({ location: city });
-        setWeather(weatherData);
-        
-        const forecastData = await weatherForecast({ location: weatherData.locationName });
-        setForecast(forecastData.forecast);
-      } catch (e) {
-        console.error("Failed to fetch weather by city:", e);
-        setError("Could not fetch weather data for the specified city.");
+        setError("Could not fetch weather data. Please try refreshing the page.");
       } finally {
         setLoading(false);
       }
@@ -81,17 +83,17 @@ export default function WeatherPage() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          fetchWeatherAndForecast(position.coords.latitude, position.coords.longitude);
+          fetchAllWeatherData(position.coords.latitude, position.coords.longitude);
         },
         (geoError) => {
           console.error("Geolocation error:", geoError);
           setError("Location access denied. Showing weather for a default location.");
-          fetchByCity("Sunnyvale, CA");
+          fetchAllWeatherData(undefined, undefined, "Sunnyvale, CA");
         }
       );
     } else {
       setError("Geolocation is not supported. Showing weather for a default location.");
-      fetchByCity("Sunnyvale, CA");
+      fetchAllWeatherData(undefined, undefined, "Sunnyvale, CA");
     }
   }, []);
 
@@ -100,6 +102,28 @@ export default function WeatherPage() {
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-3xl font-bold tracking-tight">Live Weather & Forecast</h1>
+
+        {loading ? (
+            <Skeleton className="h-24 w-full" />
+        ) : alerts && alerts.length > 0 && (
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><AlertCircle className="text-destructive" /> Weather Alerts</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                     {alerts.map((alert, index) => (
+                        <Alert key={index} className={cn(alertSeverityColors[alert.severity])}>
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertTitle>{alert.title} ({alert.severity})</AlertTitle>
+                            <AlertDescription>
+                                {alert.message}
+                            </AlertDescription>
+                        </Alert>
+                    ))}
+                </CardContent>
+            </Card>
+        )}
+
       <Card>
         <CardHeader>
           <CardTitle>Current Conditions</CardTitle>

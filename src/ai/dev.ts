@@ -1,3 +1,4 @@
+
 import { config } from 'dotenv';
 config();
 
@@ -7,4 +8,4 @@ import '@/ai/flows/smart-irrigation-planner.ts';
 import '@/ai/flows/weather-service.ts';
 import '@/ai/flows/chat-assistant.ts';
 import '@/ai/flows/pest-weed-identification.ts';
-
+import '@/ai/flows/market-insights.ts';

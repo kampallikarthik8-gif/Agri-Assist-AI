@@ -1,3 +1,4 @@
+
 import type { LucideProps } from "lucide-react";
 import {
   Bot,
@@ -11,7 +12,8 @@ import {
   Sun,
   Thermometer,
   Wind,
-  Bug
+  Bug,
+  TrendingUp
 } from "lucide-react";
 
 export const Icons = {
@@ -30,5 +32,5 @@ export const Icons = {
   Leaf,
   Assistant: Bot,
   Pest: Bug,
+  MarketInsights: TrendingUp,
 };
-

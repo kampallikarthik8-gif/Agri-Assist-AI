@@ -58,13 +58,13 @@ export function ChatAssistantForm() {
     } catch (error: any) {
       console.error(error);
       const userMessage = "Sorry, I encountered an error. Please try again.";
-       if (error.message && error.message.includes('403 Forbidden')) {
+       if (error.message && (error.message.includes('403 Forbidden') || error.message.includes('API_KEY_SERVICE_BLOCKED'))) {
           toast({
               variant: "destructive",
               title: "API Access Error",
-              description: "The Generative Language API is disabled or blocked. Please enable it in your Google Cloud project.",
+              description: "The Generative Language API is disabled or blocked by restrictions. Please check your Google Cloud project settings.",
           });
-          setMessages(prev => [...prev, { role: "assistant", content: "I can't seem to connect to my AI brain right now. Please ensure the Generative Language API is enabled in your Google Cloud project." }]);
+          setMessages(prev => [...prev, { role: "assistant", content: "I can't seem to connect to my AI brain right now. Please check your Google Cloud project's API key settings." }]);
       } else {
         toast({
             variant: "destructive",

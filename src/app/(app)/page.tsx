@@ -125,11 +125,11 @@ export default function DashboardPage() {
 
             } catch (error: any) {
                 console.error("Failed to fetch dashboard data:", error);
-                 if (error.message && error.message.includes('403 Forbidden')) {
+                 if (error.message && (error.message.includes('403 Forbidden') || error.message.includes('API_KEY_SERVICE_BLOCKED'))) {
                     toast({
                         variant: "destructive",
                         title: "API Access Error",
-                        description: "The Generative Language API is disabled or blocked. Please enable it in your Google Cloud project.",
+                        description: "The Generative Language API is disabled or blocked by restrictions. Please check your Google Cloud project settings.",
                     });
                 }
                 setLocationError("Could not fetch dashboard data.");

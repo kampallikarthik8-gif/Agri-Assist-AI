@@ -76,11 +76,11 @@ export default function WeatherPage() {
 
       } catch (e: any) {
         console.error("Failed to fetch weather data:", e);
-        if (e.message && e.message.includes('403 Forbidden')) {
+        if (e.message && (e.message.includes('403 Forbidden') || e.message.includes('API_KEY_SERVICE_BLOCKED'))) {
           toast({
               variant: "destructive",
               title: "API Access Error",
-              description: "The Generative Language API is disabled or blocked. Please enable it in your Google Cloud project.",
+              description: "The Generative Language API is disabled or blocked by restrictions. Please check your Google Cloud project settings.",
           });
         }
         setError("Could not fetch weather data. Please try refreshing the page.");

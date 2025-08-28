@@ -95,6 +95,7 @@ export default function DashboardPage() {
     const [waterUsageData, setWaterUsageData] = useState<any[]>([]);
     const [weather, setWeather] = useState<WeatherOutput | null>(null);
     const [weatherLoading, setWeatherLoading] = useState(true);
+    const [locationError, setLocationError] = useState<string | null>(null);
 
     useEffect(() => {
         setWaterUsageData([
@@ -107,18 +108,36 @@ export default function DashboardPage() {
           { date: "Sun", usage: Math.floor(Math.random() * 200) + 50 },
         ]);
 
-        async function fetchWeather() {
+        async function fetchWeather(lat: number, lon: number) {
             try {
                 setWeatherLoading(true);
-                const weatherData = await getWeather({ location: "Sunnyvale, CA" });
+                setLocationError(null);
+                const weatherData = await getWeather({ lat, lon });
                 setWeather(weatherData);
             } catch (error) {
                 console.error("Failed to fetch weather:", error);
+                setLocationError("Could not fetch weather data.");
             } finally {
                 setWeatherLoading(false);
             }
         }
-        fetchWeather();
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    fetchWeather(position.coords.latitude, position.coords.longitude);
+                },
+                (error) => {
+                    console.error("Geolocation error:", error);
+                    setLocationError("Location access denied. Showing weather for a default location.");
+                    // Fallback to default location
+                    getWeather({ location: "Sunnyvale, CA" }).then(setWeather).finally(() => setWeatherLoading(false));
+                }
+            );
+        } else {
+            setLocationError("Geolocation is not supported by this browser.");
+            getWeather({ location: "Sunnyvale, CA" }).then(setWeather).finally(() => setWeatherLoading(false));
+        }
     }, []);
 
     const WeatherIcon = weather ? weatherIconMap[weather.icon] || Sun : Sun;
@@ -133,7 +152,9 @@ export default function DashboardPage() {
               <Icons.Weather className="size-6 text-accent" />
               Current Weather
             </CardTitle>
-            <CardDescription>Sunnyvale, CA</CardDescription>
+            <CardDescription>
+                {weather && !weatherLoading ? weather.locationName : (locationError || "Loading location...")}
+            </CardDescription>
           </CardHeader>
           <CardContent className="flex items-center justify-around">
             {weatherLoading ? (
@@ -156,7 +177,7 @@ export default function DashboardPage() {
                 </div>
               </>
             ) : (
-                <p className="text-sm text-muted-foreground">Could not load weather data.</p>
+                <p className="text-sm text-muted-foreground">{locationError || "Could not load weather data."}</p>
             )}
           </CardContent>
         </Card>

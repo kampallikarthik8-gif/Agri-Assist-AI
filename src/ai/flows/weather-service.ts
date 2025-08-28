@@ -12,11 +12,14 @@ import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
 const WeatherInputSchema = z.object({
-  location: z.string().describe('The location to fetch weather data for (e.g., "Sunnyvale, CA").'),
+  location: z.string().optional().describe('The location to fetch weather data for (e.g., "Sunnyvale, CA").'),
+  lat: z.number().optional().describe('The latitude.'),
+  lon: z.number().optional().describe('The longitude.'),
 });
 export type WeatherInput = z.infer<typeof WeatherInputSchema>;
 
 const WeatherOutputSchema = z.object({
+  locationName: z.string().describe('The name of the location.'),
   temperature: z.number().describe('The current temperature in Fahrenheit.'),
   humidity: z.number().describe('The current humidity percentage.'),
   windSpeed: z.number().describe('The current wind speed in miles per hour.'),
@@ -31,7 +34,15 @@ export async function getWeather(input: WeatherInput): Promise<WeatherOutput> {
     throw new Error('OPENWEATHER_API_KEY is not set in the environment variables.');
   }
 
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(input.location)}&appid=${apiKey}&units=imperial`;
+  let url = 'https://api.openweathermap.org/data/2.5/weather?units=imperial&appid=' + apiKey;
+  if (input.lat && input.lon) {
+    url += `&lat=${input.lat}&lon=${input.lon}`;
+  } else if (input.location) {
+    url += `&q=${encodeURIComponent(input.location)}`;
+  } else {
+    throw new Error('Either location or lat/lon must be provided.');
+  }
+
 
   try {
     const response = await fetch(url);
@@ -42,6 +53,7 @@ export async function getWeather(input: WeatherInput): Promise<WeatherOutput> {
     const data = await response.json();
 
     return {
+      locationName: data.name,
       temperature: Math.round(data.main.temp),
       humidity: data.main.humidity,
       windSpeed: Math.round(data.wind.speed),

@@ -36,11 +36,9 @@ const weatherIconMap: { [key: string]: React.FC<any> } = {
     "50n": Cloud,
   };
 
-type Forecast = WeatherForecastOutput["forecast"];
-
 export default function WeatherPage() {
   const [weather, setWeather] = useState<WeatherOutput | null>(null);
-  const [forecast, setForecast] = useState<Forecast | null>(null);
+  const [forecast, setForecast] = useState<WeatherForecastOutput['forecast'] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

@@ -25,7 +25,6 @@ const ForecastSchema = z.object({
     low: z.number().describe("The predicted low temperature in Fahrenheit."),
     condition: z.string().describe("The predicted weather condition (e.g., 'Sunny', 'Cloudy', 'Rain')."),
 });
-export type Forecast = z.infer<typeof ForecastSchema>;
 
 const WeatherForecastOutputSchema = z.object({
   forecast: z.array(ForecastSchema).describe('A 7-day weather forecast.'),

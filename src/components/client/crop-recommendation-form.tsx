@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -8,7 +9,6 @@ import { cropRecommendationEngine, type CropRecommendationEngineOutput } from "@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Icons } from "../icons";
@@ -16,7 +16,6 @@ import { Badge } from "../ui/badge";
 import { Input } from "../ui/input";
 
 const formSchema = z.object({
-  soilAnalysis: z.string().min(10, "Soil analysis is required."),
   location: z.string().min(3, "Location is required."),
 });
 
@@ -28,7 +27,6 @@ export function CropRecommendationForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      soilAnalysis: "",
       location: "",
     },
   });
@@ -56,7 +54,7 @@ export function CropRecommendationForm() {
       <Card className="lg:col-span-2">
         <CardHeader>
           <CardTitle>Get Crop Recommendations</CardTitle>
-          <CardDescription>Enter your farm's data to receive AI-powered crop suggestions.</CardDescription>
+          <CardDescription>Enter your farm's location to receive AI-powered crop suggestions.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -70,19 +68,6 @@ export function CropRecommendationForm() {
                       <FormLabel>Location</FormLabel>
                       <FormControl>
                         <Input placeholder="e.g., Fresno, California" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="soilAnalysis"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Soil Analysis</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="e.g., pH: 6.5, Nitrogen: High, Potassium: Medium..." {...field} rows={8} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

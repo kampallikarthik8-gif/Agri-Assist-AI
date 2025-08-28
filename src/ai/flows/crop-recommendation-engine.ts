@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -13,9 +14,6 @@ import {z} from 'genkit';
 import { getWeather } from './weather-service';
 
 const CropRecommendationEngineInputSchema = z.object({
-  soilAnalysis: z
-    .string()
-    .describe('Detailed soil analysis data, including pH, nitrogen, phosphorus, potassium, and micronutrient levels.'),
   location: z
     .string()
     .describe('Geographic location for the farm (e.g., "Napa Valley, CA").'),
@@ -31,7 +29,7 @@ const CropRecommendationEngineOutputSchema = z.object({
     .describe('A list of recommended crops based on the input data.'),
   rationale: z
     .string()
-    .describe('A detailed explanation of why the crops were recommended, considering soil analysis, climate data, and market demand.'),
+    .describe('A detailed explanation of why the crops were recommended, considering inferred soil analysis, climate data, and market demand.'),
 });
 
 export type CropRecommendationEngineOutput = z.infer<
@@ -53,9 +51,11 @@ const prompt = ai.definePrompt({
   
 First, get the current weather for the user's location: {{{location}}}.
 
-Then, based on the provided soil analysis and the weather data you fetched, recommend the most suitable crops to plant. Also consider general market demand for commodity crops in your recommendation.
+Then, based on the provided location, infer the typical soil composition for that area.
 
-Soil Analysis: {{{soilAnalysis}}}
+Based on your inferred soil analysis and the weather data you fetched, recommend the most suitable crops to plant. Also consider general market demand for commodity crops in your recommendation.
+
+Location: {{{location}}}
 
 Consider all factors to provide a well-reasoned recommendation.
 

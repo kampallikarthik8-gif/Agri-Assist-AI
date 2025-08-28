@@ -19,7 +19,7 @@ const WeatherForecastInputSchema = z.object({
 export type WeatherForecastInput = z.infer<typeof WeatherForecastInputSchema>;
 
 
-export const ForecastSchema = z.object({
+const ForecastSchema = z.object({
     day: z.string().describe("Day of the week (e.g., 'Monday')."),
     high: z.number().describe("The predicted high temperature in Fahrenheit."),
     low: z.number().describe("The predicted low temperature in Fahrenheit."),

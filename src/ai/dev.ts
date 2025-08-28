@@ -11,3 +11,5 @@ import '@/ai/flows/pest-weed-identification.ts';
 import '@/ai/flows/market-insights.ts';
 import '@/ai/flows/government-schemes.ts';
 import '@/ai/flows/weather-forecast.ts';
+import '@/ai/flows/pest-spraying-advisor.ts';
+

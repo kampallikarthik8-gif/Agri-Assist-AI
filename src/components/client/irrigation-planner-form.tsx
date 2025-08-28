@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Icons } from "../icons";
+import { getWeather } from "@/ai/flows/weather-service";
 
 const formSchema = z.object({
   location: z.string().min(2, "Location is required."),
@@ -30,6 +32,30 @@ export function IrrigationPlannerForm() {
       cropType: "",
     },
   });
+
+   useEffect(() => {
+    async function fetchCity(lat: number, lon: number) {
+        try {
+            const weatherData = await getWeather({ lat, lon });
+            if (weatherData.locationName) {
+                form.setValue("location", weatherData.locationName);
+            }
+        } catch (error) {
+            console.error("Failed to fetch city from coordinates:", error);
+        }
+    }
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                fetchCity(position.coords.latitude, position.coords.longitude);
+            },
+            (error) => {
+                console.error("Geolocation error:", error);
+            }
+        );
+    }
+  }, [form]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);

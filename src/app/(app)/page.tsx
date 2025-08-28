@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BarChart as BarChartIcon, LineChart as LineChartIcon } from "lucide-react";
+import { BarChart as BarChartIcon, LineChart as LineChartIcon, Cloud, Sun, Wind, Cloudy, SunMoon, CloudRain, Snowflake } from "lucide-react";
 import {
   ChartContainer,
   ChartTooltip,
@@ -26,6 +26,8 @@ import {
 } from "recharts";
 import { Icons } from "@/components/icons";
 import { useState, useEffect } from "react";
+import { getWeather, WeatherOutput } from "@/ai/flows/weather-service";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const cropYieldData = [
     { month: "Jan", yield: 80 },
@@ -68,8 +70,31 @@ const chartConfig = {
   },
 };
 
+const weatherIconMap: { [key: string]: React.FC<any> } = {
+    "01d": Sun,
+    "01n": SunMoon,
+    "02d": Sun,
+    "02n": SunMoon,
+    "03d": Cloud,
+    "03n": Cloud,
+    "04d": Cloudy,
+    "04n": Cloudy,
+    "09d": CloudRain,
+    "09n": CloudRain,
+    "10d": CloudRain,
+    "10n": CloudRain,
+    "11d": CloudRain,
+    "11n": CloudRain,
+    "13d": Snowflake,
+    "13n": Snowflake,
+    "50d": Cloud,
+    "50n": Cloud,
+  };
+
 export default function DashboardPage() {
     const [waterUsageData, setWaterUsageData] = useState<any[]>([]);
+    const [weather, setWeather] = useState<WeatherOutput | null>(null);
+    const [weatherLoading, setWeatherLoading] = useState(true);
 
     useEffect(() => {
         setWaterUsageData([
@@ -81,8 +106,22 @@ export default function DashboardPage() {
           { date: "Sat", usage: Math.floor(Math.random() * 200) + 50 },
           { date: "Sun", usage: Math.floor(Math.random() * 200) + 50 },
         ]);
+
+        async function fetchWeather() {
+            try {
+                setWeatherLoading(true);
+                const weatherData = await getWeather({ location: "Sunnyvale, CA" });
+                setWeather(weatherData);
+            } catch (error) {
+                console.error("Failed to fetch weather:", error);
+            } finally {
+                setWeatherLoading(false);
+            }
+        }
+        fetchWeather();
     }, []);
 
+    const WeatherIcon = weather ? weatherIconMap[weather.icon] || Sun : Sun;
 
   return (
     <div className="flex flex-col gap-6">
@@ -97,14 +136,28 @@ export default function DashboardPage() {
             <CardDescription>Sunnyvale, CA</CardDescription>
           </CardHeader>
           <CardContent className="flex items-center justify-around">
-            <div className="flex items-center gap-4">
-              <Icons.Sun className="size-16 text-warning" />
-              <span className="text-5xl font-bold">72°F</span>
-            </div>
-            <div className="space-y-2 text-sm">
-                <p className="flex items-center gap-2"><Icons.Wind className="size-4 text-muted-foreground" /> Wind: 5 mph</p>
-                <p className="flex items-center gap-2"><Icons.Cloud className="size-4 text-muted-foreground" /> Humidity: 45%</p>
-            </div>
+            {weatherLoading ? (
+                <div className="flex w-full items-center gap-4">
+                    <Skeleton className="h-16 w-16 rounded-full" />
+                    <div className="space-y-2">
+                        <Skeleton className="h-8 w-24" />
+                        <Skeleton className="h-4 w-32" />
+                    </div>
+                </div>
+            ) : weather ? (
+              <>
+                <div className="flex items-center gap-4">
+                  <WeatherIcon className="size-16 text-warning" />
+                  <span className="text-5xl font-bold">{weather.temperature}°F</span>
+                </div>
+                <div className="space-y-2 text-sm">
+                    <p className="flex items-center gap-2"><Wind className="size-4 text-muted-foreground" /> Wind: {weather.windSpeed} mph</p>
+                    <p className="flex items-center gap-2"><Cloud className="size-4 text-muted-foreground" /> Humidity: {weather.humidity}%</p>
+                </div>
+              </>
+            ) : (
+                <p className="text-sm text-muted-foreground">Could not load weather data.</p>
+            )}
           </CardContent>
         </Card>
         

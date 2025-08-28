@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'Verdant AI',
+  title: 'AgriAssist Ai',
   description: 'AI-powered farming assistant to optimize crop management.',
 };
 

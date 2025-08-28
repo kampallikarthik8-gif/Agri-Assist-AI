@@ -42,7 +42,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
              </Button>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
               <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">
-                Verdant AI
+                AgriAssist Ai
               </span>
             </div>
           </div>

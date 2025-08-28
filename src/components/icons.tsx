@@ -19,7 +19,8 @@ import {
   Gauge,
   Sunrise,
   Sunset,
-  ScanLine
+  ScanLine,
+  Map
 } from "lucide-react";
 
 export const Icons = {
@@ -49,4 +50,5 @@ export const Icons = {
   Sunrise,
   Sunset,
   SeedScanner: ScanLine,
+  FarmMap: Map,
 };

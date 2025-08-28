@@ -27,6 +27,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 const navItems = [
   { href: "/", label: "Dashboard", icon: Icons.Dashboard },
   { href: "/weather", label: "Weather", icon: Icons.Weather },
+  { href: "/farm-map", label: "Farm Map", icon: Icons.FarmMap },
   { href: "/irrigation-planner", label: "Irrigation Planner", icon: Icons.Irrigation },
   { href: "/plant-health", label: "Heal Your Crop", icon: Icons.PlantHealth },
   { href: "/crop-recommendation", label: "Crop Recommendation", icon: Icons.CropRecommendation },

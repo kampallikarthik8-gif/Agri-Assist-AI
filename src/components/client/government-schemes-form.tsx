@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, ExternalLink } from "lucide-react";
 import { Icons } from "../icons";
 import { getWeather } from "@/ai/flows/weather-service";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
 
 const formSchema = z.object({
   region: z.string().min(2, "Region/State is required."),
@@ -136,28 +137,69 @@ export function GovernmentSchemesForm() {
         </CardContent>
       </Card>
       
-      <Card>
-        <CardHeader>
-            <CardTitle>PM Kisan Samman Nidhi</CardTitle>
-            <CardDescription>Check your beneficiary status, payment details, or find your registration number for the PM Kisan scheme.</CardDescription>
-        </CardHeader>
-        <CardContent>
-            <div className="flex flex-wrap gap-4">
-                <Button asChild>
-                    <Link href="https://pmkisan.gov.in/BeneficiaryStatus_New.aspx" target="_blank" rel="noopener noreferrer">
-                        Check Beneficiary Status
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+            <CardHeader>
+                <CardTitle>PM Kisan Samman Nidhi</CardTitle>
+                <CardDescription>Check your beneficiary status, payment details, or find your registration number for the PM Kisan scheme.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="flex flex-wrap gap-4">
+                    <Button asChild>
+                        <Link href="https://pmkisan.gov.in/BeneficiaryStatus_New.aspx" target="_blank" rel="noopener noreferrer">
+                            Check Beneficiary Status
+                            <ExternalLink className="ml-2 h-4 w-4" />
+                        </Link>
+                    </Button>
+                    <Button asChild>
+                        <Link href="https://pmkisan.gov.in/KnowYour_Registration.aspx" target="_blank" rel="noopener noreferrer">
+                            Know Your Registration No.
+                            <ExternalLink className="ml-2 h-4 w-4" />
+                        </Link>
+                    </Button>
+                </div>
+            </CardContent>
+        </Card>>
+        <Card>
+            <CardHeader>
+                <CardTitle>Kisan Credit Card (KCC)</CardTitle>
+                <CardDescription>Provides affordable credit to farmers for agricultural and allied activities.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                 <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="features">
+                        <AccordionTrigger>Key Features</AccordionTrigger>
+                        <AccordionContent>
+                           <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                                <li>Credit limit based on landholding, crop type, and scale of finance.</li>
+                                <li>Functions like an ATM/debit card for flexible withdrawals.</li>
+                                <li>Subsidized interest rates, can be as low as 4% with timely repayment.</li>
+                                <li>Valid for 3 to 5 years with annual review.</li>
+                                <li>Includes insurance coverage under PMFBY.</li>
+                           </ul>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="eligibility">
+                        <AccordionTrigger>Eligibility & Documents</AccordionTrigger>
+                        <AccordionContent>
+                           <p className="text-sm text-muted-foreground mb-2">Farmers, SHGs, and tenant farmers are eligible.</p>
+                           <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                                <li>Identity proof (Aadhaar, PAN, etc.)</li>
+                                <li>Land ownership/tenancy proof.</li>
+                                <li>Passport-size photo and bank details.</li>
+                           </ul>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+                 <Button asChild className="mt-4">
+                    <Link href="https://www.jansamarth.in/agri-loan" target="_blank" rel="noopener noreferrer">
+                        Apply for KCC Online
                         <ExternalLink className="ml-2 h-4 w-4" />
                     </Link>
                 </Button>
-                <Button asChild>
-                    <Link href="https://pmkisan.gov.in/KnowYour_Registration.aspx" target="_blank" rel="noopener noreferrer">
-                        Know Your Registration No.
-                        <ExternalLink className="ml-2 h-4 w-4" />
-                    </Link>
-                </Button>
-            </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+        </Card>
+      </div>
 
       <div className="space-y-6">
         {loading && (

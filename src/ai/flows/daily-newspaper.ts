@@ -57,6 +57,8 @@ const prompt = ai.definePrompt({
   
   Write in a clear, journalistic style that is easy for a farmer to understand.
   
+  IMPORTANT: When you mention details like dates or prices, you must invent realistic, plausible values. DO NOT use placeholders like "[Insert Date]" or "[Insert Price]".
+  
   Region: {{{region}}}, India
   
   Provide the output in the specified JSON format.`,

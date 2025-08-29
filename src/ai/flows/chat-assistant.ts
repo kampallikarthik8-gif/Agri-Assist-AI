@@ -34,7 +34,7 @@ const prompt = ai.definePrompt({
   name: 'chatAssistantPrompt',
   input: {schema: ChatAssistantInputSchema},
   output: {schema: ChatAssistantOutputSchema},
-  prompt: `You are AgriAssist Ai, a friendly and knowledgeable AI assistant for farmers. Your goal is to provide helpful, accurate, and concise answers to a wide range of agricultural questions.
+  prompt: `You are Agri Assist Ai, a friendly and knowledgeable AI assistant for farmers. Your goal is to provide helpful, accurate, and concise answers to a wide range of agricultural questions.
 
 User's question: {{{message}}}
 

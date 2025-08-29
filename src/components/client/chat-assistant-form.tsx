@@ -85,7 +85,7 @@ export function ChatAssistantForm() {
             {messages.length === 0 && (
                 <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground pt-20">
                     <Icons.Assistant className="size-16 mb-4"/>
-                    <h2 className="text-2xl font-semibold">AgriAssist Ai</h2>
+                    <h2 className="text-2xl font-semibold">Agri Assist Ai</h2>
                     <p className="max-w-md">Your AI-powered farming expert. Ask me anything about crop management, soil health, pest control, and more!</p>
                 </div>
             )}

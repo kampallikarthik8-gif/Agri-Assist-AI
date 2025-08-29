@@ -7,7 +7,7 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'Kisan Mitra AI',
+  title: 'Agri Assist Ai',
   description: 'Latest agricultural subsidies and easy access to government programs for all farmers in India.',
 };
 

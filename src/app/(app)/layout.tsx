@@ -55,7 +55,7 @@ function AppName() {
 
     return (
         <span className="text-lg font-semibold tracking-tight text-sidebar-foreground">
-            Kisan Mitra AI
+            Agri Assist Ai
         </span>
     );
 }

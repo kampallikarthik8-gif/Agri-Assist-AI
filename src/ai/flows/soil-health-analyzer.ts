@@ -76,15 +76,24 @@ const soilHealthAnalyzerFlow = ai.defineFlow(
     outputSchema: SoilHealthAnalyzerOutputSchema,
   },
   async input => {
-    try {
-      const {output} = await prompt(input);
-      if (!output) {
-        throw new Error('Failed to generate a response from the AI model.');
-      }
-      return output;
-    } catch (error) {
-      console.error("Error in soilHealthAnalyzerFlow", error);
-      throw new Error('Failed to analyze soil health.');
+    const maxRetries = 3;
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            console.log(`Attempt ${i + 1} for soilHealthAnalyzerFlow`);
+            const {output} = await prompt(input);
+            if (output) {
+                return output;
+            }
+            console.warn(`Attempt ${i + 1} returned null output.`);
+        } catch (error) {
+            console.error(`Error in soilHealthAnalyzerFlow on attempt ${i + 1}`, error);
+            if (i === maxRetries - 1) {
+                // If it's the last retry, rethrow the error
+                throw new Error('Failed to analyze soil health after multiple attempts.');
+            }
+        }
     }
+     throw new Error('Failed to analyze soil health.');
   }
 );
+

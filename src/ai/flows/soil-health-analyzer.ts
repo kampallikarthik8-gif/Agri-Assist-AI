@@ -74,10 +74,15 @@ const soilHealthAnalyzerFlow = ai.defineFlow(
     outputSchema: SoilHealthAnalyzerOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    if (!output) {
-      throw new Error('Failed to generate a response from the AI model.');
+    try {
+      const {output} = await prompt(input);
+      if (!output) {
+        throw new Error('Failed to generate a response from the AI model.');
+      }
+      return output;
+    } catch (error) {
+      console.error("Error in soilHealthAnalyzerFlow", error);
+      throw new Error('Failed to analyze soil health.');
     }
-    return output;
   }
 );

@@ -56,10 +56,15 @@ const pestDiseaseAlertFlow = ai.defineFlow(
     outputSchema: PestDiseaseAlertOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    if (!output) {
-      throw new Error('Failed to generate a response from the AI model.');
+    try {
+      const {output} = await prompt(input);
+      if (!output) {
+        return { alerts: [] };
+      }
+      return output;
+    } catch (error) {
+      console.error("Error in pestDiseaseAlertFlow", error);
+      return { alerts: [] };
     }
-    return output;
   }
 );

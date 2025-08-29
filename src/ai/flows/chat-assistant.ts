@@ -47,10 +47,15 @@ const chatAssistantFlow = ai.defineFlow(
     outputSchema: ChatAssistantOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    if (!output) {
-      throw new Error('Failed to generate a response from the AI model.');
+    try {
+      const {output} = await prompt(input);
+      if (!output) {
+        throw new Error('Failed to generate a response from the AI model.');
+      }
+      return output;
+    } catch (error) {
+      console.error("Error in chatAssistantFlow", error);
+      throw new Error('Failed to get a response from the AI model.');
     }
-    return output;
   }
 );

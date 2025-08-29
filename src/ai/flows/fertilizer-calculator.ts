@@ -67,10 +67,15 @@ const fertilizerCalculatorFlow = ai.defineFlow(
     outputSchema: FertilizerCalculatorOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    if (!output) {
-      throw new Error('Failed to generate a response from the AI model.');
+    try {
+      const {output} = await prompt(input);
+      if (!output) {
+        throw new Error('Failed to generate a response from the AI model.');
+      }
+      return output;
+    } catch (error) {
+      console.error("Error in fertilizerCalculatorFlow", error);
+      throw new Error('Failed to calculate fertilizer needs.');
     }
-    return output;
   }
 );

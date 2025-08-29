@@ -56,10 +56,15 @@ const yieldPredictionFlow = ai.defineFlow(
     outputSchema: YieldPredictionOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    if (!output) {
-      throw new Error('Failed to generate a response from the AI model.');
+    try {
+      const {output} = await prompt(input);
+      if (!output) {
+        return { forecast: [] };
+      }
+      return output;
+    } catch (error) {
+      console.error("Error in yieldPredictionFlow", error);
+      return { forecast: [] };
     }
-    return output;
   }
 );

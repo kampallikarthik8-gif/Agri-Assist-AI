@@ -48,7 +48,7 @@ const prompt = ai.definePrompt({
   - Precipitation: Avoid spraying if rain is imminent, as it will wash the pesticide off.
   - Temperature: Consider extreme temperatures that might affect pesticide efficacy or plant stress.
 
-  Based on your analysis, provide a clear recommendation ('Good', 'Caution', or 'Bad') and a concise rationale. Also return the current wind speed and a qualitative chance of rain (e.g., 'Low', 'Medium', 'High').
+  Based on your analysis, provide a clear recommendation ('Good', 'Caution', 'or 'Bad') and a concise rationale. Also return the current wind speed and a qualitative chance of rain (e.g., 'Low', 'Medium', 'High').
 
   Location: {{{location}}}
   `,
@@ -61,10 +61,15 @@ const pestSprayingAdvisorFlow = ai.defineFlow(
     outputSchema: PestSprayingAdvisorOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    if (!output) {
-      throw new Error('Failed to generate a response from the AI model.');
+    try {
+      const {output} = await prompt(input);
+      if (!output) {
+        throw new Error('Failed to generate a response from the AI model.');
+      }
+      return output;
+    } catch (error) {
+      console.error("Error in pestSprayingAdvisorFlow", error);
+      throw new Error('Failed to get spraying advice.');
     }
-    return output;
   }
 );

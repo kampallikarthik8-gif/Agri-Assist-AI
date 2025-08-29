@@ -66,10 +66,15 @@ const rainfallAlertFlow = ai.defineFlow(
     outputSchema: RainfallAlertOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    if (!output) {
-      throw new Error('Failed to generate a response from the AI model.');
+    try {
+      const {output} = await prompt(input);
+      if (!output) {
+        return { alerts: [] };
+      }
+      return output;
+    } catch (error) {
+      console.error("Error in rainfallAlertFlow", error);
+      return { alerts: [] };
     }
-    return output;
   }
 );

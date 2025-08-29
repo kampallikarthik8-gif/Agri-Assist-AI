@@ -61,10 +61,15 @@ const governmentSchemesFlow = ai.defineFlow(
     outputSchema: GovernmentSchemesOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    if (!output) {
-      throw new Error('Failed to generate a response from the AI model.');
+    try {
+      const {output} = await prompt(input);
+      if (!output) {
+        throw new Error('Failed to generate a response from the AI model.');
+      }
+      return output;
+    } catch (error) {
+      console.error("Error in governmentSchemesFlow", error);
+      return { schemes: [] };
     }
-    return output;
   }
 );

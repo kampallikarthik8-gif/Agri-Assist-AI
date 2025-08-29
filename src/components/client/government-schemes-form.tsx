@@ -57,7 +57,6 @@ const eKisanUpajNidhiFeatures = [
 
 export function GovernmentSchemesForm() {
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<GovernmentSchemesOutput | null>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -93,10 +92,8 @@ export function GovernmentSchemesForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
-    setResult(null);
     try {
-      const res = await governmentSchemes(values);
-      setResult(res);
+      await governmentSchemes(values);
     } catch (error: any) {
       console.error(error);
        if (error.message && (error.message.includes('403 Forbidden') || error.message.includes('API_KEY_SERVICE_BLOCKED'))) {
@@ -332,50 +329,6 @@ export function GovernmentSchemesForm() {
             </Button>
           </CardContent>
         </Card>
-        <Card>
-            <CardHeader>
-                <CardTitle>Annadata Sukhibhava Scheme (AP)</CardTitle>
-                <CardDescription>A flagship farmer welfare program by the Andhra Pradesh government.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                 <Accordion type="single" collapsible className="w-full">
-                    <AccordionItem value="benefit">
-                        <AccordionTrigger>Benefit & Installments</AccordionTrigger>
-                        <AccordionContent>
-                           <p className="text-sm text-muted-foreground">
-                             ₹20,000 annually per farmer family — ₹14,000 from the state and ₹6,000 under PM-KISAN, paid in three installments. Landless farmers receive the full ₹20,000 from the state.
-                           </p>
-                        </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="inclusion">
-                        <AccordionTrigger>Eligibility</AccordionTrigger>
-                        <AccordionContent>
-                            <p className="text-sm text-muted-foreground">
-                                Covers small, marginal, land-owning, and tenant farmers, including those with land rights under ROFR.
-                           </p>
-                        </AccordionContent>
-                    </AccordionItem>
-                     <AccordionItem value="impact">
-                        <AccordionTrigger>Reach & Impact</AccordionTrigger>
-                        <AccordionContent>
-                           <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-                                <li>Enrolled 64 lakh farmer families (95% of eligible households).</li>
-                                <li>₹4,760 crore disbursed since launch.</li>
-                                <li>Reported a 15% rise in tenant farmer participation.</li>
-                                <li>Achieved a 98% application approval rate and 94% beneficiary satisfaction.</li>
-                                <li>Budget allocation: over ₹5,012 crore in FY 2025‑26.</li>
-                           </ul>
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
-                 <Button asChild className="mt-4" variant="secondary">
-                    <Link href="https://apagrisnet.gov.in/" target="_blank" rel="noopener noreferrer">
-                        Visit AP AgriSnet Portal
-                        <ExternalLink className="ml-2 h-4 w-4" />
-                    </Link>
-                </Button>
-            </CardContent>
-        </Card>
       </div>
 
        <div className="grid gap-6 md:grid-cols-2">
@@ -514,8 +467,103 @@ export function GovernmentSchemesForm() {
                     </Button>
                 </CardContent>
             </Card>
-      </div>
+            
+             <Card>
+                <CardHeader>
+                    <CardTitle>Annadata Sukhibhava Scheme (AP)</CardTitle>
+                    <CardDescription>A flagship farmer welfare program by the Andhra Pradesh government.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                     <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="benefit">
+                            <AccordionTrigger>Benefit & Installments</AccordionTrigger>
+                            <AccordionContent>
+                               <p className="text-sm text-muted-foreground">
+                                 ₹20,000 annually per farmer family — ₹14,000 from the state and ₹6,000 under PM-KISAN, paid in three installments. Landless farmers receive the full ₹20,000 from the state.
+                               </p>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="inclusion">
+                            <AccordionTrigger>Eligibility</AccordionTrigger>
+                            <AccordionContent>
+                                <p className="text-sm text-muted-foreground">
+                                    Covers small, marginal, land-owning, and tenant farmers, including those with land rights under ROFR.
+                               </p>
+                            </AccordionContent>
+                        </AccordionItem>
+                         <AccordionItem value="impact">
+                            <AccordionTrigger>Reach & Impact</AccordionTrigger>
+                            <AccordionContent>
+                               <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                                    <li>Enrolled 64 lakh farmer families (95% of eligible households).</li>
+                                    <li>₹4,760 crore disbursed since launch.</li>
+                                    <li>Reported a 15% rise in tenant farmer participation.</li>
+                                    <li>Achieved a 98% application approval rate and 94% beneficiary satisfaction.</li>
+                                    <li>Budget allocation: over ₹5,012 crore in FY 2025‑26.</li>
+                               </ul>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                     <Button asChild className="mt-4" variant="secondary">
+                        <Link href="https://apagrisnet.gov.in/" target="_blank" rel="noopener noreferrer">
+                            Visit AP AgriSnet Portal
+                            <ExternalLink className="ml-2 h-4 w-4" />
+                        </Link>
+                    </Button>
+                </CardContent>
+            </Card>
 
+            <Card>
+                <CardHeader>
+                    <CardTitle>Smart & Precision Agriculture Policies (AP)</CardTitle>
+                    <CardDescription>Tech-driven initiatives from the Agri Budget 2025-26.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                     <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="digital">
+                            <AccordionTrigger>Digital Integration</AccordionTrigger>
+                            <AccordionContent>
+                               <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                                    <li><span className="font-semibold text-foreground">Farmer Registry:</span> Under AgriStack, a digital ID system consolidates land and farmer data for seamless access to schemes.</li>
+                                    <li><span className="font-semibold text-foreground">e-Panta App:</span> Android-based crop-booking system with GPS, photos, and integration into land records for insurance and loans.</li>
+                               </ul>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="ai-ml">
+                            <AccordionTrigger>AI & ML Tools</AccordionTrigger>
+                            <AccordionContent>
+                                <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                                    <li><span className="font-semibold text-foreground">APSS App:</span> Uses AI/ML for pest and disease detection and crop advisory services.</li>
+                                </ul>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="tenant">
+                            <AccordionTrigger>Tenant Support</AccordionTrigger>
+                            <AccordionContent>
+                                <p className="text-sm text-muted-foreground">Introduction of the AP New Tenancy Act 2024, with tenant entitlement cards to facilitate scheme access and loans.</p>
+                            </AccordionContent>
+                        </AccordionItem>
+                         <AccordionItem value="horticulture">
+                            <AccordionTrigger>Horticulture Clusters</AccordionTrigger>
+                            <AccordionContent>
+                                <p className="text-sm text-muted-foreground">
+                                Crop-specific clusters for bananas (Anantapur), mangoes (Chittoor/Tirupati), cashew (Srikakulam/Manyam), coconut, oil palm, and chillies across key districts.
+                                </p>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="aqua">
+                            <AccordionTrigger>Aqua Focus</AccordionTrigger>
+                            <AccordionContent>
+                                <p className="text-sm text-muted-foreground">
+                                Fisheries and aquaculture are highlighted as growth drivers, with increased relief for fishermen and subsidized electricity for production.
+                                </p>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                </CardContent>
+            </Card>
+
+      </div>
        <div className="space-y-6">
         {loading && (
           <div className="flex flex-col items-center justify-center pt-10 gap-4">
@@ -523,16 +571,9 @@ export function GovernmentSchemesForm() {
             <p className="text-muted-foreground">Searching for schemes in your region...</p>
           </div>
         )}
-        {result && !loading && (
-          <>
-            {result.schemes.length === 0 ? (
-              <div className="text-center text-muted-foreground pt-10">
-                <p>No specific schemes found for the entered region. Try a broader search (e.g., just "India").</p>
-              </div>
-            ) : null}
-          </>
-        )}
       </div>
     </div>
   );
 }
+
+    

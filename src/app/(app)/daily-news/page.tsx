@@ -5,16 +5,18 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { dailyNewspaper, type DailyNewspaperOutput } from "@/ai/flows/daily-newspaper";
+import { fetchNews, type NewsArticle } from "@/lib/news-service";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, ExternalLink } from "lucide-react";
 import { Icons } from "@/components/icons";
 import { getWeather } from "@/ai/flows/weather-service";
 import { Separator } from "@/components/ui/separator";
+import Image from "next/image";
+import Link from "next/link";
 
 const formSchema = z.object({
   region: z.string().min(2, "Region/State is required."),
@@ -22,7 +24,7 @@ const formSchema = z.object({
 
 export default function DailyNewsPage() {
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<DailyNewspaperOutput | null>(null);
+  const [articles, setArticles] = useState<NewsArticle[] | null>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -32,16 +34,41 @@ export default function DailyNewsPage() {
     },
   });
 
+    const getNews = async (region: string) => {
+        setLoading(true);
+        setArticles(null);
+        try {
+            const res = await fetchNews(region);
+            if (res.articles) {
+                setArticles(res.articles);
+            } else {
+                 toast({
+                    variant: "default",
+                    title: "No Articles Found",
+                    description: res.error || "No articles were found for this region. Please try another.",
+                });
+                setArticles([]);
+            }
+        } catch (error: any) {
+            console.error(error);
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Failed to fetch the news. Please try again.",
+            });
+        } finally {
+            setLoading(false);
+        }
+    }
+
   useEffect(() => {
     async function fetchRegionAndGenerateNews(lat: number, lon: number) {
       try {
-        setLoading(true);
         const weatherData = await getWeather({ lat, lon });
         if (weatherData.locationName) {
-          const region = weatherData.locationName;
+          const region = weatherData.locationName.split(',')[0];
           form.setValue("region", region);
-          const res = await dailyNewspaper({ region });
-          setResult(res);
+          getNews(region);
         }
       } catch (error) {
         console.error("Failed to auto-fetch news:", error);
@@ -50,8 +77,6 @@ export default function DailyNewsPage() {
           title: "Enter a Region",
           description: "Could not fetch your location. Please enter a region to get the news.",
         });
-      } finally {
-        setLoading(false);
       }
     }
 
@@ -65,32 +90,18 @@ export default function DailyNewsPage() {
         }
       );
     }
-  }, [form, toast]);
+  }, []);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
-    setResult(null);
-    try {
-      const res = await dailyNewspaper(values);
-      setResult(res);
-    } catch (error: any) {
-      console.error(error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to generate the newspaper. Please try again.",
-      });
-    } finally {
-      setLoading(false);
-    }
+    getNews(values.region);
   }
 
   return (
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>AI Daily Agricultural News</CardTitle>
-          <CardDescription>Enter a state or region in India to generate a summarized newspaper with the latest updates.</CardDescription>
+          <CardTitle>Live Agricultural News</CardTitle>
+          <CardDescription>Enter a topic or region to search for the latest agricultural news updates.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -100,9 +111,9 @@ export default function DailyNewsPage() {
                 name="region"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel className="sr-only">Region</FormLabel>
+                    <FormLabel className="sr-only">Region or Topic</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Andhra Pradesh" {...field} />
+                      <Input placeholder="e.g., Andhra Pradesh, tractors, subsidies" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -114,7 +125,7 @@ export default function DailyNewsPage() {
                 ) : (
                   <Icons.News className="mr-2 h-4 w-4" />
                 )}
-                Generate News
+                Search News
               </Button>
             </form>
           </Form>
@@ -124,36 +135,56 @@ export default function DailyNewsPage() {
       {loading && (
         <div className="flex flex-col items-center justify-center pt-20 gap-4">
           <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          <p className="text-muted-foreground text-lg">Generating your newspaper for {form.getValues('region')}...</p>
-          <p className="text-sm text-muted-foreground">This may take a moment.</p>
+          <p className="text-muted-foreground text-lg">Fetching latest news for {form.getValues('region')}...</p>
         </div>
       )}
 
-      {result && !loading && (
-        <Card className="p-6 sm:p-8">
-            <header className="text-center mb-8">
-                <h1 className="text-4xl font-bold tracking-tight text-primary">{result.newspaperTitle}</h1>
-                <p className="text-muted-foreground">Your AI-generated agricultural report for {form.getValues('region')}</p>
-            </header>
-            <main className="space-y-8">
-                {result.articles.map((article, index) => (
-                    <article key={index}>
-                        <h2 className="text-2xl font-semibold tracking-tight mb-2">{article.headline}</h2>
-                        <div className="prose prose-lg max-w-none text-foreground">
-                            <p>{article.content.replace(/\\n/g, ' ')}</p>
+      {articles && !loading && (
+        <div className="space-y-6">
+            {articles.length > 0 ? (
+                articles.map((article, index) => (
+                    <Card key={index} className="overflow-hidden">
+                      <div className="grid grid-cols-1 md:grid-cols-4">
+                        <div className="md:col-span-1">
+                          <div className="relative h-48 w-full">
+                            <Image 
+                                src={article.urlToImage || "https://picsum.photos/seed/news-fallback/600/400"}
+                                alt={article.title}
+                                fill
+                                className="object-cover"
+                                data-ai-hint="news article"
+                            />
+                          </div>
                         </div>
-                        {index < result.articles.length - 1 && <Separator className="mt-8" />}
-                    </article>
-                ))}
-            </main>
-        </Card>
+                        <div className="md:col-span-3 p-6 flex flex-col">
+                            <h2 className="text-xl font-semibold tracking-tight mb-2">{article.title}</h2>
+                            <p className="text-sm text-muted-foreground mb-1">{new Date(article.publishedAt).toLocaleDateString()} &middot; {article.source.name}</p>
+                            <p className="text-base text-foreground mb-4 flex-grow">{article.description}</p>
+                            <Button asChild size="sm" className="self-start">
+                                <Link href={article.url} target="_blank" rel="noopener noreferrer">
+                                    Read Full Story
+                                    <ExternalLink className="ml-2 h-4 w-4" />
+                                </Link>
+                            </Button>
+                        </div>
+                      </div>
+                    </Card>
+                ))
+            ) : (
+                <div className="text-center text-muted-foreground pt-20">
+                    <Icons.News className="size-16 mx-auto mb-4" />
+                    <h2 className="text-2xl font-semibold">No Articles Found</h2>
+                    <p>Try searching for a different region or a more general topic.</p>
+                </div>
+            )}
+        </div>
       )}
 
-      {!result && !loading && (
+      {!articles && !loading && (
         <div className="text-center text-muted-foreground pt-20">
           <Icons.News className="size-16 mx-auto mb-4" />
           <h2 className="text-2xl font-semibold">Your News, On Demand</h2>
-          <p>Enter a region above to get your personalized agricultural newspaper.</p>
+          <p>Enter a region or topic above to get the latest agricultural news.</p>
         </div>
       )}
     </div>

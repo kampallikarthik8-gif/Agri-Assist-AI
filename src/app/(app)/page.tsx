@@ -53,18 +53,21 @@ const newsFeed = [
         title: "ఈనాడు: రైతు భరోసా కేంద్రాల ద్వారా విత్తనాల పంపిణీ ప్రారంభం",
         summary: "ఖరీఫ్ సీజన్ కు సన్నద్ధంగా, రాష్ట్ర ప్రభుత్వం రైతు భరోసా కేంద్రాల (RBKs) ద్వారా సబ్సిడీపై విత్తనాలను పంపిణీ చేయడం ప్రారంభించింది...",
         image: "https://picsum.photos/seed/eenadu-news/600/400",
+        link: "#",
         aiHint: "indian farmer market"
     },
     {
         title: "ఆంధ్రజ్యోతి: పట్టిసీమ నుండి రాయలసీమకు నీటి విడుదల",
         summary: "పట్టిసీమ ఎత్తిపోతల పథకం నుండి కృష్ణా డెల్టాకు నీటిని విడుదల చేయడంతో, రాయలసీమలోని రైతులు హర్షం వ్యక్తం చేస్తున్నారు...",
         image: "https://picsum.photos/seed/andhrajyothy-news/600/400",
+        link: "#",
         aiHint: "water dam india"
     },
     {
         title: "ఈనాడు: వ్యవసాయ మార్కెట్లలో పత్తి ధరలు స్థిరంగా ఉన్నాయి",
         summary: "గత వారం ఒడిదుడుకుల తర్వాత, ఈరోజు ప్రధాన వ్యవసాయ మార్కెట్లలో పత్తి ధరలు స్థిరంగా ఉన్నాయి, క్వింటాల్‌కు ₹7,000 వద్ద ట్రేడవుతోంది...",
         image: "https://picsum.photos/seed/cotton-news/600/400",
+        link: "#",
         aiHint: "cotton field"
     },
     {
@@ -189,6 +192,13 @@ export default function DashboardPage() {
     }, [toast]);
 
     const WeatherIcon = weather ? weatherIconMap[weather.icon] || Sun : Sun;
+
+    const getButtonText = (item: typeof newsFeed[0]) => {
+        if (item.link?.includes("etv-live")) return "Watch Live";
+        if (item.link?.includes("BeneficiaryStatus")) return "Check Beneficiary Status";
+        if (item.link?.includes("KnowYour_Registration")) return "Know Registration Status";
+        return "Learn More";
+    }
 
   return (
     <div className="flex flex-col gap-6">
@@ -321,10 +331,10 @@ export default function DashboardPage() {
                         <div className="flex-1">
                             <h3 className="font-semibold">{item.title}</h3>
                             <p className="text-sm text-muted-foreground">{item.summary}</p>
-                            {item.link && (
+                            {item.link && item.link !== "#" && (
                                 <Button asChild variant="outline" size="sm" className="mt-2">
                                     <Link href={item.link} target="_blank" rel="noopener noreferrer">
-                                        {item.title.includes("Live") ? "Watch Live" : item.title.includes("లబ్ధిదారుని") ? "Check Beneficiary Status" : "Check Registration Status"}
+                                        {getButtonText(item)}
                                         <ExternalLink className="ml-2 h-4 w-4" />
                                     </Link>
                                 </Button>

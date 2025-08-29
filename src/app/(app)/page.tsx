@@ -214,13 +214,19 @@ export default function DashboardPage() {
           <CardContent>
             <ChartContainer config={chartConfig} className="h-40 w-full">
                 {loading ? <Skeleton className="h-full w-full" /> : (
-                    <LineChart accessibilityLayer data={yieldData || []}>
+                  yieldData && yieldData.length > 0 ? (
+                    <LineChart accessibilityLayer data={yieldData}>
                         <CartesianGrid vertical={false} />
                         <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} tickFormatter={(value) => value.substring(0,3)} />
                         <YAxis hide />
                         <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                         <Line dataKey="yield" type="natural" fill="var(--color-yield)" stroke="var(--color-yield)" strokeWidth={2} dot={false} />
                     </LineChart>
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+                      <p className="text-sm text-center">Could not generate yield prediction at this time.</p>
+                    </div>
+                  )
                 )}
             </ChartContainer>
           </CardContent>

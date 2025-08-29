@@ -74,7 +74,15 @@ const smamSummaryTable = [
     { step: 3, action: "Portal verifies your land, cropping data, tribal status" },
     { step: 4, action: "Select machine and submit application" },
     { step: 5, action: "Receive 50% subsidy upfront, track application and delivery" },
-]
+];
+
+const ntrJalaSiriSummaryTable = [
+    { step: "Eligibility Check", action: "Ensure landholding is between 2.5–10 acres OR group collectively meets 2.5 acres" },
+    { step: "Application Submission", action: "Submit at local village secretariat or via Revenue Officer with required documents" },
+    { step: "Approval Process", action: "DWMA reviews → District committee approval → Collector's sanction → Implementation" },
+    { step: "Infrastructure Setup", action: "Drilling, pump-set installation, recharge pit — based on guidelines" },
+    { step: "Wait for Formal Launch", action: "Scheme details and official communications are expected soon" },
+];
 
 
 export function GovernmentSchemesForm() {
@@ -724,7 +732,74 @@ export function GovernmentSchemesForm() {
                     <CardDescription>Targeted irrigation scheme to enhance water management.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-sm text-muted-foreground">This scheme offers up to ₹2 lakh in support per farmer for irrigation infrastructure. For more information, please refer to official state government announcements.</p>
+                    <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="about">
+                            <AccordionTrigger>About NTR Jala Siri Scheme</AccordionTrigger>
+                            <AccordionContent>
+                                <p className="text-sm text-muted-foreground mb-3">
+                                    The scheme aims to support small and marginal farmers in Andhra Pradesh by providing free borewell drilling and subsidized pump-sets—often solar-powered—as part of a broader irrigation infrastructure drive. It seeks to integrate the benefits of the central KUSUM scheme with state-level efforts.
+                                </p>
+                                <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                                    <li>Benefits up to ₹2 lakh per farmer, including solar pump-sets and borewell infrastructure.</li>
+                                    <li>Funding structure: Central government (approx. 40%), State government (30%), and farmer contribution (30%).</li>
+                                </ul>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="eligibility">
+                            <AccordionTrigger>Key Eligibility Criteria</AccordionTrigger>
+                            <AccordionContent>
+                                <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                                    <li>Farmers with 2.5 to 10 acres of land, or a group of farmers with contiguous land totaling at least 2.5 acres.</li>
+                                    <li>No existing borewell or having an abandoned borewell on the land.</li>
+                                    <li>Lands under submergence, Lanka lands, or over-exploited zones are not eligible.</li>
+                                </ul>
+                                <p className="text-xs text-muted-foreground mt-2">A detailed guideline document outlines site feasibility, approval flows, subsidy breakdowns, and technical steps.</p>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="how-to-apply">
+                            <AccordionTrigger>How to Apply</AccordionTrigger>
+                            <AccordionContent>
+                                <p className="text-sm text-muted-foreground mb-2">While there’s no explicit “apply online” option, applications can be made via your Village Secretariat / Revenue Officer (VRO). Submit your application with supporting documents like land records (Patta passbook) and Aadhaar ID. The VRO will forward the application to the Assistant Project Director (DWMA).</p>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="approval-workflow">
+                            <AccordionTrigger>Project Approval Workflow</AccordionTrigger>
+                            <AccordionContent>
+                                <p className="text-sm text-muted-foreground">
+                                    The District Water Management Agency and village-level committees review eligibility, conduct groundwater surveys, and recommend proposals. Successful applications receive administrative sanction from the Project Director and District Collector, after which infrastructure setup follows.
+                                </p>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="stay-updated">
+                            <AccordionTrigger>Stay Updated</AccordionTrigger>
+                            <AccordionContent>
+                                 <p className="text-sm text-muted-foreground">
+                                    The scheme is being relaunched, with initial allocations of ₹50 crore and formal guidelines forthcoming. Visit your Village Secretariat or DWMA office, prepare documents, and keep an eye on official district websites for updates.
+                                </p>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="summary-table">
+                            <AccordionTrigger>Quick Summary</AccordionTrigger>
+                            <AccordionContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Step</TableHead>
+                                            <TableHead>Action Required</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {ntrJalaSiriSummaryTable.map((item, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell className="font-semibold p-2">{item.step}</TableCell>
+                                                <TableCell className="p-2">{item.action}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
                 </CardContent>
             </Card>
             <Card>
@@ -761,5 +836,3 @@ export function GovernmentSchemesForm() {
     </div>
   );
 }
-
-    

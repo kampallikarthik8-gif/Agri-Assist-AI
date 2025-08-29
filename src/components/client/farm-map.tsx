@@ -108,20 +108,22 @@ export function FarmMap() {
       // This is a temporary workaround for a bug in the DrawingManager where the overlay is not a valid instance
       if (!overlay.setMap) return;
 
-      if (typeof overlay.getPath === 'function') { // Polygon
+      if (overlay instanceof google.maps.Polygon) {
         path = overlay.getPath().getArray().map(p => ({ lat: p.lat(), lng: p.lng() }));
         type = 'polygon';
-      } else { // Rectangle - getPath is not available, we need to construct it
-        const bounds = (overlay as google.maps.Rectangle).getBounds()!;
+      } else if (overlay instanceof google.maps.Rectangle) {
+        const bounds = overlay.getBounds()!;
         const ne = bounds.getNorthEast();
         const sw = bounds.getSouthWest();
         path = [
-            { lat: ne.lat(), lng: ne.lng() },
             { lat: ne.lat(), lng: sw.lng() },
-            { lat: sw.lat(), lng: sw.lng() },
-            { lat: sw.lat(), lng: ne.lng() }
+            { lat: ne.lat(), lng: ne.lng() },
+            { lat: sw.lat(), lng: ne.lng() },
+            { lat: sw.lat(), lng: sw.lng() }
         ];
         type = 'rectangle';
+      } else {
+        return;
       }
 
       const areaInMeters = google.maps.geometry.spherical.computeArea(path);

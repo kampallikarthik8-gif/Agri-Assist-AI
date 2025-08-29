@@ -68,6 +68,14 @@ const digitalPlatformsSummary = [
     { scheme: "e-Karshak Portal/App", portal: "https://karshak.ap.gov.in", purpose: "Crop booking, insurance, procurement, loan facilitation" },
 ];
 
+const smamSummaryTable = [
+    { step: 1, action: "Visit Karshak Portal – FM App" },
+    { step: 2, action: "Register/log in using Aadhaar-linked mobile number" },
+    { step: 3, action: "Portal verifies your land, cropping data, tribal status" },
+    { step: 4, action: "Select machine and submit application" },
+    { step: 5, action: "Receive 50% subsidy upfront, track application and delivery" },
+]
+
 
 export function GovernmentSchemesForm() {
   const [loading, setLoading] = useState(false);
@@ -514,60 +522,7 @@ export function GovernmentSchemesForm() {
                 </CardContent>
             </Card>
             
-            <Card>
-                <CardHeader>
-                    <CardTitle>Annadata Sukhibhava Scheme (AP)</CardTitle>
-                    <CardDescription>A flagship farmer welfare program by the Andhra Pradesh government.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                     <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value="benefit">
-                            <AccordionTrigger>Benefit & Installments</AccordionTrigger>
-                            <AccordionContent>
-                               <p className="text-sm text-muted-foreground">
-                                 ₹20,000 annually per farmer family — ₹14,000 from the state and ₹6,000 under PM-KISAN, paid in three installments. Landless farmers receive the full ₹20,000 from the state.
-                               </p>
-                            </AccordionContent>
-                        </AccordionItem>
-                        <AccordionItem value="inclusion">
-                            <AccordionTrigger>Eligibility</AccordionTrigger>
-                            <AccordionContent>
-                                <p className="text-sm text-muted-foreground">
-                                    Covers small, marginal, land-owning, and tenant farmers, including those with land rights under ROFR.
-                               </p>
-                            </AccordionContent>
-                        </AccordionItem>
-                         <AccordionItem value="impact">
-                            <AccordionTrigger>Reach & Impact</AccordionTrigger>
-                            <AccordionContent>
-                               <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-                                    <li>Enrolled 64 lakh farmer families (95% of eligible households).</li>
-                                    <li>₹4,760 crore disbursed since launch.</li>
-                                    <li>Reported a 15% rise in tenant farmer participation.</li>
-                                    <li>Achieved a 98% application approval rate and 94% beneficiary satisfaction.</li>
-                                    <li>Budget allocation: over ₹5,012 crore in FY 2025‑26.</li>
-                               </ul>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
-                     <div className="flex flex-wrap gap-4 mt-4">
-                        <Button asChild size="sm">
-                            <Link href="https://annadathasukhibhava.ap.gov.in/know-your-status" target="_blank" rel="noopener noreferrer">
-                                Know Your Status
-                                <ExternalLink className="ml-2 h-4 w-4" />
-                            </Link>
-                        </Button>
-                        <Button asChild size="sm" variant="secondary">
-                            <Link href="https://apagrisnet.gov.in/" target="_blank" rel="noopener noreferrer">
-                                Visit AP AgriSnet Portal
-                                <ExternalLink className="ml-2 h-4 w-4" />
-                            </Link>
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
-
-            <Card>
+            <Card className="lg:col-span-1 md:col-span-2">
                 <CardHeader>
                     <CardTitle>Smart & Precision Agriculture Policies (AP)</CardTitle>
                     <CardDescription>Tech-driven initiatives from the Agri Budget 2025-26.</CardDescription>
@@ -653,50 +608,135 @@ export function GovernmentSchemesForm() {
                 </CardHeader>
                 <CardContent>
                      <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value="subsidy">
-                            <AccordionTrigger>Subsidy & Reach</AccordionTrigger>
+                        <AccordionItem value="how-to-apply">
+                            <AccordionTrigger>How to Apply (Step-by-Step)</AccordionTrigger>
+                            <AccordionContent>
+                               <ol className="list-decimal space-y-3 pl-5 text-sm text-muted-foreground">
+                                    <li><span className="font-semibold text-foreground">Head to the Karshak Portal – FM App:</span> Managed by NIC-AP, this portal is the central hub for applying under the SMAM Relaunch scheme.</li>
+                                    <li><span className="font-semibold text-foreground">Create or Log In to Your Account:</span> Use your Aadhaar-linked mobile number to register or log in securely.</li>
+                                    <li><span className="font-semibold text-foreground">Auto-Verification of Your Details:</span> The portal automatically validates land ownership (Webland), crop history (e-Panta), tribal eligibility (Giri Bhoomi), and previous subsidy receipts.</li>
+                                    <li><span className="font-semibold text-foreground">Select Equipment and Submit:</span> Choose the machinery you need. The scheme provides a front-end 50% subsidy, credited directly at purchase.</li>
+                                    <li><span className="font-semibold text-foreground">Track Application and Delivery:</span> The portal allows full visibility from approval to delivery via your local Rythu Seva Kendra (RSK).</li>
+                               </ol>
+                            </AccordionContent>
+                        </AccordionItem>
+                         <AccordionItem value="impact">
+                            <AccordionTrigger>Recent Impact</AccordionTrigger>
                             <AccordionContent>
                                <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-                                    <li><span className="font-semibold text-foreground">Subsidy:</span> 50% upfront subsidy at the time of equipment purchase.</li>
-                                    <li><span className="font-semibold text-foreground">Reach:</span> Over 25,000 farmers benefited within the first 45 days, with ₹61 crore in subsidies distributed.</li>
+                                    <li>25,000+ farmers benefited within 45 days, receiving farm tools worth ₹61 crore.</li>
+                                    <li>Over ₹60 crore worth of machinery has been disbursed under the 2024–25 phase, benefitting small and marginal farmers directly.</li>
                                </ul>
                             </AccordionContent>
                         </AccordionItem>
-                        <AccordionItem value="focus">
-                            <AccordionTrigger>Focus Areas & Technology</AccordionTrigger>
+                         <AccordionItem value="summary-table">
+                            <AccordionTrigger>Application Summary</AccordionTrigger>
                             <AccordionContent>
-                                <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-                                    <li><span className="font-semibold text-foreground">Focus Areas:</span> Equipment across all farming stages, with a priority for rainfed and tribal regions.</li>
-                                    <li><span className="font-semibold text-foreground">Tech Platform:</span> Managed via the Karshak Portal–FM App with integrated databases to verify eligibility.</li>
-                                </ul>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Step</TableHead>
+                                            <TableHead>Action</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {smamSummaryTable.map((item) => (
+                                            <TableRow key={item.step}>
+                                                <TableCell className="font-semibold p-2">{item.step}</TableCell>
+                                                <TableCell className="p-2">{item.action}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="quick-answer">
+                            <AccordionTrigger>Quick Answer</AccordionTrigger>
+                            <AccordionContent>
+                                <p className="text-sm text-muted-foreground">
+                                    <span className="font-semibold text-foreground">Apply here:</span> Use the Karshak Portal – FM App (managed by NIC-AP) to complete your application online.
+                                </p>
+                                 <p className="text-sm text-muted-foreground mt-2">
+                                    <span className="font-semibold text-foreground">Benefit:</span> Upfront 50% subsidy applied directly at the time of purchase, with eligibility verified via integrated state databases.
+                                </p>
                             </AccordionContent>
                         </AccordionItem>
                     </Accordion>
                 </CardContent>
             </Card>
-
-            <div className="grid gap-6 lg:grid-cols-2">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>NTR Jala Siri</CardTitle>
-                        <CardDescription>Targeted irrigation scheme to enhance water management.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <p>This scheme offers up to ₹2 lakh in support per farmer for irrigation infrastructure. For more information, please refer to official state government announcements.</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Farmer Suicide Ex-Gratia Scheme</CardTitle>
-                        <CardDescription>Financial support for families in crisis.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <p>Provides a one-time compensation of ₹7 lakh to the family in the event of a farmer’s death by suicide.</p>
-                    </CardContent>
-                </Card>
-            </div>
-
-            <Card className="md:col-span-2">
+        </div>
+        <div className="grid gap-6 lg:grid-cols-3">
+             <Card>
+                <CardHeader>
+                    <CardTitle>Annadata Sukhibhava Scheme (AP)</CardTitle>
+                    <CardDescription>A flagship farmer welfare program by the Andhra Pradesh government.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                     <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="benefit">
+                            <AccordionTrigger>Benefit & Installments</AccordionTrigger>
+                            <AccordionContent>
+                               <p className="text-sm text-muted-foreground">
+                                 ₹20,000 annually per farmer family — ₹14,000 from the state and ₹6,000 under PM-KISAN, paid in three installments. Landless farmers receive the full ₹20,000 from the state.
+                               </p>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="inclusion">
+                            <AccordionTrigger>Eligibility</AccordionTrigger>
+                            <AccordionContent>
+                                <p className="text-sm text-muted-foreground">
+                                    Covers small, marginal, land-owning, and tenant farmers, including those with land rights under ROFR.
+                               </p>
+                            </AccordionContent>
+                        </AccordionItem>
+                         <AccordionItem value="impact">
+                            <AccordionTrigger>Reach & Impact</AccordionTrigger>
+                            <AccordionContent>
+                               <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                                    <li>Enrolled 64 lakh farmer families (95% of eligible households).</li>
+                                    <li>₹4,760 crore disbursed since launch.</li>
+                                    <li>Reported a 15% rise in tenant farmer participation.</li>
+                                    <li>Achieved a 98% application approval rate and 94% beneficiary satisfaction.</li>
+                                    <li>Budget allocation: over ₹5,012 crore in FY 2025‑26.</li>
+                               </ul>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                     <div className="flex flex-wrap gap-4 mt-4">
+                        <Button asChild size="sm">
+                            <Link href="https://annadathasukhibhava.ap.gov.in/know-your-status" target="_blank" rel="noopener noreferrer">
+                                Know Your Status
+                                <ExternalLink className="ml-2 h-4 w-4" />
+                            </Link>
+                        </Button>
+                        <Button asChild size="sm" variant="secondary">
+                            <Link href="https://apagrisnet.gov.in/" target="_blank" rel="noopener noreferrer">
+                                Visit AP AgriSnet Portal
+                                <ExternalLink className="ml-2 h-4 w-4" />
+                            </Link>
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle>NTR Jala Siri</CardTitle>
+                    <CardDescription>Targeted irrigation scheme to enhance water management.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-muted-foreground">This scheme offers up to ₹2 lakh in support per farmer for irrigation infrastructure. For more information, please refer to official state government announcements.</p>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Farmer Suicide Ex-Gratia Scheme</CardTitle>
+                    <CardDescription>Financial support for families in crisis.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-sm text-muted-foreground">Provides a one-time compensation of ₹7 lakh to the family in the event of a farmer’s death by suicide.</p>
+                </CardContent>
+            </Card>
+            <Card className="lg:col-span-3 md:col-span-2">
                 <CardHeader>
                     <CardTitle>Mid-Day Meal & Procurement Initiatives</CardTitle>
                     <CardDescription>Connecting farm produce directly to government programs.</CardDescription>
@@ -709,7 +749,6 @@ export function GovernmentSchemesForm() {
                     </ul>
                 </CardContent>
             </Card>
-
       </div>
        <div className="space-y-6">
         {loading && (
@@ -722,3 +761,5 @@ export function GovernmentSchemesForm() {
     </div>
   );
 }
+
+    

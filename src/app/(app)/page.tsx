@@ -2,6 +2,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -9,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BarChart as BarChartIcon, LineChart as LineChartIcon, Cloud, Sun, Wind, Cloudy, SunMoon, CloudRain, Snowflake, Bug } from "lucide-react";
+import { BarChart as BarChartIcon, LineChart as LineChartIcon, Cloud, Sun, Wind, Cloudy, SunMoon, CloudRain, Snowflake, Bug, ExternalLink } from "lucide-react";
 import {
   ChartContainer,
   ChartTooltip,
@@ -31,6 +32,7 @@ import { yieldPrediction, type YieldPredictionOutput } from "@/ai/flows/yield-pr
 import { pestDiseaseAlert, type PestDiseaseAlertOutput } from "@/ai/flows/pest-disease-alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 
 const newsFeed = [
     {
@@ -50,6 +52,13 @@ const newsFeed = [
         summary: "గత వారం ఒడిదుడుకుల తర్వాత, ఈరోజు ప్రధాన వ్యవసాయ మార్కెట్లలో పత్తి ధరలు స్థిరంగా ఉన్నాయి, క్వింటాల్‌కు ₹7,000 వద్ద ట్రేడవుతోంది...",
         image: "https://picsum.photos/seed/cotton-news/600/400",
         aiHint: "cotton field"
+    },
+    {
+        title: "ఈటీవీ ఆంధ్రప్రదేశ్ లైవ్",
+        summary: "ఈటీవీ ఆంధ్రప్రదేశ్ ఛానెల్‌ను ప్రత్యక్షంగా చూడండి.",
+        image: "https://picsum.photos/seed/etv-live/600/400",
+        link: "https://www.eenadu.net/andhra-pradesh/etv-live",
+        aiHint: "television news studio"
     }
 ];
 
@@ -288,6 +297,14 @@ export default function DashboardPage() {
                         <div className="flex-1">
                             <h3 className="font-semibold">{item.title}</h3>
                             <p className="text-sm text-muted-foreground">{item.summary}</p>
+                            {item.link && (
+                                <Button asChild variant="outline" size="sm" className="mt-2">
+                                    <Link href={item.link} target="_blank" rel="noopener noreferrer">
+                                        Watch Live
+                                        <ExternalLink className="ml-2 h-4 w-4" />
+                                    </Link>
+                                </Button>
+                            )}
                         </div>
                     </div>
                 ))}

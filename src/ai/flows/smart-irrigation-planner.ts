@@ -56,7 +56,7 @@ const smartIrrigationPlannerFlow = ai.defineFlow(
       return output;
     } catch (error) {
       console.error("Error in smartIrrigationPlannerFlow", error);
-      throw new Error('Failed to generate irrigation plan.');
+      throw error;
     }
   }
 );

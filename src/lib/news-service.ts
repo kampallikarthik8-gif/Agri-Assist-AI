@@ -38,7 +38,8 @@ export async function fetchNews(query: string): Promise<{ articles?: NewsArticle
         return { error: 'News service is not configured. Please contact support.' };
     }
 
-    const url = `https://newsapi.org/v2/everything?q=agriculture%20AND%20(${encodeURIComponent(query)})&sortBy=publishedAt&language=en&apiKey=${apiKey}`;
+    // Using the top-headlines endpoint for better quality, targeting India, and then filtering by query.
+    const url = `https://newsapi.org/v2/top-headlines?country=in&category=business&q=agriculture%20AND%20(${encodeURIComponent(query)})&sortBy=publishedAt&apiKey=${apiKey}`;
 
     try {
         const response = await fetch(url);

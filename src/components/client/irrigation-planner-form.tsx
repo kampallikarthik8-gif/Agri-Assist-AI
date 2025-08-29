@@ -65,7 +65,7 @@ export function IrrigationPlannerForm() {
       setResult(res);
     } catch (error: any) {
       console.error(error);
-      if (error.message && error.message.includes('403 Forbidden')) {
+      if (error.message && (error.message.includes('403 Forbidden') || error.message.includes('API_KEY_SERVICE_BLOCKED'))) {
           toast({
               variant: "destructive",
               title: "API Access Error",

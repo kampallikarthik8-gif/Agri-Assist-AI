@@ -28,7 +28,7 @@ const defaultCenter = {
   lng: 77.2090,
 };
 
-const libraries: ("places")[] = ["places"];
+const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "geometry"];
 
 type PlaceResult = google.maps.places.PlaceResult;
 

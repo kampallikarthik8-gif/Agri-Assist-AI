@@ -34,7 +34,7 @@ const defaultCenter = {
   lng: 77.2090,
 };
 
-const libraries: ("drawing" | "geometry")[] = ["drawing", "geometry"];
+const libraries: ("drawing" | "geometry" | "places")[] = ["drawing", "geometry", "places"];
 
 type DrawnShape = {
     id: number;

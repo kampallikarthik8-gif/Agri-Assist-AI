@@ -46,7 +46,7 @@ const newsFeed = [
         title: "వైఎస్ఆర్ రైతు భరోసా స్థితిని తెలుసుకోండి",
         summary: "అధికారిక పోర్టల్‌లో మీ వైఎస్ఆర్ రైతు భరోసా చెల్లింపు వివరాలు మరియు స్థితిని తనిఖీ చేయండి.",
         image: "https://picsum.photos/seed/ysr-rythu-bharosa/600/400",
-        link: "https://annadathasukhibhava.ap.gov.in/know-your-status",
+        link: "https://ysrrythubharosa.ap.gov.in/RBApp/RB/CheckPaymentStatus",
         aiHint: "indian government scheme"
     },
     {
@@ -81,7 +81,7 @@ const newsFeed = [
         title: "ఈటీవీ ఆంధ్రప్రదేశ్ లైవ్",
         summary: "ఈటీవీ ఆంధ్రప్రదేశ్ ఛానెల్‌ను ప్రత్యక్షంగా చూడండి.",
         image: "https://picsum.photos/seed/etv-live/600/400",
-        link: "#",
+        link: "https://www.youtube.com/watch?v=Fj2yV8cW2dY",
         aiHint: "television news studio"
     }
 ];
@@ -201,9 +201,9 @@ export default function DashboardPage() {
     const WeatherIcon = weather ? weatherIconMap[weather.icon] || Sun : Sun;
 
     const getButtonText = (item: typeof newsFeed[0]) => {
-        if (item.link?.includes("etv-live")) return "Watch Live";
+        if (item.link?.includes("youtube.com")) return "Watch Live";
         if (item.link?.includes("BeneficiaryStatus")) return "Check Beneficiary Status";
-        if (item.link?.includes("annadathasukhibhava")) return "Check Annadata Sukhibhava Status";
+        if (item.link?.includes("ysrrythubharosa")) return "Check Rythu Bharosa Status";
         if (item.link?.includes("KnowYour_Registration")) return "Know Registration Status";
         return "Learn More";
     }

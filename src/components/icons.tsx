@@ -55,4 +55,5 @@ export const Icons = {
   SeedScanner: ScanLine,
   FarmMap: Map,
   Calculator,
+  YieldPrediction: TrendingUp,
 };

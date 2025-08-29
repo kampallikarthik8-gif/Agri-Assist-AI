@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { z } from "zod";
 import { soilHealthAnalyzer, type SoilHealthAnalyzerOutput } from "@/ai/flows/soil-health-analyzer";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Leaf, Droplets, FlaskConical, Thermometer } from "lucide-react";
+import { Loader2, Leaf, Droplets, FlaskConical, Thermometer, ExternalLink } from "lucide-react";
 import { Icons } from "../icons";
 
 const formSchema = z.object({
@@ -103,14 +104,23 @@ export function SoilHealthForm() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={loading} className="w-full">
-                {loading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Leaf className="mr-2 h-4 w-4" />
-                )}
-                Analyze Soil Health
-              </Button>
+              <div className="space-y-2">
+                <Button type="submit" disabled={loading} className="w-full">
+                    {loading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                    <Leaf className="mr-2 h-4 w-4" />
+                    )}
+                    Analyze Soil Health
+                </Button>
+                <Button variant="outline" className="w-full" asChild>
+                    <Link href="https://soilhealth.dac.gov.in/soilTestingLabs" target="_blank">
+                        <FlaskConical className="mr-2 h-4 w-4" />
+                        Find a Soil Testing Lab
+                        <ExternalLink className="ml-auto h-4 w-4" />
+                    </Link>
+                </Button>
+              </div>
             </form>
           </Form>
         </CardContent>

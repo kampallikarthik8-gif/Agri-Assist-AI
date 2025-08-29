@@ -126,9 +126,6 @@ export function GovernmentSchemesForm() {
              <Button variant="outline" size="sm" onClick={() => handleQuickSearch('Telangana')} disabled={loading}>
               Search Telangana
             </Button>
-             <Button variant="outline" size="sm" onClick={() => handleQuickSearch('Maharashtra')} disabled={loading}>
-              Search Maharashtra
-            </Button>
           </div>
         </CardContent>
       </Card>

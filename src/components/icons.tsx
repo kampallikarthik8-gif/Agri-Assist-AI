@@ -24,6 +24,7 @@ import {
   Map,
   Calculator,
   DollarSign,
+  Scale,
 } from "lucide-react";
 
 export const Icons = {
@@ -58,4 +59,5 @@ export const Icons = {
   Calculator,
   YieldPrediction: TrendingUp,
   Profit: DollarSign,
+  FarmlandConverter: Scale,
 };

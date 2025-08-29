@@ -43,7 +43,7 @@ export function FertilizerShopsMap() {
     const request: google.maps.places.PlaceSearchRequest = {
       location: map.getCenter()!,
       radius: 5000, // 5km radius
-      keyword: "fertilizer shop",
+      keyword: "fertilizer shop OR rbk",
     };
 
     service.nearbySearch(request, (results, status) => {

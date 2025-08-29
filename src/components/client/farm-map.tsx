@@ -162,6 +162,14 @@ export function FarmMap() {
     setActiveInfoWindow(shapeId);
   }
 
+  if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
+      return (
+         <div className="flex items-center justify-center h-full text-center text-muted-foreground p-4">
+            Google Maps API Key is missing. Please add `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` to your .env file to use this feature.
+        </div>
+      )
+  }
+  
   if (loadError) {
     return (
       <div className="flex items-center justify-center h-full text-center text-muted-foreground p-4">
@@ -170,13 +178,6 @@ export function FarmMap() {
     );
   }
 
-  if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
-      return (
-         <div className="flex items-center justify-center h-full text-center text-muted-foreground p-4">
-            Google Maps API Key is missing. Please add `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` to your .env file to use this feature.
-        </div>
-      )
-  }
 
   return isLoaded ? (
     <div className="relative h-full w-full">

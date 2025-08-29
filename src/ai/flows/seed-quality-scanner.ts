@@ -73,4 +73,3 @@ const seedQualityScannerFlow = ai.defineFlow(
     }
   }
 );
-

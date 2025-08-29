@@ -2,6 +2,7 @@
 "use client";
 
 import { FertilizerShopsMap } from "@/components/client/fertilizer-shops-map";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function FertilizerShopsPage() {
   return (

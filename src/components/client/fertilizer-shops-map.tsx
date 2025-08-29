@@ -13,9 +13,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Star, Search, Loader2, Phone, Clock, MapPin, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
 import { ScrollArea } from "../ui/scroll-area";
 import { Badge } from "../ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
 
 const containerStyle = {
   width: "100%",
@@ -240,7 +241,7 @@ export function FertilizerShopsMap() {
               position={selectedPlace.geometry?.location}
               onCloseClick={() => setSelectedPlace(null)}
             >
-              <div className="p-1 w-64 space-y-2">
+               <div className="p-1 w-64 space-y-2">
                 <h3 className="font-bold text-base">{selectedPlace.name}</h3>
                 <p className="text-sm text-muted-foreground flex items-start gap-2"><MapPin className="size-4 mt-0.5 shrink-0" />{selectedPlace.vicinity}</p>
                 {selectedPlace.formatted_phone_number && <p className="text-sm text-muted-foreground flex items-center gap-2"><Phone className="size-4" />{selectedPlace.formatted_phone_number}</p>}

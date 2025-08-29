@@ -615,6 +615,16 @@ export function GovernmentSchemesForm() {
                                 </p>
                             </AccordionContent>
                         </AccordionItem>
+                        <AccordionItem value="solarisation">
+                            <AccordionTrigger>Full Solarisation of Farm Power (via PM-KUSUM)</AccordionTrigger>
+                            <AccordionContent>
+                               <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                                    <li><span className="font-semibold text-foreground">Goal:</span> Solarize all ~293,000 agricultural pump sets and 1,156 feeders (target capacity: 1,162.8 MW) within a year.</li>
+                                    <li><span className="font-semibold text-foreground">Benefits:</span> Reduces state subsidies, ensures reliable daytime power supply, and boosts green energy usage.</li>
+                                     <li><span className="font-semibold text-foreground">Implementation:</span> Land identified; tenders and power purchase agreements issued; monthly monitoring mandated.</li>
+                               </ul>
+                            </AccordionContent>
+                        </AccordionItem>
                     </Accordion>
                 </CardContent>
             </Card>

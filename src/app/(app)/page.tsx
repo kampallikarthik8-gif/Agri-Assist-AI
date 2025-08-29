@@ -203,7 +203,7 @@ export default function DashboardPage() {
     const getButtonText = (item: typeof newsFeed[0]) => {
         if (item.link?.includes("etv-live")) return "Watch Live";
         if (item.link?.includes("BeneficiaryStatus")) return "Check Beneficiary Status";
-        if (item.link?.includes("annadathasukhibhava")) return "Check YSR Rythu Bharosa Status";
+        if (item.link?.includes("annadathasukhibhava")) return "Check Rythu Bharosa-PM Kisan Status";
         if (item.link?.includes("KnowYour_Registration")) return "Know Registration Status";
         return "Learn More";
     }

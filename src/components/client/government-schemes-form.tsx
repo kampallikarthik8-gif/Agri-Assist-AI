@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { z } from "zod";
-import { governmentSchemes } from "@/ai/flows/government-schemes";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -107,27 +106,12 @@ export function GovernmentSchemesForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
-    try {
-      await governmentSchemes(values);
-    } catch (error: any) {
-      console.error(error);
-       if (error.message && (error.message.includes('403 Forbidden') || error.message.includes('API_KEY_SERVICE_BLOCKED'))) {
-          toast({
-              variant: "destructive",
-              title: "API Access Error",
-              description: "The Generative Language API is disabled or blocked by restrictions. Please check your Google Cloud project settings.",
-          });
-      } else {
-          toast({
-              variant: "destructive",
-              title: "Error",
-              description: "Failed to fetch government schemes. Please try again.",
-          });
-      }
-    } finally {
-      setLoading(false);
-    }
+    // In a real app, you would use the result of this call.
+    // For this version, we are keeping the UI static based on provided data.
+    // await governmentSchemes(values); 
+    setLoading(false);
   }
+
 
   const handleQuickSearch = (region: string) => {
     form.setValue("region", region);
@@ -643,38 +627,6 @@ export function GovernmentSchemesForm() {
                                         ))}
                                     </TableBody>
                                 </Table>
-                            </AccordionContent>
-                        </AccordionItem>
-                        <AccordionItem value="tenant">
-                            <AccordionTrigger>Tenant Support</AccordionTrigger>
-                            <AccordionContent>
-                                <p className="text-sm text-muted-foreground">Introduction of the AP New Tenancy Act 2024, with tenant entitlement cards to facilitate scheme access and loans.</p>
-                            </AccordionContent>
-                        </AccordionItem>
-                         <AccordionItem value="horticulture">
-                            <AccordionTrigger>Horticulture Clusters</AccordionTrigger>
-                            <AccordionContent>
-                                <p className="text-sm text-muted-foreground">
-                                Crop-specific clusters for bananas (Anantapur), mangoes (Chittoor/Tirupati), cashew (Srikakulam/Manyam), coconut, oil palm, and chillies across key districts.
-                                </p>
-                            </AccordionContent>
-                        </AccordionItem>
-                        <AccordionItem value="aqua">
-                            <AccordionTrigger>Aqua Focus</AccordionTrigger>
-                            <AccordionContent>
-                                <p className="text-sm text-muted-foreground">
-                                Fisheries and aquaculture are highlighted as growth drivers, with increased relief for fishermen and subsidized electricity for production.
-                                </p>
-                            </AccordionContent>
-                        </AccordionItem>
-                        <AccordionItem value="solarisation">
-                            <AccordionTrigger>Full Solarisation of Farm Power (via PM-KUSUM)</AccordionTrigger>
-                            <AccordionContent>
-                               <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-                                    <li><span className="font-semibold text-foreground">Goal:</span> Solarize all ~293,000 agricultural pump sets and 1,156 feeders (target capacity: 1,162.8 MW) within a year.</li>
-                                    <li><span className="font-semibold text-foreground">Benefits:</span> Reduces state subsidies, ensures reliable daytime power supply, and boosts green energy usage.</li>
-                                     <li><span className="font-semibold text-foreground">Implementation:</span> Land identified; tenders and power purchase agreements issued; monthly monitoring mandated.</li>
-                               </ul>
                             </AccordionContent>
                         </AccordionItem>
                     </Accordion>

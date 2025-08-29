@@ -11,7 +11,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { weatherForecast, WeatherForecastOutput } from './weather-forecast';
+import { weatherForecast } from './weather-forecast';
 
 const RainfallAlertInputSchema = z.object({
   location: z.string().describe("The location for which to generate alerts (e.g., 'San Francisco, CA')."),

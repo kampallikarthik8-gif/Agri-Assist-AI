@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useRef } from "react";
 import {
   GoogleMap,
   useJsApiLoader,
@@ -9,7 +9,10 @@ import {
   InfoWindow,
 } from "@react-google-maps/api";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Star } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Star, Search, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const containerStyle = {
   width: "100%",
@@ -31,6 +34,10 @@ export function FertilizerShopsMap() {
   const [center, setCenter] = useState(defaultCenter);
   const [places, setPlaces] = useState<PlaceResult[]>([]);
   const [selectedPlace, setSelectedPlace] = useState<PlaceResult | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const { toast } = useToast();
+
 
   const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
@@ -49,9 +56,33 @@ export function FertilizerShopsMap() {
     service.nearbySearch(request, (results, status) => {
       if (status === google.maps.places.PlacesServiceStatus.OK && results) {
         setPlaces(results);
+      } else {
+        setPlaces([]);
       }
     });
   }, []);
+
+  const handleSearch = useCallback(async () => {
+    if (!searchQuery || !isLoaded || !mapRef.current) return;
+    setIsSearching(true);
+    
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address: searchQuery }, (results, status) => {
+        setIsSearching(false);
+        if (status === 'OK' && results && results[0]) {
+            const location = results[0].geometry.location;
+            mapRef.current?.setCenter(location);
+            mapRef.current?.setZoom(14);
+            searchNearbyShops(mapRef.current!);
+        } else {
+            toast({
+                variant: "destructive",
+                title: "Location not found",
+                description: "Could not find the location you entered. Please try another search.",
+            });
+        }
+    });
+  }, [searchQuery, isLoaded, searchNearbyShops, toast]);
 
   const onLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
@@ -103,6 +134,22 @@ export function FertilizerShopsMap() {
 
   return isLoaded ? (
     <div className="relative h-full w-full">
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 w-full max-w-md px-4">
+        <div className="flex w-full items-center space-x-2">
+            <Input 
+                type="text" 
+                placeholder="Search for a location..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                className="bg-background/90"
+            />
+            <Button type="button" onClick={handleSearch} disabled={isSearching}>
+                {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+            </Button>
+        </div>
+      </div>
+
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={center}
@@ -112,8 +159,9 @@ export function FertilizerShopsMap() {
         options={{
           mapTypeId: "roadmap",
           streetViewControl: false,
-          mapTypeControl: true,
+          mapTypeControl: false,
           fullscreenControl: false,
+          zoomControl: false,
         }}
       >
         {places.map((place) => (

@@ -31,8 +31,11 @@ const RainfallAlertOutputSchema = z.object({
 export type RainfallAlertOutput = z.infer<typeof RainfallAlertOutputSchema>;
 
 export async function rainfallAlert(input: RainfallAlertInput): Promise<RainfallAlertOutput> {
-  const forecast = await weatherForecast(input);
-  return rainfallAlertFlow({ location: input.location, forecast: forecast.forecast });
+  const forecastData = await weatherForecast(input);
+  if (!forecastData || !forecastData.forecast) {
+    throw new Error("Could not retrieve weather forecast to generate alerts.");
+  }
+  return rainfallAlertFlow({ location: input.location, forecast: forecastData.forecast });
 }
 
 const prompt = ai.definePrompt({

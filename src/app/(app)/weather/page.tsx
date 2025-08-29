@@ -66,12 +66,15 @@ export default function WeatherPage() {
 
         const locationName = weatherData.locationName;
 
-        const forecastData = await weatherForecast({ location: locationName });
-        setForecast(forecastData.forecast);
+        const [forecastData, alertData] = await Promise.all([
+            weatherForecast({ location: locationName }),
+            rainfallAlert({ location: locationName })
+        ]);
+
+        setForecast(forecastData?.forecast);
         
-        const alertData = await rainfallAlert({ location: locationName });
         // Filter out 'none' type alerts before setting state
-        const meaningfulAlerts = alertData.alerts.filter(a => a.type !== 'none');
+        const meaningfulAlerts = alertData?.alerts?.filter(a => a.type !== 'none') || [];
         setAlerts(meaningfulAlerts);
 
       } catch (e: any) {
@@ -248,4 +251,3 @@ export default function WeatherPage() {
     </div>
   );
 }
-

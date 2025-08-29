@@ -2,6 +2,7 @@
 'use server';
 
 import { z } from 'zod';
+import Parser from 'rss-parser';
 
 const NewsArticleSchema = z.object({
     source: z.object({
@@ -17,63 +18,45 @@ const NewsArticleSchema = z.object({
     content: z.string().nullable(),
 });
 
-const NewsApiResponseSchema = z.object({
-    status: z.string(),
-    totalResults: z.number(),
-    articles: z.array(NewsArticleSchema),
-});
-
-const NewsApiErrorSchema = z.object({
-    status: z.string(),
-    code: z.string(),
-    message: z.string(),
-})
-
 export type NewsArticle = z.infer<typeof NewsArticleSchema>;
 
-export async function fetchNews(query: string): Promise<{ articles?: NewsArticle[], error?: string }> {
-    const apiKey = process.env.NEWS_API_KEY;
-    if (!apiKey) {
-        console.error('NEWS_API_KEY is not set in the environment variables.');
-        return { error: 'News service is not configured. Please contact support.' };
-    }
+const parser = new Parser();
 
-    // Using the top-headlines endpoint for better quality, targeting India, and then filtering by query.
-    const url = `https://newsapi.org/v2/top-headlines?country=in&category=business&q=agriculture%20AND%20(${encodeURIComponent(query)})&sortBy=publishedAt&apiKey=${apiKey}`;
+// A simple regex to extract the image URL from the description's img tag
+const extractImageFromDescription = (description: string): string | null => {
+    const match = description.match(/<img src="([^"]+)"/);
+    return match ? match[1] : null;
+};
+
+export async function fetchNews(query: string): Promise<{ articles?: NewsArticle[], error?: string }> {
+    // Construct the Google News RSS feed URL
+    const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-IN&gl=IN&ceid=IN:en`;
 
     try {
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (!response.ok) {
-            const errorData = NewsApiErrorSchema.safeParse(data);
-            if (errorData.success) {
-                 console.error(`NewsAPI Error: ${errorData.data.message}`);
-                 if (errorData.data.code === 'apiKeyMissing' || errorData.data.code === 'apiKeyInvalid') {
-                    return { error: 'The news service API key is invalid or missing.' };
-                 }
-                 return { error: `Failed to fetch news: ${errorData.data.message}` };
-            }
-            return { error: 'An unknown error occurred while fetching news.' };
-        }
+        const feed = await parser.parseURL(url);
         
-        const parsedData = NewsApiResponseSchema.safeParse(data);
-        if (parsedData.success) {
-            // Filter out articles that have been removed or have no title/description
-            const validArticles = parsedData.data.articles.filter(article => 
-                article.title && 
-                article.title !== "[Removed]" && 
-                article.description && 
-                article.description !== "[Removed]"
-            );
-            return { articles: validArticles };
-        } else {
-            console.error("Failed to parse NewsAPI response:", parsedData.error);
-            return { error: 'Failed to parse news data.' };
+        if (!feed.items) {
+            return { articles: [] };
         }
 
-    } catch (error) {
-        console.error('Error fetching news:', error);
-        return { error: 'Could not connect to the news service.' };
+        const articles: NewsArticle[] = feed.items.map(item => ({
+            source: {
+                id: item.source?.url || null,
+                name: item.source?.value || item.creator || 'Google News',
+            },
+            author: item.creator || null,
+            title: item.title || 'No title',
+            description: item.contentSnippet || null,
+            url: item.link || '',
+            urlToImage: extractImageFromDescription(item.content || ''),
+            publishedAt: item.isoDate || new Date().toISOString(),
+            content: item.content || null,
+        })).filter(article => article.title && article.title !== 'No title' && article.url);
+
+        return { articles };
+
+    } catch (error: any) {
+        console.error('Error fetching or parsing RSS feed:', error);
+        return { error: `Could not connect to the news service. Details: ${error.message}` };
     }
 }

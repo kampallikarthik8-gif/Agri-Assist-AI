@@ -46,6 +46,15 @@ const aifQuickReference = [
     { parameter: "Application Process", detail: "Online via portal, PMU review, bank appraisal & disbursement" },
 ];
 
+const eKisanUpajNidhiFeatures = [
+    { feature: "Collateral-Free Loans", detail: "Farmers can get loans without providing additional guarantee—only the stored produce is used as collateral." },
+    { feature: "Low Interest Rate", detail: "Loans are available at around 7% per annum." },
+    { feature: "Flexible Amount & Rate", detail: "Farmers can choose the loan amount and interest rate via the digital platform linked to banks." },
+    { feature: "Reduced Security Deposit", detail: "Deposit charges reduced from 3% to just 1% of stock value for WDRA-registered warehouses." },
+    { feature: "Preventing Distress Sales", detail: "By providing storage and timely loans, farmers can avoid selling crops at low prices during emergencies." },
+    { feature: "Integration with MSP and e‑NAM", detail: "Enables farmers to sell at MSP (or better) through digital marketplace linkages." },
+];
+
 export function GovernmentSchemesForm() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<GovernmentSchemesOutput | null>(null);
@@ -325,62 +334,62 @@ export function GovernmentSchemesForm() {
         </Card>
       </div>
 
-       <div className="grid gap-6 md:grid-cols-1">
-        <Card className="md:col-span-1">
-             <CardHeader>
-                <CardTitle>Agriculture Infrastructure Fund (AIF)</CardTitle>
-                <CardDescription>A financing facility for post-harvest infrastructure and community farming assets.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                 <Accordion type="single" collapsible className="w-full">
-                     <AccordionItem value="what-is-aif">
-                        <AccordionTrigger>What is AIF?</AccordionTrigger>
-                        <AccordionContent>
-                           <p className="text-sm text-muted-foreground">
-                               The Agriculture Infrastructure Fund (AIF) is a ₹1 lakh crore central sector scheme launched in 2020 to support agri-entrepreneurs, farmers, FPOs, and startups. It aims to improve post-harvest infrastructure and runs through 2032-33, with loan disbursements ending in FY 2025-26.
-                           </p>
-                        </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="benefits">
-                        <AccordionTrigger>Key Benefits & Financing Features</AccordionTrigger>
-                        <AccordionContent>
-                           <ul className="list-disc space-y-3 pl-5 text-sm text-muted-foreground">
+       <div className="grid gap-6 md:grid-cols-2">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Agriculture Infrastructure Fund (AIF)</CardTitle>
+                    <CardDescription>A financing facility for post-harvest infrastructure and community farming assets.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="what-is-aif">
+                            <AccordionTrigger>What is AIF?</AccordionTrigger>
+                            <AccordionContent>
+                            <p className="text-sm text-muted-foreground">
+                                The Agriculture Infrastructure Fund (AIF) is a ₹1 lakh crore central sector scheme launched in 2020 to support agri-entrepreneurs, farmers, FPOs, and startups. It aims to improve post-harvest infrastructure and runs through 2032-33, with loan disbursements ending in FY 2025-26.
+                            </p>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="benefits">
+                            <AccordionTrigger>Key Benefits & Financing Features</AccordionTrigger>
+                            <AccordionContent>
+                            <ul className="list-disc space-y-3 pl-5 text-sm text-muted-foreground">
                                 <li><span className="font-semibold text-foreground">Interest Subvention:</span> 3% per annum for loans up to ₹2 crore for a maximum of 7 years.</li>
                                 <li><span className="font-semibold text-foreground">Credit Guarantee:</span> Available for loans up to ₹2 crore via CGTMSE or NABSanrakshan, with fees paid by the government.</li>
                                 <li><span className="font-semibold text-foreground">Promoter's Contribution:</span> Minimum 10% for loans up to ₹2 crore, and 25% for loans above that.</li>
                                 <li><span className="font-semibold text-foreground">Loan Tenure & Moratorium:</span> Maximum 7-year repayment period, including a moratorium of 6 months to 2 years.</li>
                                 <li><span className="font-semibold text-foreground">Project Limit:</span> Up to 25 projects for private entities; no limit for state agencies, FPOs, SHGs, etc.</li>
-                           </ul>
-                        </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="projects">
-                        <AccordionTrigger>What Projects Qualify?</AccordionTrigger>
-                        <AccordionContent>
-                            <p className="text-sm text-muted-foreground">The scheme supports infrastructure such as warehouses, silos, cold storage, pack-houses, sorting & grading units, processing centers, and community farming assets like polyhouses and smart irrigation.</p>
-                        </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="eligibility">
-                        <AccordionTrigger>Who is Eligible?</AccordionTrigger>
-                        <AccordionContent>
-                             <p className="text-sm text-muted-foreground">Eligible applicants include individual farmers, FPOs, SHGs, cooperatives, agri-entrepreneurs, startups, and central/state agencies.</p>
-                        </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="application">
-                        <AccordionTrigger>How to Apply Online</AccordionTrigger>
-                        <AccordionContent>
-                           <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+                            </ul>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="projects">
+                            <AccordionTrigger>What Projects Qualify?</AccordionTrigger>
+                            <AccordionContent>
+                                <p className="text-sm text-muted-foreground">The scheme supports infrastructure such as warehouses, silos, cold storage, pack-houses, sorting & grading units, processing centers, and community farming assets like polyhouses and smart irrigation.</p>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="eligibility">
+                            <AccordionTrigger>Who is Eligible?</AccordionTrigger>
+                            <AccordionContent>
+                                <p className="text-sm text-muted-foreground">Eligible applicants include individual farmers, FPOs, SHGs, cooperatives, agri-entrepreneurs, startups, and central/state agencies.</p>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="application">
+                            <AccordionTrigger>How to Apply Online</AccordionTrigger>
+                            <AccordionContent>
+                            <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
                                 <li><span className="font-semibold text-foreground">Register:</span> Visit the AIF Portal, register with your Aadhaar and mobile number.</li>
                                 <li><span className="font-semibold text-foreground">Prepare DPR:</span> Create a Detailed Project Report (DPR) with project details, costs, and financials.</li>
                                 <li><span className="font-semibold text-foreground">Apply:</span> Upload the DPR and other required documents, and select a lending bank.</li>
                                 <li><span className="font-semibold text-foreground">Review & Sanction:</span> The Central PMU reviews the application, and the selected bank appraises and sanctions the loan.</li>
                                 <li><span className="font-semibold text-foreground">Monitor:</span> Track your application status on the AIF portal dashboard.</li>
-                           </ol>
-                        </AccordionContent>
-                    </AccordionItem>
-                     <AccordionItem value="quick-ref">
-                        <AccordionTrigger>Quick Reference Table</AccordionTrigger>
-                        <AccordionContent>
-                           <Table>
+                            </ol>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="quick-ref">
+                            <AccordionTrigger>Quick Reference Table</AccordionTrigger>
+                            <AccordionContent>
+                            <Table>
                                 <TableBody>
                                     {aifQuickReference.map((item, index) => (
                                         <TableRow key={index}>
@@ -389,26 +398,78 @@ export function GovernmentSchemesForm() {
                                         </TableRow>
                                     ))}
                                 </TableBody>
-                           </Table>
-                        </AccordionContent>
-                    </AccordionItem>
-                     <AccordionItem value="state-news">
-                        <AccordionTrigger>Recent State-Level Announcement</AccordionTrigger>
-                        <AccordionContent>
-                           <p className="text-sm text-muted-foreground">
-                               The Uttar Pradesh government plans to disburse ₹5,000 crore in subsidized agri loans, leveraging the AIF to build infrastructure like cold storage, warehouses, and grading units.
-                           </p>
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
-                 <Button asChild className="mt-4">
-                    <Link href="https://agriinfra.dac.gov.in" target="_blank" rel="noopener noreferrer">
-                        Visit AIF Portal
-                        <ExternalLink className="ml-2 h-4 w-4" />
-                    </Link>
-                </Button>
-            </CardContent>
-        </Card>
+                            </Table>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                    <Button asChild className="mt-4">
+                        <Link href="https://agriinfra.dac.gov.in" target="_blank" rel="noopener noreferrer">
+                            Visit AIF Portal
+                            <ExternalLink className="ml-2 h-4 w-4" />
+                        </Link>
+                    </Button>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>e-Kisan Upaj Nidhi</CardTitle>
+                    <CardDescription>Leverage your stored produce as collateral to secure low-interest loans and avoid distress sales.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                     <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="what-is-it">
+                            <AccordionTrigger>What is e-Kisan Upaj Nidhi?</AccordionTrigger>
+                            <AccordionContent>
+                               <p className="text-sm text-muted-foreground">
+                                   A digital platform by WDRA that allows farmers to use their stored produce as collateral to obtain easy loans, preventing distress sales by providing financial flexibility.
+                               </p>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="features">
+                            <AccordionTrigger>Core Features & Benefits</AccordionTrigger>
+                            <AccordionContent>
+                               <Table>
+                                    <TableBody>
+                                        {eKisanUpajNidhiFeatures.map((item, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell className="font-semibold p-2">{item.feature}</TableCell>
+                                                <TableCell className="p-2">{item.detail}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                               </Table>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="how-it-works">
+                            <AccordionTrigger>How It Works</AccordionTrigger>
+                            <AccordionContent>
+                               <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+                                   <li><span className="font-semibold text-foreground">Store Produce:</span> Deposit harvest in a WDRA-registered warehouse and get an electronic Negotiable Warehouse Receipt (e-NWR).</li>
+                                   <li><span className="font-semibold text-foreground">Apply for Loan:</span> Use the e-Kisan Upaj Nidhi platform to apply for a loan against your e-NWR.</li>
+                                   <li><span className="font-semibold text-foreground">Loan Disbursement:</span> Banks evaluate and disburse the loan, typically at ~7% interest.</li>
+                                   <li><span className="font-semibold text-foreground">Repay & Sell:</span> Sell your produce when market conditions are favorable and use the proceeds to repay the loan.</li>
+                               </ol>
+                            </AccordionContent>
+                        </AccordionItem>
+                         <AccordionItem value="considerations">
+                            <AccordionTrigger>Additional Considerations</AccordionTrigger>
+                            <AccordionContent>
+                               <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                                    <li><span className="font-semibold text-foreground">No Loan Guarantee:</span> WDRA facilitates access but does not guarantee loans; banks perform their own evaluation.</li>
+                                    <li><span className="font-semibold text-foreground">Gradual Adoption:</span> Awareness and adoption of this digital platform are still growing among farmers.</li>
+                               </ul>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                     <Button asChild className="mt-4">
+                        <Link href="https://www.wdra.gov.in/web/wdra/e-kisan-upaj-nidhi" target="_blank" rel="noopener noreferrer">
+                            Learn More at WDRA
+                            <ExternalLink className="ml-2 h-4 w-4" />
+                        </Link>
+                    </Button>
+                </CardContent>
+            </Card>
       </div>
 
 
@@ -459,4 +520,6 @@ export function GovernmentSchemesForm() {
 }
 
     
+    
+
     

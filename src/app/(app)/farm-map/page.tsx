@@ -1,4 +1,5 @@
 
+
 import { FarmMap } from "@/components/client/farm-map";
 
 export default function FarmMapPage() {

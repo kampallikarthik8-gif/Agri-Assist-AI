@@ -17,6 +17,8 @@ const CropRecommendationEngineInputSchema = z.object({
   location: z
     .string()
     .describe('Geographic location for the farm (e.g., "Napa Valley, CA").'),
+  lat: z.number().optional().describe('The latitude.'),
+  lon: z.number().optional().describe('The longitude.'),
 });
 
 export type CropRecommendationEngineInput = z.infer<
@@ -49,7 +51,8 @@ const prompt = ai.definePrompt({
   tools: [getWeather],
   prompt: `You are an expert agricultural advisor. 
   
-First, get the current weather for the user's location: {{{location}}}.
+First, get the current weather for the user's location.
+If lat/lon are provided, use them. Otherwise, use the location name.
 
 Then, based on the provided location, infer the typical soil composition for that area.
 

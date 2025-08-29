@@ -122,4 +122,3 @@ ai.defineFlow(
         return await fetchWeatherData(input);
     }
 )
-

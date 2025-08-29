@@ -11,7 +11,17 @@ import {
 } from "@react-google-maps/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, Leaf, BrainCircuit, Loader2 } from "lucide-react";
+import { soilHealthAnalyzer, SoilHealthAnalyzerOutput } from "@/ai/flows/soil-health-analyzer";
+import { cropRecommendationEngine, CropRecommendationEngineOutput } from "@/ai/flows/crop-recommendation-engine";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 const containerStyle = {
   width: "100%",
@@ -32,6 +42,7 @@ type DrawnShape = {
     path: google.maps.LatLngLiteral[];
     area: number; // in square meters
     infoWindowPos: google.maps.LatLng;
+    center: google.maps.LatLngLiteral;
 };
 
 const LOCAL_STORAGE_KEY = 'farm_map_fields';
@@ -42,6 +53,11 @@ export function FarmMap() {
   const [drawnShapes, setDrawnShapes] = useState<DrawnShape[]>([]);
   const [activeInfoWindow, setActiveInfoWindow] = useState<number | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<SoilHealthAnalyzerOutput | CropRecommendationEngineOutput | null>(null);
+  const [analysisTitle, setAnalysisTitle] = useState("");
+  const [isAnalysisLoading, setIsAnalysisLoading] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { toast } = useToast();
 
   const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
@@ -70,7 +86,6 @@ export function FarmMap() {
     if (isMounted) {
        const shapesToSave = drawnShapes.map(shape => ({
             ...shape,
-            // Convert LatLng object to a plain object for JSON serialization
             infoWindowPos: { lat: shape.infoWindowPos.lat(), lng: shape.infoWindowPos.lng() },
         }));
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(shapesToSave));
@@ -105,7 +120,6 @@ export function FarmMap() {
       let path: google.maps.LatLngLiteral[];
       let type: 'polygon' | 'rectangle';
 
-      // This is a temporary workaround for a bug in the DrawingManager where the overlay is not a valid instance
       if (!overlay.setMap) return;
 
       if (overlay instanceof google.maps.Polygon) {
@@ -135,10 +149,11 @@ export function FarmMap() {
           path,
           area: areaInMeters,
           infoWindowPos: new google.maps.LatLng(centerOfPolygon.lat, centerOfPolygon.lng),
+          center: centerOfPolygon,
       };
 
       setDrawnShapes(prev => [...prev, newShape]);
-      overlay.setMap(null); // Hide the DrawingManager's shape, we'll render our own Polygon
+      overlay.setMap(null); 
   };
 
   const getCenterOfPolygon = (path: google.maps.LatLngLiteral[]) => {
@@ -155,11 +170,40 @@ export function FarmMap() {
   
   const deleteShape = (shapeId: number) => {
     setDrawnShapes(prev => prev.filter(shape => shape.id !== shapeId));
-    setActiveInfoWindow(null); // Close info window after deleting
+    setActiveInfoWindow(null);
   };
 
   const handlePolygonClick = (shapeId: number) => {
     setActiveInfoWindow(shapeId);
+  }
+
+  const handleAnalysis = async (shape: DrawnShape, analysisType: 'soil' | 'crop') => {
+    setIsAnalysisLoading(true);
+    setAnalysisResult(null);
+    setIsDialogOpen(true);
+    setActiveInfoWindow(null);
+
+    try {
+        if (analysisType === 'soil') {
+            setAnalysisTitle("Soil Health Analysis");
+            const result = await soilHealthAnalyzer({ location: `Field at ${shape.center.lat.toFixed(4)}, ${shape.center.lon.toFixed(4)}`, lat: shape.center.lat, lon: shape.center.lon });
+            setAnalysisResult(result);
+        } else {
+            setAnalysisTitle("Crop Recommendation");
+            const result = await cropRecommendationEngine({ location: `Field at ${shape.center.lat.toFixed(4)}, ${shape.center.lon.toFixed(4)}`, lat: shape.center.lat, lon: shape.center.lon });
+            setAnalysisResult(result);
+        }
+    } catch (error: any) {
+      console.error(error);
+      toast({
+          variant: "destructive",
+          title: "Analysis Failed",
+          description: error.message || "Could not retrieve AI analysis for this field.",
+      });
+      setIsDialogOpen(false);
+    } finally {
+        setIsAnalysisLoading(false);
+    }
   }
 
   if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
@@ -178,7 +222,6 @@ export function FarmMap() {
     );
   }
 
-
   return isLoaded ? (
     <div className="relative h-full w-full">
       <GoogleMap
@@ -190,6 +233,7 @@ export function FarmMap() {
         options={{
           mapTypeId: "satellite",
           streetViewControl: false,
+          mapTypeControl: true,
           mapTypeControlOptions: {
             position: google.maps.ControlPosition.TOP_RIGHT,
             style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
@@ -247,11 +291,19 @@ export function FarmMap() {
                     position={activeShape.infoWindowPos}
                     onCloseClick={() => setActiveInfoWindow(null)}
                 >
-                    <div className="p-2 text-foreground space-y-2">
+                    <div className="p-2 text-foreground space-y-2 w-48">
                         <div>
                             <h4 className="font-bold text-base">Field Area</h4>
                             <p>{areaInAcres.toFixed(3)} acres</p>
                             <p>{activeShape.area.toFixed(2)} square meters</p>
+                        </div>
+                        <div className="space-y-2">
+                           <Button size="sm" className="w-full" onClick={() => handleAnalysis(activeShape, 'soil')}>
+                             <Leaf className="mr-2 size-4"/> Analyze Soil
+                           </Button>
+                           <Button size="sm" className="w-full" onClick={() => handleAnalysis(activeShape, 'crop')}>
+                            <BrainCircuit className="mr-2 size-4"/> Get Crop Recs
+                           </Button>
                         </div>
                         <Button
                             variant="destructive"
@@ -260,13 +312,12 @@ export function FarmMap() {
                             className="w-full"
                         >
                             <Trash2 className="mr-2 size-4" />
-                            Delete
+                            Delete Field
                         </Button>
                     </div>
                 </InfoWindow>
             );
         })()}
-
       </GoogleMap>
       {drawnShapes.length > 0 && (
         <Button
@@ -279,6 +330,37 @@ export function FarmMap() {
           <Trash2 className="size-5" />
         </Button>
       )}
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{analysisTitle}</DialogTitle>
+            <DialogDescription>AI-powered analysis for the selected field.</DialogDescription>
+          </DialogHeader>
+          <div className="py-4 max-h-[60vh] overflow-y-auto">
+            {isAnalysisLoading ? (
+              <div className="flex justify-center items-center h-24">
+                <Loader2 className="size-8 animate-spin text-primary" />
+              </div>
+            ) : analysisResult && "report" in analysisResult ? (
+              <div className="space-y-2">
+                <p><strong>Organic Matter:</strong> {analysisResult.report.organicMatter}</p>
+                <p><strong>Nitrogen:</strong> {analysisResult.report.nitrogen}</p>
+                <p><strong>Phosphorus:</strong> {analysisResult.report.phosphorus}</p>
+                <p><strong>Potassium:</strong> {analysisResult.report.potassium}</p>
+                <p><strong>pH:</strong> {analysisResult.report.ph}</p>
+                <p><strong>Moisture:</strong> {analysisResult.report.moisture}</p>
+                <p className="pt-2 border-t mt-2"><strong>Summary:</strong> {analysisResult.summary}</p>
+              </div>
+            ) : analysisResult && "recommendedCrops" in analysisResult ? (
+              <div className="space-y-2">
+                <p><strong>Recommended Crops:</strong> {analysisResult.recommendedCrops.join(', ')}</p>
+                <p className="pt-2 border-t mt-2"><strong>Rationale:</strong> {analysisResult.rationale}</p>
+              </div>
+            ) : null}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   ) : (
     <Skeleton className="h-full w-full rounded-lg" />

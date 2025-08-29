@@ -15,6 +15,8 @@ import { getWeather } from './weather-service';
 
 const SoilHealthAnalyzerInputSchema = z.object({
   location: z.string().describe('Geographic location for the farm (e.g., "Napa Valley, CA").'),
+  lat: z.number().optional().describe('The latitude.'),
+  lon: z.number().optional().describe('The longitude.'),
 });
 
 export type SoilHealthAnalyzerInput = z.infer<typeof SoilHealthAnalyzerInputSchema>;
@@ -48,7 +50,7 @@ const prompt = ai.definePrompt({
   
   Your task is to simulate a soil health analysis based on satellite imagery for a given location.
   
-  First, get the current weather for the user's location: {{{location}}} to understand the recent environmental conditions.
+  First, get the current weather for the user's location (using lat/lon if provided) to understand the recent environmental conditions.
   
   Then, based on the provided location and typical geological and environmental factors for that area, generate a plausible soil health report. This should simulate an analysis derived from multispectral satellite data (like Landsat or Sentinel-2).
   

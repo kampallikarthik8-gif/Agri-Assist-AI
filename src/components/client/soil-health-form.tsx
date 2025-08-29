@@ -13,10 +13,11 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Leaf, Droplets, FlaskConical, Thermometer } from "lucide-react";
 import { Icons } from "../icons";
-import { getWeather } from "@/ai/flows/weather-service";
 
 const formSchema = z.object({
   location: z.string().min(3, "Location is required."),
+  lat: z.number().optional(),
+  lon: z.number().optional(),
 });
 
 export function SoilHealthForm() {
@@ -28,32 +29,30 @@ export function SoilHealthForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       location: "",
+      lat: undefined,
+      lon: undefined,
     },
   });
 
   useEffect(() => {
-    async function fetchCity(lat: number, lon: number) {
-        try {
-            const weatherData = await getWeather({ lat, lon });
-            if (weatherData.locationName) {
-                form.setValue("location", weatherData.locationName);
-            }
-        } catch (error) {
-            console.error("Failed to fetch city from coordinates:", error);
-        }
-    }
-
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                fetchCity(position.coords.latitude, position.coords.longitude);
-            },
-            (error) => {
-                console.error("Geolocation error:", error);
-            }
-        );
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          form.setValue("lat", position.coords.latitude);
+          form.setValue("lon", position.coords.longitude);
+          form.setValue("location", `Lat: ${position.coords.latitude.toFixed(4)}, Lon: ${position.coords.longitude.toFixed(4)}`);
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+           toast({
+                variant: "destructive",
+                title: "Location Error",
+                description: "Could not automatically fetch your location. Please enter it manually.",
+            });
+        }
+      );
     }
-  }, [form]);
+  }, [form, toast]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);

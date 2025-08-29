@@ -34,17 +34,48 @@ type DrawnShape = {
     infoWindowPos: google.maps.LatLng;
 };
 
+const LOCAL_STORAGE_KEY = 'farm_map_fields';
+
 export function FarmMap() {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [center, setCenter] = useState(defaultCenter);
   const [drawnShapes, setDrawnShapes] = useState<DrawnShape[]>([]);
   const [activeInfoWindow, setActiveInfoWindow] = useState<number | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
     libraries,
   });
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isMounted) {
+      const savedShapes = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedShapes) {
+          const shapes = JSON.parse(savedShapes).map((shape: any) => ({
+              ...shape,
+              infoWindowPos: new google.maps.LatLng(shape.infoWindowPos.lat, shape.infoWindowPos.lng),
+          }));
+          setDrawnShapes(shapes);
+      }
+    }
+  }, [isMounted]);
+
+  useEffect(() => {
+    if (isMounted) {
+       const shapesToSave = drawnShapes.map(shape => ({
+            ...shape,
+            // Convert LatLng object to a plain object for JSON serialization
+            infoWindowPos: { lat: shape.infoWindowPos.lat(), lng: shape.infoWindowPos.lng() },
+        }));
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(shapesToSave));
+    }
+  }, [drawnShapes, isMounted]);
 
   useEffect(() => {
     if (navigator.geolocation) {

@@ -137,7 +137,7 @@ export function GovernmentSchemesForm() {
         </CardContent>
       </Card>
       
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         <Card>
             <CardHeader>
                 <CardTitle>PM Kisan Samman Nidhi</CardTitle>
@@ -194,6 +194,20 @@ export function GovernmentSchemesForm() {
                  <Button asChild className="mt-4">
                     <Link href="https://www.jansamarth.in/agri-loan" target="_blank" rel="noopener noreferrer">
                         Apply for KCC Online
+                        <ExternalLink className="ml-2 h-4 w-4" />
+                    </Link>
+                </Button>
+            </CardContent>
+        </Card>
+        <Card>
+            <CardHeader>
+                <CardTitle>PM Surya Ghar: Rooftop Solar Scheme</CardTitle>
+                <CardDescription>To apply for the Rooftop Solar Financing Scheme, visit the PM Surya Ghar Portal, complete your application, and click 'Apply for Loan' to proceed on JanSamarth.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Button asChild>
+                    <Link href="https://pmsuryaghar.gov.in" target="_blank" rel="noopener noreferrer">
+                        Apply for Rooftop Solar
                         <ExternalLink className="ml-2 h-4 w-4" />
                     </Link>
                 </Button>

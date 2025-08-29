@@ -332,6 +332,50 @@ export function GovernmentSchemesForm() {
             </Button>
           </CardContent>
         </Card>
+        <Card>
+            <CardHeader>
+                <CardTitle>Annadata Sukhibhava Scheme (AP)</CardTitle>
+                <CardDescription>A flagship farmer welfare program by the Andhra Pradesh government.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                 <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="benefit">
+                        <AccordionTrigger>Benefit & Installments</AccordionTrigger>
+                        <AccordionContent>
+                           <p className="text-sm text-muted-foreground">
+                             ₹20,000 annually per farmer family — ₹14,000 from the state and ₹6,000 under PM-KISAN, paid in three installments. Landless farmers receive the full ₹20,000 from the state.
+                           </p>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="inclusion">
+                        <AccordionTrigger>Eligibility</AccordionTrigger>
+                        <AccordionContent>
+                            <p className="text-sm text-muted-foreground">
+                                Covers small, marginal, land-owning, and tenant farmers, including those with land rights under ROFR.
+                           </p>
+                        </AccordionContent>
+                    </AccordionItem>
+                     <AccordionItem value="impact">
+                        <AccordionTrigger>Reach & Impact</AccordionTrigger>
+                        <AccordionContent>
+                           <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                                <li>Enrolled 64 lakh farmer families (95% of eligible households).</li>
+                                <li>₹4,760 crore disbursed since launch.</li>
+                                <li>Reported a 15% rise in tenant farmer participation.</li>
+                                <li>Achieved a 98% application approval rate and 94% beneficiary satisfaction.</li>
+                                <li>Budget allocation: over ₹5,012 crore in FY 2025‑26.</li>
+                           </ul>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+                 <Button asChild className="mt-4" variant="secondary">
+                    <Link href="https://apagrisnet.gov.in/" target="_blank" rel="noopener noreferrer">
+                        Visit AP AgriSnet Portal
+                        <ExternalLink className="ml-2 h-4 w-4" />
+                    </Link>
+                </Button>
+            </CardContent>
+        </Card>
       </div>
 
        <div className="grid gap-6 md:grid-cols-2">

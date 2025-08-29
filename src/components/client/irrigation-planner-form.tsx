@@ -88,7 +88,7 @@ export function IrrigationPlannerForm() {
       <Card>
         <CardHeader>
           <CardTitle>Create Irrigation Plan</CardTitle>
-          <CardDescription>Provide details about your field to generate an optimal irrigation schedule.</CardDescription>
+          <CardDescription>Provide details about your field to generate an optimal irrigation schedule. We've tried to detect your location automatically.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>

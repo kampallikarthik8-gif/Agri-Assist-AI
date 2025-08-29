@@ -92,7 +92,7 @@ export function GovernmentSchemesForm() {
       <Card>
         <CardHeader>
           <CardTitle>Find Government Schemes & Subsidies</CardTitle>
-          <CardDescription>Enter your state or region in India to find relevant agricultural support programs.</CardDescription>
+          <CardDescription>Enter your state or region in India to find relevant agricultural support programs. We've tried to detect your location automatically.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -128,6 +128,9 @@ export function GovernmentSchemesForm() {
             </Button>
             <Button variant="outline" size="sm" onClick={() => handleQuickSearch('Andhra Pradesh')} disabled={loading}>
               Search Andhra Pradesh
+            </Button>
+             <Button variant="outline" size="sm" onClick={() => handleQuickSearch('Maharashtra')} disabled={loading}>
+              Search Maharashtra
             </Button>
           </div>
         </CardContent>

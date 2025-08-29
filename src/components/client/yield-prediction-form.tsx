@@ -107,7 +107,7 @@ export function YieldPredictionForm() {
       <Card>
         <CardHeader>
           <CardTitle>Generate Yield Forecast</CardTitle>
-          <CardDescription>Enter your location and crop type to get an AI-powered 6-month yield prediction.</CardDescription>
+          <CardDescription>Enter your location and crop type to get an AI-powered 6-month yield prediction. We've tried to detect your location automatically.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -163,7 +163,7 @@ export function YieldPredictionForm() {
               <p className="text-muted-foreground">Generating forecast...</p>
             </div>
           )}
-          {result && !loading && (
+          {result && result.forecast.length > 0 && !loading ? (
             <ChartContainer config={chartConfig} className="h-full w-full">
                 <BarChart accessibilityLayer data={result.forecast}>
                     <CartesianGrid vertical={false} />
@@ -173,13 +173,12 @@ export function YieldPredictionForm() {
                     <Bar dataKey="yield" fill="var(--color-yield)" radius={4} />
                 </BarChart>
             </ChartContainer>
-          )}
-          {!result && !loading && (
+          ) : !loading ? (
              <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
                 <Icons.YieldPrediction className="size-12 mb-4"/>
-                <p>Your yield prediction chart will appear here.</p>
+                <p>Your yield prediction chart will appear here. {result && result.forecast.length === 0 ? "Could not generate forecast." : ""}</p>
             </div>
-          )}
+          ) : null}
         </CardContent>
       </Card>
     </div>

@@ -89,7 +89,7 @@ export function MarketInsightsForm() {
         <Card>
           <CardHeader>
             <CardTitle>Get Market Analysis</CardTitle>
-            <CardDescription>Enter a crop and region to get AI-powered market insights.</CardDescription>
+            <CardDescription>Enter a crop and region to get AI-powered market insights. We've tried to detect your location automatically.</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>

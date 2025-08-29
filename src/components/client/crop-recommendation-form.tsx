@@ -41,6 +41,11 @@ export function CropRecommendationForm() {
             }
         } catch (error) {
             console.error("Failed to fetch city from coordinates:", error);
+            toast({
+                variant: "destructive",
+                title: "Location Error",
+                description: "Could not automatically fetch your location.",
+            });
         }
     }
 
@@ -54,7 +59,7 @@ export function CropRecommendationForm() {
             }
         );
     }
-  }, [form]);
+  }, [form, toast]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
@@ -87,7 +92,7 @@ export function CropRecommendationForm() {
       <Card className="lg:col-span-2">
         <CardHeader>
           <CardTitle>Get Crop Recommendations</CardTitle>
-          <CardDescription>Enter your farm's location to receive AI-powered crop suggestions.</CardDescription>
+          <CardDescription>Enter your farm's location to receive AI-powered crop suggestions. We've tried to detect your location automatically.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>

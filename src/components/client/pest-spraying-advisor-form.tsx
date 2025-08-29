@@ -99,7 +99,7 @@ export function PestSprayingAdvisorForm() {
       <Card>
         <CardHeader>
           <CardTitle>Pest Spraying Advisor</CardTitle>
-          <CardDescription>Get an AI-powered recommendation for the best time to spray based on live weather conditions.</CardDescription>
+          <CardDescription>Get an AI-powered recommendation for the best time to spray based on live weather conditions. We've tried to detect your location automatically.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>

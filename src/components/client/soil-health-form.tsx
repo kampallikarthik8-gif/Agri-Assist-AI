@@ -86,7 +86,7 @@ export function SoilHealthForm() {
       <Card>
         <CardHeader>
           <CardTitle>Satellite Soil Health Analysis</CardTitle>
-          <CardDescription>Enter your farm's location for an AI-powered soil health report based on simulated satellite data.</CardDescription>
+          <CardDescription>Enter your farm's location for an AI-powered soil health report based on simulated satellite data. We've tried to detect your location automatically.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>

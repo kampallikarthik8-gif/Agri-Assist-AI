@@ -24,11 +24,11 @@ export type FertilizerCalculatorInput = z.infer<typeof FertilizerCalculatorInput
 
 const FertilizerCalculatorOutputSchema = z.object({
   fertilizerAmounts: z.object({
-    nitrogen: z.number().describe('The recommended amount of nitrogen fertilizer.'),
-    phosphorus: z.number().describe('The recommended amount of phosphorus fertilizer.'),
-    potassium: z.number().describe('The recommended amount of potassium fertilizer.'),
+    nitrogen: z.number().describe('The recommended amount of nitrogen fertilizer in kg.'),
+    phosphorus: z.number().describe('The recommended amount of phosphorus fertilizer in kg.'),
+    potassium: z.number().describe('The recommended amount of potassium fertilizer in kg.'),
   }),
-  unit: z.string().describe('The unit for the fertilizer amounts (e.g., kg or lbs).'),
+  unit: z.string().describe('The unit for the fertilizer amounts, which must be "kg".'),
   recommendation: z.string().describe('A detailed explanation of the recommendation, including application timing and methods.'),
 });
 export type FertilizerCalculatorOutput = z.infer<typeof FertilizerCalculatorOutputSchema>;
@@ -55,7 +55,7 @@ Based on the provided soil analysis, crop type, and farm area, calculate the req
 
 Consider the ideal nutrient requirements for the specified crop. The calculated amounts should compensate for the deficiencies in the soil to reach optimal levels for the crop's growth stage.
 
-Provide the total required amounts for N, P, and K. Also, provide a detailed recommendation that explains the calculation and suggests the best time and method for application (e.g., split application, pre-planting). The units for the fertilizer amounts should be appropriate for the area unit provided (e.g., lbs for acres, kg for hectares).
+Provide the total required amounts for N, P, and K in kilograms (kg). Also, provide a detailed recommendation that explains the calculation and suggests the best time and method for application (e.g., split application, pre-planting). The unit for the fertilizer amounts must be 'kg'.
 
 Provide the output in JSON format.`,
 });
@@ -79,4 +79,3 @@ const fertilizerCalculatorFlow = ai.defineFlow(
     }
   }
 );
-

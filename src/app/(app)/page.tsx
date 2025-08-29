@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BarChart as BarChartIcon, LineChart as LineChartIcon, Cloud, Sun, Wind, Cloudy, SunMoon, CloudRain, Snowflake, Bug, ExternalLink } from "lucide-react";
+import { BarChart as BarChartIcon, LineChart as LineChartIcon, Cloud, Sun, Wind, Cloudy, SunMoon, CloudRain, Snowflake, Bug, ExternalLink, Eye } from "lucide-react";
 import {
   ChartContainer,
   ChartTooltip,
@@ -180,43 +180,49 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-6">
       <h1 className="text-3xl font-bold tracking-tight">Kisan Mitra AI Dashboard</h1>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="lg:col-span-1">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Icons.Weather className="size-6 text-accent" />
-              Current Weather
-            </CardTitle>
-            <CardDescription>
-                {weather && !loading ? weather.locationName : (locationError || "Loading location...")}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex items-center justify-around">
-            {loading ? (
-                <div className="flex w-full items-center gap-4">
-                    <Skeleton className="h-16 w-16 rounded-full" />
-                    <div className="space-y-2">
-                        <Skeleton className="h-8 w-24" />
-                        <Skeleton className="h-4 w-32" />
+        <Card className="lg:col-span-2">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Icons.Weather className="size-6 text-accent" />
+                    Current Weather
+                </CardTitle>
+                <CardDescription>
+                    {weather && !loading ? weather.locationName : (locationError || "Loading location...")}
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col md:flex-row items-center justify-around gap-6">
+                {loading ? (
+                    <div className="flex w-full items-center gap-4">
+                        <Skeleton className="h-16 w-16 rounded-full" />
+                        <div className="space-y-2">
+                            <Skeleton className="h-8 w-24" />
+                            <Skeleton className="h-4 w-32" />
+                        </div>
                     </div>
-                </div>
-            ) : weather ? (
-              <>
-                <div className="flex items-center gap-4">
-                  <WeatherIcon className="size-16 text-warning" />
-                  <span className="text-5xl font-bold">{weather.temperature}°C</span>
-                </div>
-                <div className="space-y-2 text-sm">
-                    <p className="flex items-center gap-2"><Wind className="size-4 text-muted-foreground" /> Wind: {weather.windSpeed} km/h</p>
-                    <p className="flex items-center gap-2"><Cloud className="size-4 text-muted-foreground" /> Humidity: {weather.humidity}%</p>
-                </div>
-              </>
-            ) : (
-                <p className="text-sm text-muted-foreground">{locationError || "Could not load weather data."}</p>
-            )}
-          </CardContent>
+                ) : weather ? (
+                <>
+                    <div className="flex items-center gap-4 text-center md:text-left">
+                        <WeatherIcon className="size-16 text-warning" />
+                        <div>
+                          <span className="text-5xl font-bold">{weather.temperature}°F</span>
+                          <p className="text-muted-foreground capitalize">{weather.description}</p>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+                        <p className="flex items-center gap-2"><Icons.Thermometer className="size-4 text-muted-foreground" /> Feels like: {weather.feelsLike}°F</p>
+                        <p className="flex items-center gap-2"><Wind className="size-4 text-muted-foreground" /> Wind: {weather.windSpeed} mph</p>
+                        <p className="flex items-center gap-2"><Cloud className="size-4 text-muted-foreground" /> Humidity: {weather.humidity}%</p>
+                        <p className="flex items-center gap-2"><Icons.UV className="size-4 text-muted-foreground" /> UV Index: {weather.uvIndex}</p>
+                        <p className="flex items-center gap-2"><Eye className="size-4 text-muted-foreground" /> Visibility: {weather.visibility} mi</p>
+                    </div>
+                </>
+                ) : (
+                    <p className="text-sm text-muted-foreground">{locationError || "Could not load weather data."}</p>
+                )}
+            </CardContent>
         </Card>
         
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
                 <LineChartIcon className="size-6 text-primary"/>
@@ -264,7 +270,7 @@ export default function DashboardPage() {
                                 </div>
                                 <div>
                                     <p className="font-semibold">{alert.name}</p>
-                                    <p className="text-sm text-muted-foreground">{alert.riskLevel}</p>
+                                    <p className="text-sm text-muted-foreground">{alert.riskLevel} risk</p>
                                 </div>
                             </li>
                         ))}

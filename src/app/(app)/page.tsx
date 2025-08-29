@@ -129,7 +129,11 @@ export default function DashboardPage() {
                     pestDiseaseAlert({ location })
                 ]);
                 
-                setYieldData(yieldRes.forecast);
+                if (yieldRes) {
+                    setYieldData(yieldRes.forecast);
+                } else {
+                    setYieldData([]);
+                }
                 setPestAlerts(pestRes.alerts);
 
             } catch (error: any) {

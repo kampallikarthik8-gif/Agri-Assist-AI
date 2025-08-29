@@ -34,20 +34,20 @@ import { useToast } from "@/hooks/use-toast";
 
 const newsFeed = [
     {
-        title: "PM-Kisan Scheme: Next installment to be released soon",
-        summary: "The government is preparing to release the next installment of the Pradhan Mantri Kisan Samman Nidhi (PM-KISAN) scheme...",
+        title: "PM-కిసాన్ పథకం: తదుపరి విడత త్వరలో విడుదల",
+        summary: "ప్రధాన మంత్రి కిసాన్ సమ్మాన్ నిధి (PM-KISAN) పథకం తదుపరి విడతను విడుదల చేయడానికి ప్రభుత్వం సన్నాహాలు చేస్తోంది...",
         image: "https://picsum.photos/seed/news1/600/400",
         aiHint: "indian farmer government"
     },
     {
-        title: "Monsoon arrives in Kerala, good rainfall expected",
-        summary: "The Southwest Monsoon has made its onset over Kerala, with the IMD forecasting a normal to above-normal rainy season this year...",
+        title: "కేరళలోకి రుతుపవనాలు ప్రవేశించాయి, మంచి వర్షపాతం అంచనా",
+        summary: "నైరుతి రుతుపవనాలు కేరళలో ప్రవేశించాయి, ఈ సంవత్సరం సాధారణం నుండి అధిక వర్షాకాలం ఉంటుందని IMD అంచనా వేసింది...",
         image: "https://picsum.photos/seed/news2/600/400",
         aiHint: "monsoon rain india"
     },
     {
-        title: "New subsidy announced for solar-powered irrigation pumps",
-        summary: "Under the PM-KUSUM scheme, farmers can now avail a higher subsidy for installing solar-powered water pumps...",
+        title: "సౌర శక్తితో నడిచే నీటిపంపులకు కొత్త సబ్సిడీ ప్రకటన",
+        summary: "PM-KUSUM పథకం కింద, రైతులు ఇప్పుడు సౌర శక్తితో నడిచే నీటి పంపులను ఏర్పాటు చేసుకోవడానికి అధిక సబ్సిడీని పొందవచ్చు...",
         image: "https://picsum.photos/seed/news3/600/400",
         aiHint: "solar panel farm"
     }
@@ -270,9 +270,9 @@ export default function DashboardPage() {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Icons.News className="size-6 text-primary" />
-                    Agricultural News & Updates
+                    వ్యవసాయ వార్తలు & నవీకరణలు
                 </CardTitle>
-                <CardDescription>Latest news and updates for Indian farmers</CardDescription>
+                <CardDescription>భారతీయ రైతుల కోసం తాజా వార్తలు మరియు నవీకరణలు</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6">
                 {newsFeed.map((item, index) => (

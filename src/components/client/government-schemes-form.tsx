@@ -567,7 +567,7 @@ export function GovernmentSchemesForm() {
                                 <ExternalLink className="ml-2 h-4 w-4" />
                             </Link>
                         </Button>
-                        <Button asChild className="mt-4" variant="secondary">
+                        <Button asChild size="sm" variant="secondary">
                             <Link href="https://apagrisnet.gov.in/" target="_blank" rel="noopener noreferrer">
                                 Visit AP AgriSnet Portal
                                 <ExternalLink className="ml-2 h-4 w-4" />
@@ -683,9 +683,9 @@ export function GovernmentSchemesForm() {
                     </CardHeader>
                     <CardContent>
                         <p>Provides a one-time compensation of ₹7 lakh to the family in the event of a farmer’s death by suicide.</p>
-                    </Caredit>
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+            </div>
 
             <Card className="md:col-span-2">
                 <CardHeader>
@@ -713,3 +713,4 @@ export function GovernmentSchemesForm() {
     </div>
   );
 }
+

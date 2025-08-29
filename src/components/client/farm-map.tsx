@@ -18,8 +18,8 @@ const containerStyle = {
 };
 
 const defaultCenter = {
-  lat: 37.7749,
-  lng: -122.4194,
+  lat: 28.6139, // Default to Delhi, India
+  lng: 77.2090,
 };
 
 const libraries: "drawing"[] = ["drawing"];
@@ -60,15 +60,16 @@ export function FarmMap() {
   }, []);
 
   const onPolygonComplete = (polygon: google.maps.Polygon) => {
-    // The polygon is automatically added to the map by the DrawingManager.
-    // We'll keep a reference to it to be able to clear it later.
-    setDrawnPolygons((prev) => [...prev, polygon]);
-    // Prevent the polygon from being drawn again by the manager
-    (polygon as any).setMap(null); 
-    
-    // To keep it on the map, we need to re-add it under our own management
-    polygon.setMap(map);
+    // The polygon is automatically added to the map by the DrawingManager when `drawingControl` is true.
+    // To manage it ourselves (e.g., to clear it), we'll add it to our state.
+    // The google.maps.event.addListener on the drawingManager handles this.
   };
+
+  const onDrawingManagerLoad = (drawingManager: google.maps.drawing.DrawingManager) => {
+    google.maps.event.addListener(drawingManager, 'polygoncomplete', (polygon: google.maps.Polygon) => {
+        setDrawnPolygons(prev => [...prev, polygon]);
+    });
+  }
 
   const clearDrawings = () => {
     drawnPolygons.forEach((p) => p.setMap(null));
@@ -77,10 +78,18 @@ export function FarmMap() {
 
   if (loadError) {
     return (
-      <div className="flex items-center justify-center h-full">
-        Error loading maps. Please check your API key and configuration.
+      <div className="flex items-center justify-center h-full text-center text-muted-foreground p-4">
+        Could not load the map. Please ensure you have a valid Google Maps API key in your environment variables and that it is correctly configured in the Google Cloud Console.
       </div>
     );
+  }
+
+  if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
+      return (
+         <div className="flex items-center justify-center h-full text-center text-muted-foreground p-4">
+            Google Maps API Key is missing. Please add `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` to your .env file to use this feature.
+        </div>
+      )
   }
 
   return isLoaded ? (
@@ -95,9 +104,11 @@ export function FarmMap() {
           mapTypeId: "satellite",
           streetViewControl: false,
           mapTypeControl: false,
+          fullscreenControl: false,
         }}
       >
         <DrawingManager
+          onLoad={onDrawingManagerLoad}
           onPolygonComplete={onPolygonComplete}
           options={{
             drawingControl: true,
@@ -116,6 +127,14 @@ export function FarmMap() {
               editable: true,
               zIndex: 1,
             },
+            rectangleOptions: {
+                fillColor: "hsl(var(--primary) / 0.3)",
+                strokeColor: "hsl(var(--primary))",
+                strokeWeight: 2,
+                clickable: false,
+                editable: true,
+                zIndex: 1,
+            }
           }}
         />
       </GoogleMap>

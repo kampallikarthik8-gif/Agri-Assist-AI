@@ -55,6 +55,15 @@ const eKisanUpajNidhiFeatures = [
     { feature: "Integration with MSP and e‑NAM", detail: "Enables farmers to sell at MSP (or better) through digital marketplace linkages." },
 ];
 
+const marketingSummary = [
+    { level: "State Level", services: "Regulation under Markets Act, AMCs, market yard infrastructure, policy enforcement" },
+    { level: "District Level (Tirupati)", services: "Rythu Bazaars, storage godowns, fee collection, farmer support" },
+    { level: "Rythu Bandhu / Pledge Loans", services: "Loan against produce stored in godowns with minimal interest" },
+    { level: "Digital Platforms", services: "Adoption of e-NAM, UMP, ReMS for transparent markets" },
+    { level: "APMARKFED Network", services: "Input distribution, MSP-based procurement, farmer support via cooperatives" },
+];
+
+
 export function GovernmentSchemesForm() {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -457,8 +466,65 @@ export function GovernmentSchemesForm() {
                     </Button>
                 </CardContent>
             </Card>
-            
-             <Card>
+
+            <Card className="md:col-span-2">
+                <CardHeader>
+                    <CardTitle>Agricultural Marketing Department (Andhra Pradesh)</CardTitle>
+                    <CardDescription>Understanding market structures, services, and digital platforms in AP.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="structure">
+                            <AccordionTrigger>Statewide Structure & Purpose</AccordionTrigger>
+                            <AccordionContent>
+                                <p className="text-sm text-muted-foreground">
+                                    Established in 1962, the department operates under the Agriculture & Cooperation Department, enforcing the Agricultural Produce & Livestock Markets Act. It oversees about 217 Agricultural Market Committees (AMCs) managing 324 market yards, regulates trade, collects a 1% market fee, and develops infrastructure.
+                                </p>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="district">
+                            <AccordionTrigger>District-Level Functions (Focus on Tirupati)</AccordionTrigger>
+                            <AccordionContent>
+                                 <p className="text-sm text-muted-foreground mb-2">The District Agriculture Trade & Marketing Officer manages 12 Market Committees in Tirupati, with a focus on Rythu Bazaars (direct-to-consumer markets) to eliminate intermediaries. The district has 37 godowns with a 34,300 MT capacity, utilized by around 400 paddy farmers.</p>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="services">
+                            <AccordionTrigger>Key Services & Schemes</AccordionTrigger>
+                            <AccordionContent>
+                                <ul className="list-disc space-y-3 pl-5 text-sm text-muted-foreground">
+                                    <li><span className="font-semibold text-foreground">Rythu Bazaars:</span> Provide fee-free market access where farmers set prices for direct sales.</li>
+                                    <li><span className="font-semibold text-foreground">Rythu Bandhu Pathakam (Pledge Finance):</span> Enables farmers to take interest-free loans up to ₹2 lakh against produce stored in AMC godowns.</li>
+                                    <li><span className="font-semibold text-foreground">E-NAM & Digital Platforms:</span> AMCs are integrated with e-NAM and the Unified Market Platform (UMP) for transparent digital bidding and direct payments.</li>
+                                    <li><span className="font-semibold text-foreground">APMARKFED Support:</span> A cooperative network supplying inputs and procuring commodities at MSP to prevent distress sales.</li>
+                                </ul>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="summary">
+                            <AccordionTrigger>Quick Summary</AccordionTrigger>
+                            <AccordionContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Level</TableHead>
+                                            <TableHead>Services & Functions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {marketingSummary.map((item, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell className="font-semibold p-2">{item.level}</TableCell>
+                                                <TableCell className="p-2">{item.services}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                </CardContent>
+            </Card>
+
+            <Card>
                 <CardHeader>
                     <CardTitle>Annadata Sukhibhava Scheme (AP)</CardTitle>
                     <CardDescription>A flagship farmer welfare program by the Andhra Pradesh government.</CardDescription>

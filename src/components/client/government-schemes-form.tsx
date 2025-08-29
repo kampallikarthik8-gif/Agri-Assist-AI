@@ -36,6 +36,15 @@ const pmKisanOverview = [
     { feature: "Disbursement Issues", detail: "Delay caused by unmapped Aadhaar, closed accounts, KYC pending; banks asked to fix it." }
 ];
 
+const aifQuickReference = [
+    { parameter: "Loan Amount", detail: "Up to ₹2 crore (subvention eligible); can exceed but no benefits beyond ₹2cr" },
+    { parameter: "Interest Subvention", detail: "3% p.a. up to ₹2cr for max 7 years including moratorium" },
+    { parameter: "Promoter Contribution", detail: "10% up to ₹2cr; 25% beyond that" },
+    { parameter: "Credit Guarantee", detail: "Covered under CGTMSE/NABSanrakshan for up to ₹2cr loan" },
+    { parameter: "Tenure & Moratorium", detail: "Up to 7 years; moratorium: 6 months–2 years" },
+    { parameter: "Max Projects", detail: "Private entities: 25; institutions like FPOs/Coops: no limit" },
+    { parameter: "Application Process", detail: "Online via portal, PMU review, bank appraisal & disbursement" },
+];
 
 export function GovernmentSchemesForm() {
   const [loading, setLoading] = useState(false);
@@ -315,6 +324,93 @@ export function GovernmentSchemesForm() {
           </CardContent>
         </Card>
       </div>
+
+       <div className="grid gap-6 md:grid-cols-1">
+        <Card className="md:col-span-1">
+             <CardHeader>
+                <CardTitle>Agriculture Infrastructure Fund (AIF)</CardTitle>
+                <CardDescription>A financing facility for post-harvest infrastructure and community farming assets.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                 <Accordion type="single" collapsible className="w-full">
+                     <AccordionItem value="what-is-aif">
+                        <AccordionTrigger>What is AIF?</AccordionTrigger>
+                        <AccordionContent>
+                           <p className="text-sm text-muted-foreground">
+                               The Agriculture Infrastructure Fund (AIF) is a ₹1 lakh crore central sector scheme launched in 2020 to support agri-entrepreneurs, farmers, FPOs, and startups. It aims to improve post-harvest infrastructure and runs through 2032-33, with loan disbursements ending in FY 2025-26.
+                           </p>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="benefits">
+                        <AccordionTrigger>Key Benefits & Financing Features</AccordionTrigger>
+                        <AccordionContent>
+                           <ul className="list-disc space-y-3 pl-5 text-sm text-muted-foreground">
+                                <li><span className="font-semibold text-foreground">Interest Subvention:</span> 3% per annum for loans up to ₹2 crore for a maximum of 7 years.</li>
+                                <li><span className="font-semibold text-foreground">Credit Guarantee:</span> Available for loans up to ₹2 crore via CGTMSE or NABSanrakshan, with fees paid by the government.</li>
+                                <li><span className="font-semibold text-foreground">Promoter's Contribution:</span> Minimum 10% for loans up to ₹2 crore, and 25% for loans above that.</li>
+                                <li><span className="font-semibold text-foreground">Loan Tenure & Moratorium:</span> Maximum 7-year repayment period, including a moratorium of 6 months to 2 years.</li>
+                                <li><span className="font-semibold text-foreground">Project Limit:</span> Up to 25 projects for private entities; no limit for state agencies, FPOs, SHGs, etc.</li>
+                           </ul>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="projects">
+                        <AccordionTrigger>What Projects Qualify?</AccordionTrigger>
+                        <AccordionContent>
+                            <p className="text-sm text-muted-foreground">The scheme supports infrastructure such as warehouses, silos, cold storage, pack-houses, sorting & grading units, processing centers, and community farming assets like polyhouses and smart irrigation.</p>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="eligibility">
+                        <AccordionTrigger>Who is Eligible?</AccordionTrigger>
+                        <AccordionContent>
+                             <p className="text-sm text-muted-foreground">Eligible applicants include individual farmers, FPOs, SHGs, cooperatives, agri-entrepreneurs, startups, and central/state agencies.</p>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="application">
+                        <AccordionTrigger>How to Apply Online</AccordionTrigger>
+                        <AccordionContent>
+                           <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+                                <li><span className="font-semibold text-foreground">Register:</span> Visit the AIF Portal, register with your Aadhaar and mobile number.</li>
+                                <li><span className="font-semibold text-foreground">Prepare DPR:</span> Create a Detailed Project Report (DPR) with project details, costs, and financials.</li>
+                                <li><span className="font-semibold text-foreground">Apply:</span> Upload the DPR and other required documents, and select a lending bank.</li>
+                                <li><span className="font-semibold text-foreground">Review & Sanction:</span> The Central PMU reviews the application, and the selected bank appraises and sanctions the loan.</li>
+                                <li><span className="font-semibold text-foreground">Monitor:</span> Track your application status on the AIF portal dashboard.</li>
+                           </ol>
+                        </AccordionContent>
+                    </AccordionItem>
+                     <AccordionItem value="quick-ref">
+                        <AccordionTrigger>Quick Reference Table</AccordionTrigger>
+                        <AccordionContent>
+                           <Table>
+                                <TableBody>
+                                    {aifQuickReference.map((item, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell className="font-semibold p-2">{item.parameter}</TableCell>
+                                            <TableCell className="p-2">{item.detail}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                           </Table>
+                        </AccordionContent>
+                    </AccordionItem>
+                     <AccordionItem value="state-news">
+                        <AccordionTrigger>Recent State-Level Announcement</AccordionTrigger>
+                        <AccordionContent>
+                           <p className="text-sm text-muted-foreground">
+                               The Uttar Pradesh government plans to disburse ₹5,000 crore in subsidized agri loans, leveraging the AIF to build infrastructure like cold storage, warehouses, and grading units.
+                           </p>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+                 <Button asChild className="mt-4">
+                    <Link href="https://agriinfra.dac.gov.in" target="_blank" rel="noopener noreferrer">
+                        Visit AIF Portal
+                        <ExternalLink className="ml-2 h-4 w-4" />
+                    </Link>
+                </Button>
+            </CardContent>
+        </Card>
+      </div>
+
 
       <div className="space-y-6">
         {loading && (

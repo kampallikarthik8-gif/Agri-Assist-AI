@@ -100,7 +100,7 @@ export default function DailyNewsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Live Agricultural News</CardTitle>
-          <CardDescription>Enter a topic or region to search for the latest agricultural news updates.</CardDescription>
+          <CardDescription>Enter a topic or region to get the latest agricultural news updates from across India. The latest headlines for your location are shown below.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>

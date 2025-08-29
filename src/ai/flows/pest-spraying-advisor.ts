@@ -74,7 +74,7 @@ const pestSprayingAdvisorFlow = ai.defineFlow(
             console.error(`Error in pestSprayingAdvisorFlow on attempt ${i + 1}`, error);
             if (i === maxRetries - 1) {
                 // If it's the last retry, rethrow the error
-                throw error;
+                throw new Error('Failed to generate a response from the AI model after multiple attempts.');
             }
         }
     }

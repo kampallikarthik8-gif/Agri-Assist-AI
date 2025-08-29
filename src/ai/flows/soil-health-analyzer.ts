@@ -96,4 +96,3 @@ const soilHealthAnalyzerFlow = ai.defineFlow(
      throw new Error('Failed to analyze soil health.');
   }
 );
-

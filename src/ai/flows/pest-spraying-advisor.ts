@@ -69,7 +69,7 @@ const pestSprayingAdvisorFlow = ai.defineFlow(
       return output;
     } catch (error) {
       console.error("Error in pestSprayingAdvisorFlow", error);
-      throw new Error('Failed to get spraying advice.');
+      throw error;
     }
   }
 );

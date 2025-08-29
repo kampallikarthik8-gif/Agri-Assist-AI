@@ -76,11 +76,11 @@ export function PestSprayingAdvisorForm() {
       setResult(res);
     } catch (error: any) {
       console.error(error);
-      if (error.message && error.message.includes('403 Forbidden')) {
+      if (error.message && (error.message.includes('403 Forbidden') || error.message.includes('API_KEY_SERVICE_BLOCKED'))) {
           toast({
               variant: "destructive",
               title: "API Access Error",
-              description: "The Generative Language API is disabled or blocked. Please enable it in your Google Cloud project.",
+              description: "The Generative Language API is disabled or blocked. Please check your Google Cloud project settings.",
           });
       } else {
           toast({

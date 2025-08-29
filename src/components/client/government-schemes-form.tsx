@@ -560,12 +560,20 @@ export function GovernmentSchemesForm() {
                             </AccordionContent>
                         </AccordionItem>
                     </Accordion>
-                     <Button asChild className="mt-4" variant="secondary">
-                        <Link href="https://apagrisnet.gov.in/" target="_blank" rel="noopener noreferrer">
-                            Visit AP AgriSnet Portal
-                            <ExternalLink className="ml-2 h-4 w-4" />
-                        </Link>
-                    </Button>
+                     <div className="flex flex-wrap gap-4 mt-4">
+                        <Button asChild size="sm">
+                            <Link href="https://annadathasukhibhava.ap.gov.in/know-your-status" target="_blank" rel="noopener noreferrer">
+                                Know Your Status
+                                <ExternalLink className="ml-2 h-4 w-4" />
+                            </Link>
+                        </Button>
+                        <Button asChild className="mt-4" variant="secondary">
+                            <Link href="https://apagrisnet.gov.in/" target="_blank" rel="noopener noreferrer">
+                                Visit AP AgriSnet Portal
+                                <ExternalLink className="ml-2 h-4 w-4" />
+                            </Link>
+                        </Button>
+                    </div>
                 </CardContent>
             </Card>
 
@@ -675,10 +683,10 @@ export function GovernmentSchemesForm() {
                     </CardHeader>
                     <CardContent>
                         <p>Provides a one-time compensation of ₹7 lakh to the family in the event of a farmer’s death by suicide.</p>
-                    </CardContent>
-                </Card>
-            </div>
-            
+                    </Caredit>
+                </CardContent>
+            </Card>
+
             <Card className="md:col-span-2">
                 <CardHeader>
                     <CardTitle>Mid-Day Meal & Procurement Initiatives</CardTitle>

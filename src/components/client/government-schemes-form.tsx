@@ -136,6 +136,21 @@ export function GovernmentSchemesForm() {
         </CardContent>
       </Card>
       
+      <Card>
+        <CardHeader>
+            <CardTitle>PM Kisan Samman Nidhi</CardTitle>
+            <CardDescription>Check your beneficiary status and payment details for the PM Kisan scheme.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <Button asChild>
+                <Link href="https://pmkisan.gov.in/BeneficiaryStatus_New.aspx" target="_blank" rel="noopener noreferrer">
+                    Check Beneficiary Status
+                    <ExternalLink className="ml-2 h-4 w-4" />
+                </Link>
+            </Button>
+        </CardContent>
+      </Card>
+
       <div className="space-y-6">
         {loading && (
           <div className="flex flex-col items-center justify-center pt-10 gap-4">

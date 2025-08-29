@@ -61,15 +61,24 @@ const pestSprayingAdvisorFlow = ai.defineFlow(
     outputSchema: PestSprayingAdvisorOutputSchema,
   },
   async input => {
-    try {
-      const {output} = await prompt(input);
-      if (!output) {
-        throw new Error('Failed to generate a response from the AI model.');
-      }
-      return output;
-    } catch (error) {
-      console.error("Error in pestSprayingAdvisorFlow", error);
-      throw error;
+    const maxRetries = 3;
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            console.log(`Attempt ${i + 1} for pestSprayingAdvisorFlow`);
+            const {output} = await prompt(input);
+            if (output) {
+                return output;
+            }
+            console.warn(`Attempt ${i + 1} returned null output.`);
+        } catch (error) {
+            console.error(`Error in pestSprayingAdvisorFlow on attempt ${i + 1}`, error);
+            if (i === maxRetries - 1) {
+                // If it's the last retry, rethrow the error
+                throw error;
+            }
+        }
     }
+    // If all retries fail to produce an output
+    throw new Error('Failed to generate a response from the AI model after multiple attempts.');
   }
 );

@@ -581,7 +581,7 @@ export function GovernmentSchemesForm() {
                             <AccordionContent>
                                <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
                                     <li><span className="font-semibold text-foreground">Farmer Registry:</span> Under AgriStack, a digital ID system consolidates land and farmer data for seamless access to schemes.</li>
-                                    <li><span className="font-semibold text-foreground">e-Panta App:</span> Android-based crop-booking system with GPS, photos, and integration into land records for insurance and loans.</li>
+                                    <li><span className="font-semibold text-foreground">e‑Panta App:</span> Android-based crop-booking system with GPS, photos, and integration into land records for insurance and loans.</li>
                                </ul>
                             </AccordionContent>
                         </AccordionItem>
@@ -655,6 +655,41 @@ export function GovernmentSchemesForm() {
                             </AccordionContent>
                         </AccordionItem>
                     </Accordion>
+                </CardContent>
+            </Card>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>NTR Jala Siri</CardTitle>
+                        <CardDescription>Targeted irrigation scheme to enhance water management.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <p>This scheme offers up to ₹2 lakh in support per farmer for irrigation infrastructure. For more information, please refer to official state government announcements.</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Farmer Suicide Ex-Gratia Scheme</CardTitle>
+                        <CardDescription>Financial support for families in crisis.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <p>Provides a one-time compensation of ₹7 lakh to the family in the event of a farmer’s death by suicide.</p>
+                    </CardContent>
+                </Card>
+            </div>
+            
+            <Card className="md:col-span-2">
+                <CardHeader>
+                    <CardTitle>Mid-Day Meal & Procurement Initiatives</CardTitle>
+                    <CardDescription>Connecting farm produce directly to government programs.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                        <li><span className="font-semibold text-foreground">Rice Procurement:</span> 3.5 lakh metric tons of fine-quality rice supplied to over 41,000 schools and 4,000 hostels, procured directly from farmers.</li>
+                        <li><span className="font-semibold text-foreground">Prompt Payments:</span> ₹12,400 crore credited quickly to farmers for their produce.</li>
+                        <li><span className="font-semibold text-foreground">Infrastructure & e-NAM:</span> Initiatives to modernize canal systems, improve soil testing, and leverage the e-NAM digital platform for transparent market access.</li>
+                    </ul>
                 </CardContent>
             </Card>
 

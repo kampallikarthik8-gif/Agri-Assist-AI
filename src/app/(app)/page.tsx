@@ -36,6 +36,13 @@ import { Button } from "@/components/ui/button";
 
 const newsFeed = [
     {
+        title: "పీఎం-కిసాన్ లబ్ధిదారుని స్థితిని తనిఖీ చేయండి",
+        summary: "అధికారిక ప్రభుత్వ పోర్టల్‌లో మీ పీఎం-కిసాన్ లబ్ధిదారుని స్థితి మరియు చెల్లింపు వివరాలను నేరుగా తనిఖీ చేయండి.",
+        image: "https://picsum.photos/seed/pmkisan-gov/600/400",
+        link: "https://pmkisan.gov.in/BeneficiaryStatus_New.aspx",
+        aiHint: "government document"
+    },
+    {
         title: "ఈనాడు: రైతు భరోసా కేంద్రాల ద్వారా విత్తనాల పంపిణీ ప్రారంభం",
         summary: "ఖరీఫ్ సీజన్ కు సన్నద్ధంగా, రాష్ట్ర ప్రభుత్వం రైతు భరోసా కేంద్రాల (RBKs) ద్వారా సబ్సిడీపై విత్తనాలను పంపిణీ చేయడం ప్రారంభించింది...",
         image: "https://picsum.photos/seed/eenadu-news/600/400",
@@ -310,7 +317,7 @@ export default function DashboardPage() {
                             {item.link && (
                                 <Button asChild variant="outline" size="sm" className="mt-2">
                                     <Link href={item.link} target="_blank" rel="noopener noreferrer">
-                                        Watch Live
+                                        {item.title.includes("Live") ? "Watch Live" : "Check Status"}
                                         <ExternalLink className="ml-2 h-4 w-4" />
                                     </Link>
                                 </Button>

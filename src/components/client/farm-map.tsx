@@ -74,7 +74,10 @@ export function FarmMap() {
       let path: google.maps.LatLngLiteral[];
       let type: 'polygon' | 'rectangle';
 
-      if (overlay.getPath) { // Polygon
+      // This is a temporary workaround for a bug in the DrawingManager where the overlay is not a valid instance
+      if (!overlay.setMap) return;
+
+      if (typeof overlay.getPath === 'function') { // Polygon
         path = overlay.getPath().getArray().map(p => ({ lat: p.lat(), lng: p.lng() }));
         type = 'polygon';
       } else { // Rectangle - getPath is not available, we need to construct it
@@ -112,9 +115,14 @@ export function FarmMap() {
       return { lat: center.lat(), lng: center.lng() };
   };
 
-  const clearDrawings = () => {
+  const clearAllDrawings = () => {
     setDrawnShapes([]);
     setActiveInfoWindow(null);
+  };
+  
+  const deleteShape = (shapeId: number) => {
+    setDrawnShapes(prev => prev.filter(shape => shape.id !== shapeId));
+    setActiveInfoWindow(null); // Close info window after deleting
   };
 
   const handlePolygonClick = (shapeId: number) => {
@@ -205,10 +213,21 @@ export function FarmMap() {
                     position={activeShape.infoWindowPos}
                     onCloseClick={() => setActiveInfoWindow(null)}
                 >
-                    <div className="p-2 text-foreground">
-                        <h4 className="font-bold text-base">Field Area</h4>
-                        <p>{areaInAcres.toFixed(3)} acres</p>
-                        <p>{activeShape.area.toFixed(2)} square meters</p>
+                    <div className="p-2 text-foreground space-y-2">
+                        <div>
+                            <h4 className="font-bold text-base">Field Area</h4>
+                            <p>{areaInAcres.toFixed(3)} acres</p>
+                            <p>{activeShape.area.toFixed(2)} square meters</p>
+                        </div>
+                        <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => deleteShape(activeShape.id)}
+                            className="w-full"
+                        >
+                            <Trash2 className="mr-2 size-4" />
+                            Delete
+                        </Button>
                     </div>
                 </InfoWindow>
             );
@@ -219,7 +238,7 @@ export function FarmMap() {
         <Button
           variant="destructive"
           size="icon"
-          onClick={clearDrawings}
+          onClick={clearAllDrawings}
           className="absolute bottom-4 right-4 z-10"
           title="Clear all drawings"
         >

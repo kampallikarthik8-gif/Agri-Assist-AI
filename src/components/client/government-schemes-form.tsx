@@ -84,6 +84,26 @@ const ntrJalaSiriSummaryTable = [
     { step: "Wait for Formal Launch", action: "Scheme details and official communications are expected soon" },
 ];
 
+const suicideExGratiaSupportingDocs = [
+    "Aadhaar card of the deceased",
+    "Resident/Domicile certificate",
+    "Death certificate & Panchanama report",
+    "Post-mortem report",
+    "FIR copy",
+    "Mandal- and Divisional-Level Committee reports",
+    "Land records or lease documents (for tenant farmers, e.g., CCRC)",
+    "Nominee/legal heir bank account details certified by Tahsildar",
+    "Passport-sized photograph (if specified)",
+];
+
+const suicideExGratiaSummary = [
+    { aspect: "Benefit Amount", detail: "₹7,00,000 one-time ex‑gratia" },
+    { aspect: "Eligible Cases", detail: "Farmer/tenant farmer suicides due to agrarian reasons in Andhra Pradesh" },
+    { aspect: "Application Mode", detail: "Automatic—initiated via administrative and committee review" },
+    { aspect: "Required Verifications", detail: "VRO, Mandal-level, and Divisional-level committees review the case" },
+    { aspect: "Disbursement Method", detail: "DBT to legal heirs or reimbursement via Collectorate" },
+    { aspect: "Supporting Documents", detail: "Aadhaar, death/medical reports, FIR, land/lease proof, heir details, etc." },
+];
 
 export function GovernmentSchemesForm() {
   const [loading, setLoading] = useState(false);
@@ -808,7 +828,82 @@ export function GovernmentSchemesForm() {
                     <CardDescription>Financial support for families in crisis.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-sm text-muted-foreground">Provides a one-time compensation of ₹7 lakh to the family in the event of a farmer’s death by suicide.</p>
+                    <p className="text-sm text-muted-foreground mb-4">
+                        The Andhra Pradesh Farmers Suicide Ex-Gratia Scheme provides a one-time financial assistance of ₹7,00,000 to the legal heirs of a farmer (including tenant or agriculture-dependent individuals) who has died by suicide due to agrarian distress. The assistance aims to offer immediate financial relief, facilitating rehabilitation and easing the burden on the bereaved family.
+                    </p>
+                    <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="eligibility">
+                            <AccordionTrigger>Who Is Eligible?</AccordionTrigger>
+                            <AccordionContent>
+                                <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                                    <li><span className="font-semibold text-foreground">Residency:</span> The deceased must be a permanent resident of Andhra Pradesh.</li>
+                                    <li><span className="font-semibold text-foreground">Occupation:</span> The individual must be a farmer, tenant farmer, or otherwise earning a livelihood from agriculture.</li>
+                                    <li><span className="font-semibold text-foreground">Cause of Death:</span> Must be confirmed as suicide, due to agrarian stresses such as crop failure, borewell failure, high cultivation costs, non-remunerative prices, inability to repay loans, or family burdens like education or marriage expenses.</li>
+                                </ul>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="process">
+                            <AccordionTrigger>How to Apply — Process Overview</AccordionTrigger>
+                            <AccordionContent>
+                                <p className="text-sm text-muted-foreground mb-3">There is no need for a formal application—the process is initiated automatically when the incident is reported.</p>
+                                <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+                                    <li><span className="font-semibold text-foreground">Initial Report & Field Visit:</span> The Village Revenue Officer (VRO) is notified, and the District Collector, along with officials from Agriculture and Revenue Departments, visits the family to offer support and gather initial details.</li>
+                                    <li><span className="font-semibold text-foreground">Committee Verification:</span> Mandal-Level and Divisional-Level Committees review the case, verify eligibility, and forward recommendations.</li>
+                                    <li><span className="font-semibold text-foreground">Proposal & Approval:</span> The District Collector prepares a proposal, which is reviewed and approved by the Commissioner & Director of Agriculture. The ₹7 lakh ex-gratia is then disbursed via DBT.</li>
+                                </ol>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="documents">
+                            <AccordionTrigger>Supporting Documents</AccordionTrigger>
+                            <AccordionContent>
+                                <p className="text-sm text-muted-foreground mb-2">These documents are required to verify the case and process the payment:</p>
+                                <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                                    {suicideExGratiaSupportingDocs.map((doc, i) => <li key={i}>{doc}</li>)}
+                                </ul>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="strengths-challenges">
+                            <AccordionTrigger>Program Strengths & Challenges</AccordionTrigger>
+                            <AccordionContent>
+                                <h4 className="font-semibold text-foreground mb-1">Strengths:</h4>
+                                <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground mb-3">
+                                    <li>Quick relief in times of distress.</li>
+                                    <li>Built-in morbidity committees for verification.</li>
+                                    <li>Designated grievance mechanisms in Collectorates.</li>
+                                </ul>
+                                 <h4 className="font-semibold text-foreground mb-1">Challenges:</h4>
+                                <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                                    <li>Families have sometimes faced delays or have been denied assistance due to technicalities or failure in the verification process.</li>
+                                </ul>
+                            </AccordionContent>
+                        </AccordionItem>
+                         <AccordionItem value="summary-table">
+                            <AccordionTrigger>Quick Summary</AccordionTrigger>
+                            <AccordionContent>
+                               <Table>
+                                    <TableBody>
+                                        {suicideExGratiaSummary.map((item, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell className="font-semibold p-2">{item.aspect}</TableCell>
+                                                <TableCell className="p-2">{item.detail}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="what-to-do">
+                            <AccordionTrigger>What You Should Do If Needed</AccordionTrigger>
+                            <AccordionContent>
+                                <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+                                    <li>Report the incident immediately to the Village Revenue Officer (VRO) or nearest Collector’s office.</li>
+                                    <li>Ensure the Mandal- and Divisional-Level Committees are notified and expected to conduct on-site verification.</li>
+                                    <li>Keep track of the verification and approval process via Collectorate channels or helplines.</li>
+                                    <li>In case of delays or challenges, reach out to local Farmer Associations or legal aid/support groups for assistance.</li>
+                                </ol>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
                 </CardContent>
             </Card>
             <Card className="lg:col-span-3 md:col-span-2">

@@ -21,7 +21,7 @@ const formSchema = z.object({
   soilPhosphorus: z.coerce.number().min(0, "Value must be positive."),
   soilPotassium: z.coerce.number().min(0, "Value must be positive."),
   farmArea: z.coerce.number().min(0.1, "Area must be greater than 0."),
-  areaUnit: z.enum(["acres", "hectares"]),
+  areaUnit: z.enum(["acres", "gunts", "cents"]),
 });
 
 export function FertilizerCalculatorForm() {
@@ -167,9 +167,15 @@ export function FertilizerCalculatorForm() {
                             </FormItem>
                             <FormItem className="flex items-center space-x-2 space-y-0">
                                 <FormControl>
-                                <RadioGroupItem value="hectares" />
+                                <RadioGroupItem value="gunts" />
                                 </FormControl>
-                                <FormLabel className="font-normal">Hectares</FormLabel>
+                                <FormLabel className="font-normal">Gunts</FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center space-x-2 space-y-0">
+                                <FormControl>
+                                <RadioGroupItem value="cents" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Cents</FormLabel>
                             </FormItem>
                             </RadioGroup>
                         </FormControl>

@@ -18,7 +18,7 @@ const FertilizerCalculatorInputSchema = z.object({
   soilPhosphorus: z.number().describe('The current phosphorus level in the soil, in parts-per-million (ppm).'),
   soilPotassium: z.number().describe('The current potassium level in the soil, in parts-per-million (ppm).'),
   farmArea: z.number().describe('The size of the farm area to be fertilized.'),
-  areaUnit: z.enum(['acres', 'hectares']).describe('The unit for the farm area.'),
+  areaUnit: z.enum(['acres', 'gunts', 'cents']).describe('The unit for the farm area.'),
 });
 export type FertilizerCalculatorInput = z.infer<typeof FertilizerCalculatorInputSchema>;
 

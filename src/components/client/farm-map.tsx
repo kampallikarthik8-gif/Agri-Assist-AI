@@ -6,6 +6,8 @@ import {
   GoogleMap,
   useJsApiLoader,
   DrawingManager,
+  Polygon,
+  InfoWindow,
 } from "@react-google-maps/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -22,12 +24,21 @@ const defaultCenter = {
   lng: 77.2090,
 };
 
-const libraries: "drawing"[] = ["drawing"];
+const libraries: ("drawing" | "geometry")[] = ["drawing", "geometry"];
+
+type DrawnShape = {
+    id: number;
+    type: 'polygon' | 'rectangle';
+    path: google.maps.LatLngLiteral[];
+    area: number; // in square meters
+    infoWindowPos: google.maps.LatLng;
+};
 
 export function FarmMap() {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [center, setCenter] = useState(defaultCenter);
-  const [drawnPolygons, setDrawnPolygons] = useState<google.maps.Polygon[]>([]);
+  const [drawnShapes, setDrawnShapes] = useState<DrawnShape[]>([]);
+  const [activeInfoWindow, setActiveInfoWindow] = useState<number | null>(null);
 
   const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
@@ -58,23 +69,57 @@ export function FarmMap() {
   const onUnmount = useCallback(function callback() {
     setMap(null);
   }, []);
+  
+  const onOverlayComplete = (overlay: google.maps.Polygon | google.maps.Rectangle) => {
+      let path: google.maps.LatLngLiteral[];
+      let type: 'polygon' | 'rectangle';
 
-  const onPolygonComplete = (polygon: google.maps.Polygon) => {
-    // The polygon is automatically added to the map by the DrawingManager when `drawingControl` is true.
-    // To manage it ourselves (e.g., to clear it), we'll add it to our state.
-    // The google.maps.event.addListener on the drawingManager handles this.
+      if (overlay.getPath) { // Polygon
+        path = overlay.getPath().getArray().map(p => ({ lat: p.lat(), lng: p.lng() }));
+        type = 'polygon';
+      } else { // Rectangle - getPath is not available, we need to construct it
+        const bounds = (overlay as google.maps.Rectangle).getBounds()!;
+        const ne = bounds.getNorthEast();
+        const sw = bounds.getSouthWest();
+        path = [
+            { lat: ne.lat(), lng: ne.lng() },
+            { lat: ne.lat(), lng: sw.lng() },
+            { lat: sw.lat(), lng: sw.lng() },
+            { lat: sw.lat(), lng: ne.lng() }
+        ];
+        type = 'rectangle';
+      }
+
+      const areaInMeters = google.maps.geometry.spherical.computeArea(path);
+      const centerOfPolygon = getCenterOfPolygon(path);
+      
+      const newShape: DrawnShape = {
+          id: Date.now(),
+          type,
+          path,
+          area: areaInMeters,
+          infoWindowPos: new google.maps.LatLng(centerOfPolygon.lat, centerOfPolygon.lng),
+      };
+
+      setDrawnShapes(prev => [...prev, newShape]);
+      overlay.setMap(null); // Hide the DrawingManager's shape, we'll render our own Polygon
   };
 
-  const onDrawingManagerLoad = (drawingManager: google.maps.drawing.DrawingManager) => {
-    google.maps.event.addListener(drawingManager, 'polygoncomplete', (polygon: google.maps.Polygon) => {
-        setDrawnPolygons(prev => [...prev, polygon]);
-    });
-  }
+  const getCenterOfPolygon = (path: google.maps.LatLngLiteral[]) => {
+      const bounds = new google.maps.LatLngBounds();
+      path.forEach(p => bounds.extend(p));
+      const center = bounds.getCenter();
+      return { lat: center.lat(), lng: center.lng() };
+  };
 
   const clearDrawings = () => {
-    drawnPolygons.forEach((p) => p.setMap(null));
-    setDrawnPolygons([]);
+    setDrawnShapes([]);
+    setActiveInfoWindow(null);
   };
+
+  const handlePolygonClick = (shapeId: number) => {
+    setActiveInfoWindow(shapeId);
+  }
 
   if (loadError) {
     return (
@@ -103,13 +148,16 @@ export function FarmMap() {
         options={{
           mapTypeId: "satellite",
           streetViewControl: false,
-          mapTypeControl: false,
+          mapTypeControlOptions: {
+            position: google.maps.ControlPosition.TOP_RIGHT,
+            style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
+          },
           fullscreenControl: false,
         }}
       >
         <DrawingManager
-          onLoad={onDrawingManagerLoad}
-          onPolygonComplete={onPolygonComplete}
+          onPolygonComplete={onOverlayComplete}
+          onRectangleComplete={onOverlayComplete as any}
           options={{
             drawingControl: true,
             drawingControlOptions: {
@@ -123,22 +171,51 @@ export function FarmMap() {
               fillColor: "hsl(var(--primary) / 0.3)",
               strokeColor: "hsl(var(--primary))",
               strokeWeight: 2,
-              clickable: false,
-              editable: true,
+              editable: false,
               zIndex: 1,
             },
             rectangleOptions: {
                 fillColor: "hsl(var(--primary) / 0.3)",
                 strokeColor: "hsl(var(--primary))",
                 strokeWeight: 2,
-                clickable: false,
-                editable: true,
+                editable: false,
                 zIndex: 1,
             }
           }}
         />
+
+        {drawnShapes.map((shape) => (
+            <Polygon
+                key={shape.id}
+                paths={shape.path}
+                onClick={() => handlePolygonClick(shape.id)}
+                options={{
+                    fillColor: "hsl(var(--primary) / 0.3)",
+                    strokeColor: "hsl(var(--primary))",
+                    strokeWeight: 2,
+                }}
+            />
+        ))}
+
+        {activeInfoWindow !== null && drawnShapes.find(s => s.id === activeInfoWindow) && (() => {
+            const activeShape = drawnShapes.find(s => s.id === activeInfoWindow)!;
+            const areaInAcres = activeShape.area * 0.000247105;
+            return (
+                <InfoWindow
+                    position={activeShape.infoWindowPos}
+                    onCloseClick={() => setActiveInfoWindow(null)}
+                >
+                    <div className="p-2 text-foreground">
+                        <h4 className="font-bold text-base">Field Area</h4>
+                        <p>{areaInAcres.toFixed(3)} acres</p>
+                        <p>{activeShape.area.toFixed(2)} square meters</p>
+                    </div>
+                </InfoWindow>
+            );
+        })()}
+
       </GoogleMap>
-      {drawnPolygons.length > 0 && (
+      {drawnShapes.length > 0 && (
         <Button
           variant="destructive"
           size="icon"

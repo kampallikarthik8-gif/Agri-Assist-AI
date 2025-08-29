@@ -23,25 +23,19 @@ const formSchema = z.object({
   region: z.string().min(2, "Region/State is required."),
 });
 
-const kccFeatures = [
-    { title: "Credit Limit", content: "Based on landholding, crop type, and scale of finance. Can include term loans for allied activities." },
-    { title: "Flexible Withdrawals", content: "Functions like an ATM/debit card for cash withdrawal and purchases." },
-    { title: "Low Interest Rates", content: "Subsidized rates. Can be as low as 4% with timely repayment through interest subvention schemes." },
-    { title: "Validity", content: "Valid for 3 to 5 years, subject to annual review." },
-    { title: "Insurance Coverage", content: "Includes coverage under PM Fasal Bima Yojana (PMFBY)." }
+const pmKisanUpdates = [
+    { title: "20th Installment Disbursed", content: "On August 2, 2025, Prime Minister Narendra Modi released the 20th installment of PM-Kisan, transferring ₹20,500 crore to 9.7 crore farmers via Direct Benefit Transfer." },
+    { title: "Budget Allocation for FY 2025–26", content: "The Government has allocated a substantial ₹63,500 crore for PM-Kisan in the fiscal year 2025–26, reflecting continued emphasis on farmer welfare." },
+    { title: "Technical Glitches in Disbursement", content: "Recent disbursements have encountered technical challenges including unmapped Aadhaar numbers, closed bank accounts, and incomplete KYC. The government has directed banks to resolve these glitches promptly." }
 ];
 
-const kccDocs = [
-    "Identity proof (Aadhaar, PAN, Voter ID)",
-    "Land ownership/tenancy proof",
-    "Passport-size photo",
-    "Bank account details"
+const pmKisanOverview = [
+    { feature: "Scheme Objective", detail: "Provide ₹6,000 annually in 3 installments (₹2,000 each) to small & marginal farmers (up to 2 hectares)." },
+    { feature: "20th Installment Date", detail: "August 2, 2025 (₹20,500 crore transferred)." },
+    { feature: "FY 2025–26 Allocation", detail: "₹63,500 crore allocated." },
+    { feature: "Disbursement Issues", detail: "Delay caused by unmapped Aadhaar, closed accounts, KYC pending; banks asked to fix it." }
 ];
 
-const pmsSubsidy = [
-    { level: "Up to 2 kW", subsidy: "60% of system cost, up to ₹60,000" },
-    { level: "2–3 kW", subsidy: "40% of additional cost, up to ₹78,000 total" },
-];
 
 export function GovernmentSchemesForm() {
   const [loading, setLoading] = useState(false);
@@ -163,17 +157,56 @@ export function GovernmentSchemesForm() {
         <Card>
             <CardHeader>
                 <CardTitle>PM Kisan Samman Nidhi</CardTitle>
-                <CardDescription>Check your beneficiary status, payment details, or find your registration number for the PM Kisan scheme.</CardDescription>
+                <CardDescription>Check status, get updates, or find your registration number for the PM Kisan scheme.</CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="flex flex-wrap gap-4">
-                    <Button asChild>
+                 <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="updates">
+                        <AccordionTrigger>Latest Updates</AccordionTrigger>
+                        <AccordionContent>
+                           <ul className="list-disc space-y-3 pl-5 text-sm text-muted-foreground">
+                                {pmKisanUpdates.map((update, index) => (
+                                    <li key={index}>
+                                        <span className="font-semibold text-foreground">{update.title}:</span> {update.content}
+                                    </li>
+                                ))}
+                           </ul>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="overview">
+                        <AccordionTrigger>Quick Overview</AccordionTrigger>
+                        <AccordionContent>
+                           <Table>
+                                <TableBody>
+                                    {pmKisanOverview.map((item, index) => (
+                                        <TableRow key={index}>
+                                            <TableCell className="font-semibold p-2">{item.feature}</TableCell>
+                                            <TableCell className="p-2">{item.detail}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                           </Table>
+                        </AccordionContent>
+                    </AccordionItem>
+                    <AccordionItem value="more-info">
+                        <AccordionTrigger>Learn More</AccordionTrigger>
+                        <AccordionContent>
+                           <ul className="list-disc space-y-3 pl-5 text-sm text-muted-foreground">
+                               <li><span className="font-semibold text-foreground">Eligibility & Benefits:</span> Small/marginal farmers (≤ 2 hectares) get ₹6,000/year via DBT in three installments.</li>
+                               <li><span className="font-semibold text-foreground">Application & Status:</span> Register via the official portal’s “Farmer Corner” or CSCs. Check status with Aadhaar, mobile, or account number.</li>
+                               <li><span className="font-semibold text-foreground">e-KYC Requirement:</span> e-KYC is mandatory and can be done via OTP, biometric, or face authentication to avoid payment delays.</li>
+                           </ul>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
+                <div className="flex flex-wrap gap-4 mt-4">
+                    <Button asChild size="sm">
                         <Link href="https://pmkisan.gov.in/BeneficiaryStatus_New.aspx" target="_blank" rel="noopener noreferrer">
                             Check Beneficiary Status
                             <ExternalLink className="ml-2 h-4 w-4" />
                         </Link>
                     </Button>
-                    <Button asChild>
+                    <Button asChild size="sm" variant="secondary">
                         <Link href="https://pmkisan.gov.in/KnowYour_Registration.aspx" target="_blank" rel="noopener noreferrer">
                             Know Your Registration No.
                             <ExternalLink className="ml-2 h-4 w-4" />
@@ -225,8 +258,8 @@ export function GovernmentSchemesForm() {
           <CardHeader>
             <CardTitle>PM Surya Ghar: Muft Bijli Yojana</CardTitle>
             <CardDescription>
-              A scheme to promote rooftop solar and provide free electricity up
-              to 300 units/month.
+              A scheme to promote rooftop solar and provide free electricity
+              up to 300 units/month.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -329,4 +362,5 @@ export function GovernmentSchemesForm() {
   );
 }
 
+    
     

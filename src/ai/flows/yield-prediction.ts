@@ -68,3 +68,4 @@ const yieldPredictionFlow = ai.defineFlow(
     }
   }
 );
+

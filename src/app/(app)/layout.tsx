@@ -34,6 +34,7 @@ const navItems = [
   { href: "/soil-health", label: "Soil Health", icon: Icons.Leaf },
   { href: "/crop-recommendation", label: "Crop Recommendation", icon: Icons.CropRecommendation },
   { href: "/fertilizer-calculator", label: "Fertilizer Calculator", icon: Icons.Calculator },
+  { href: "/fertilizer-shops", label: "Fertilizer Shops", icon: Icons.FertilizerShops },
   { href: "/seed-quality", label: "Seed Quality", icon: Icons.SeedScanner },
   { href: "/market-insights", label: "Market Insights", icon: Icons.MarketInsights },
   { href: "/yield-prediction", label: "Yield Prediction", icon: Icons.YieldPrediction },

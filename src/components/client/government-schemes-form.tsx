@@ -272,21 +272,15 @@ export function GovernmentSchemesForm() {
         <Card>
           <CardHeader>
             <CardTitle>PM Surya Ghar: Muft Bijli Yojana</CardTitle>
-            <CardDescription>
-              A scheme to promote rooftop solar and provide free electricity
-              up to 300 units/month.
-            </CardDescription>
+            <CardDescription>A scheme to promote rooftop solar and provide free electricity up to 300 units/month.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Accordion type="single" collapsible className="w-full">
+             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="overview">
                 <AccordionTrigger>Overview</AccordionTrigger>
                 <AccordionContent>
                   <p className="text-sm text-muted-foreground">
-                    Launched in Feb 2024 with a budget of ₹75,021 crore, this
-                    scheme aims to help 1 crore households install rooftop
-                    solar systems, generating their own electricity and reducing
-                    bills.
+                    Launched in Feb 2024 with a budget of ₹75,021 crore, this scheme aims to help 1 crore households install rooftop solar systems, generating their own electricity and reducing bills.
                   </p>
                 </AccordionContent>
               </AccordionItem>
@@ -318,11 +312,7 @@ export function GovernmentSchemesForm() {
               </AccordionItem>
             </Accordion>
             <Button asChild className="mt-4">
-              <Link
-                href="https://pmsuryaghar.gov.in"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <Link href="https://pmsuryaghar.gov.in" target="_blank" rel="noopener noreferrer">
                 Apply for Rooftop Solar
                 <ExternalLink className="ml-2 h-4 w-4" />
               </Link>
@@ -563,6 +553,35 @@ export function GovernmentSchemesForm() {
                 </CardContent>
             </Card>
 
+            <Card>
+                <CardHeader>
+                    <CardTitle>Subsidized Farm Mechanization Scheme (SMAM Relaunch)</CardTitle>
+                    <CardDescription>A high-impact scheme under the Sub-Mission on Agricultural Mechanization.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                     <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="subsidy">
+                            <AccordionTrigger>Subsidy & Reach</AccordionTrigger>
+                            <AccordionContent>
+                               <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                                    <li><span className="font-semibold text-foreground">Subsidy:</span> 50% upfront subsidy at the time of equipment purchase.</li>
+                                    <li><span className="font-semibold text-foreground">Reach:</span> Over 25,000 farmers benefited within the first 45 days, with ₹61 crore in subsidies distributed.</li>
+                               </ul>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="focus">
+                            <AccordionTrigger>Focus Areas & Technology</AccordionTrigger>
+                            <AccordionContent>
+                                <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                                    <li><span className="font-semibold text-foreground">Focus Areas:</span> Equipment across all farming stages, with a priority for rainfed and tribal regions.</li>
+                                    <li><span className="font-semibold text-foreground">Tech Platform:</span> Managed via the Karshak Portal–FM App with integrated databases to verify eligibility.</li>
+                                </ul>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                </CardContent>
+            </Card>
+
       </div>
        <div className="space-y-6">
         {loading && (
@@ -575,5 +594,3 @@ export function GovernmentSchemesForm() {
     </div>
   );
 }
-
-    

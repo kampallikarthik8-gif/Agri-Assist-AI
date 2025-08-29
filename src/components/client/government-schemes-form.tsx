@@ -578,10 +578,11 @@ export function GovernmentSchemesForm() {
                             <AccordionTrigger>AP Farmer Registry (AgriStack / APFR)</AccordionTrigger>
                             <AccordionContent>
                                 <p className="text-sm text-muted-foreground mb-3">This digital platform enables farmers to obtain a unique Farmer ID and access benefits seamlessly.</p>
-                                <h4 className="font-semibold text-foreground mb-2">Registration Portal & Documents</h4>
+                                <h4 className="font-semibold text-foreground mb-2">Documents Required:</h4>
                                 <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-                                    <li>Visit <Link href="https://apfr.agristack.gov.in" target="_blank" rel="noopener noreferrer" className="text-primary underline">apfr.agristack.gov.in</Link> to start.</li>
-                                    <li>You will need your Aadhaar card, mobile number, land ownership documents (Pattadar passbook), bank passbook, and a recent photograph.</li>
+                                    <li>Aadhaar card & linked mobile number</li>
+                                    <li>Land ownership documents (Pattadar passbook)</li>
+                                    <li>Bank passbook and a recent photograph</li>
                                 </ul>
                                 <h4 className="font-semibold text-foreground mt-3 mb-2">How to Register</h4>
                                 <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
@@ -589,6 +590,12 @@ export function GovernmentSchemesForm() {
                                     <li>Fill in personal/land details, upload documents, and submit. Note your acknowledgment number to track status.</li>
                                     <li>Alternatively, register at nearby Farmers Service Centres (RSKs/CSCs).</li>
                                 </ol>
+                                <Button asChild size="sm" className="mt-4">
+                                  <Link href="https://apfr.agristack.gov.in" target="_blank" rel="noopener noreferrer">
+                                    Go to APFR Portal
+                                    <ExternalLink className="ml-2 h-4 w-4" />
+                                  </Link>
+                                </Button>
                             </AccordionContent>
                         </AccordionItem>
                         <AccordionItem value="e-panta">
@@ -601,9 +608,15 @@ export function GovernmentSchemesForm() {
                                 </p>
                                 <h4 className="font-semibold text-foreground mb-2">How to Register</h4>
                                 <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-                                    <li>Visit the <Link href="http://103.210.72.120/epantarabi/" target="_blank" rel="noopener noreferrer" className="text-primary underline">e-Panta Crop Booking portal</Link> and follow prompts to log in and register crop details.</li>
-                                    <li>You may also use the e-Karshak app or portal at <Link href="https://karshak.ap.gov.in" target="_blank" rel="noopener noreferrer" className="text-primary underline">karshak.ap.gov.in</Link>.</li>
+                                    <li>Visit the e-Panta Crop Booking portal and follow prompts to log in and register crop details.</li>
+                                    <li>You may also use the e-Karshak app or portal at karshak.ap.gov.in.</li>
                                 </ul>
+                                 <Button asChild size="sm" className="mt-4">
+                                  <Link href="http://103.210.72.120/epantarabi/" target="_blank" rel="noopener noreferrer">
+                                    Go to e-Panta Portal
+                                    <ExternalLink className="ml-2 h-4 w-4" />
+                                  </Link>
+                                </Button>
                             </AccordionContent>
                         </AccordionItem>
                          <AccordionItem value="digital-summary">

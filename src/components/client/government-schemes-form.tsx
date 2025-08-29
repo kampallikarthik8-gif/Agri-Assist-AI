@@ -16,10 +16,32 @@ import { Loader2, ExternalLink } from "lucide-react";
 import { Icons } from "../icons";
 import { getWeather } from "@/ai/flows/weather-service";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
+import { Table, TableBody, TableCell, TableRow, TableHead, TableHeader } from "../ui/table";
+
 
 const formSchema = z.object({
   region: z.string().min(2, "Region/State is required."),
 });
+
+const kccFeatures = [
+    { title: "Credit Limit", content: "Based on landholding, crop type, and scale of finance. Can include term loans for allied activities." },
+    { title: "Flexible Withdrawals", content: "Functions like an ATM/debit card for cash withdrawal and purchases." },
+    { title: "Low Interest Rates", content: "Subsidized rates. Can be as low as 4% with timely repayment through interest subvention schemes." },
+    { title: "Validity", content: "Valid for 3 to 5 years, subject to annual review." },
+    { title: "Insurance Coverage", content: "Includes coverage under PM Fasal Bima Yojana (PMFBY)." }
+];
+
+const kccDocs = [
+    "Identity proof (Aadhaar, PAN, Voter ID)",
+    "Land ownership/tenancy proof",
+    "Passport-size photo",
+    "Bank account details"
+];
+
+const pmsSubsidy = [
+    { level: "Up to 2 kW", subsidy: "60% of system cost, up to ₹60,000" },
+    { level: "2–3 kW", subsidy: "40% of additional cost, up to ₹78,000 total" },
+];
 
 export function GovernmentSchemesForm() {
   const [loading, setLoading] = useState(false);
@@ -200,18 +222,64 @@ export function GovernmentSchemesForm() {
             </CardContent>
         </Card>
         <Card>
-            <CardHeader>
-                <CardTitle>PM Surya Ghar: Rooftop Solar Scheme</CardTitle>
-                <CardDescription>To apply for the Rooftop Solar Financing Scheme, visit the PM Surya Ghar Portal, complete your application, and click 'Apply for Loan' to proceed on JanSamarth.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Button asChild>
-                    <Link href="https://pmsuryaghar.gov.in" target="_blank" rel="noopener noreferrer">
-                        Apply for Rooftop Solar
-                        <ExternalLink className="ml-2 h-4 w-4" />
-                    </Link>
-                </Button>
-            </CardContent>
+          <CardHeader>
+            <CardTitle>PM Surya Ghar: Muft Bijli Yojana</CardTitle>
+            <CardDescription>
+              A scheme to promote rooftop solar and provide free electricity up
+              to 300 units/month.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="overview">
+                <AccordionTrigger>Overview</AccordionTrigger>
+                <AccordionContent>
+                  <p className="text-sm text-muted-foreground">
+                    Launched in Feb 2024 with a budget of ₹75,021 crore, this
+                    scheme aims to help 1 crore households install rooftop
+                    solar systems, generating their own electricity and reducing
+                    bills.
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="subsidy">
+                <AccordionTrigger>Subsidy & Financing</AccordionTrigger>
+                <AccordionContent>
+                    <h4 className="font-semibold text-foreground mb-2">Subsidy Details:</h4>
+                    <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                        <li>Up to 60% subsidy for systems up to 2 kW.</li>
+                        <li>40% subsidy for systems between 2–3 kW.</li>
+                        <li>This means approx. ₹30,000 for 1kW, ₹60,000 for 2kW, and ₹78,000 for 3kW systems.</li>
+                    </ul>
+                    <h4 className="font-semibold text-foreground mt-3 mb-2">Financing:</h4>
+                    <p className="text-sm text-muted-foreground">
+                        Affordable, collateral-free loans are available with interest rates around 7%.
+                    </p>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="eligibility">
+                <AccordionTrigger>Eligibility</AccordionTrigger>
+                <AccordionContent>
+                  <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                    <li>Must be an Indian citizen.</li>
+                    <li>Must own a house with a suitable rooftop.</li>
+                    <li>Must have a valid electricity connection.</li>
+                    <li>Cannot have availed any other solar panel subsidy.</li>
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+            <Button asChild className="mt-4">
+              <Link
+                href="https://pmsuryaghar.gov.in"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Apply for Rooftop Solar
+                <ExternalLink className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </CardContent>
         </Card>
       </div>
 
@@ -260,3 +328,5 @@ export function GovernmentSchemesForm() {
     </div>
   );
 }
+
+    

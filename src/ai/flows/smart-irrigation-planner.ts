@@ -51,6 +51,7 @@ const smartIrrigationPlannerFlow = ai.defineFlow(
     const maxRetries = 3;
     for (let i = 0; i < maxRetries; i++) {
       try {
+        console.log(`Attempt ${i + 1} for smartIrrigationPlannerFlow`);
         const {output} = await prompt(input);
         if (output) {
             return output;
@@ -59,12 +60,12 @@ const smartIrrigationPlannerFlow = ai.defineFlow(
       } catch (error) {
         console.error(`Error in smartIrrigationPlannerFlow on attempt ${i + 1}`, error);
         if (i === maxRetries - 1) {
-            // If it's the last retry, re-throw the error
-            throw error;
+            // If it's the last retry, re-throw a more specific error
+            throw new Error('Failed to generate an irrigation plan after multiple attempts.');
         }
       }
     }
     // If all retries fail to produce an output
-    throw new Error('Failed to generate a response from the AI model after multiple attempts.');
+    throw new Error('Failed to generate an irrigation plan.');
   }
 );

@@ -48,15 +48,23 @@ const smartIrrigationPlannerFlow = ai.defineFlow(
     outputSchema: SmartIrrigationPlannerOutputSchema,
   },
   async input => {
-    try {
-      const {output} = await prompt(input);
-      if (!output) {
-        throw new Error('Failed to generate a response from the AI model.');
+    const maxRetries = 3;
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        const {output} = await prompt(input);
+        if (output) {
+            return output;
+        }
+        console.warn(`Attempt ${i + 1} returned null output.`);
+      } catch (error) {
+        console.error(`Error in smartIrrigationPlannerFlow on attempt ${i + 1}`, error);
+        if (i === maxRetries - 1) {
+            // If it's the last retry, re-throw the error
+            throw error;
+        }
       }
-      return output;
-    } catch (error) {
-      console.error("Error in smartIrrigationPlannerFlow", error);
-      throw error;
     }
+    // If all retries fail to produce an output
+    throw new Error('Failed to generate a response from the AI model after multiple attempts.');
   }
 );

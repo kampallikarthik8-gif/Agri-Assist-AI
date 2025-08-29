@@ -229,7 +229,7 @@ export default function WeatherPage() {
                     ))}
                 </div>
             )}
-            {forecast && !loading && (
+            {forecast && forecast.length > 0 && !loading && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
                     {forecast.map((day, index) => {
                         const DailyWeatherIcon = weatherIconMap[day.condition.toLowerCase()] || Sun;
@@ -243,8 +243,8 @@ export default function WeatherPage() {
                     })}
                 </div>
             )}
-             {!forecast && !loading && (
-                <p className="text-muted-foreground">Could not generate a forecast at this time.</p>
+             {(!forecast || forecast.length === 0) && !loading && (
+                <p className="text-muted-foreground text-center">Could not generate a forecast at this time.</p>
             )}
         </CardContent>
       </Card>

@@ -27,7 +27,7 @@ const ForecastSchema = z.object({
 });
 
 const WeatherForecastOutputSchema = z.object({
-  forecast: z.array(ForecastSchema).describe('A 7-day weather forecast.'),
+  forecast: z.array(ForecastSchema).describe('A 7-day weather forecast. If a forecast cannot be determined, return an empty array.'),
 });
 export type WeatherForecastOutput = z.infer<typeof WeatherForecastOutputSchema>;
 
@@ -52,6 +52,8 @@ const prompt = ai.definePrompt({
   - The predicted low temperature in Fahrenheit.
   - A brief, one-or-two-word description of the weather condition (e.g., 'Sunny', 'Partly Cloudy', 'Rain', 'Snow').
   
+  If for any reason you cannot generate a forecast, return a response with an empty "forecast" array.
+  
   Provide the output as a structured 7-day forecast.`,
 });
 
@@ -64,7 +66,8 @@ const weatherForecastFlow = ai.defineFlow(
   async input => {
     const {output} = await prompt(input);
     if (!output) {
-      throw new Error('Failed to generate a response from the AI model.');
+      // If the model fails to return anything, return a valid object with an empty forecast.
+      return { forecast: [] };
     }
     return output;
   }

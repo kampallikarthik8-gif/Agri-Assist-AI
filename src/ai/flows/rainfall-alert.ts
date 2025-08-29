@@ -32,8 +32,9 @@ export type RainfallAlertOutput = z.infer<typeof RainfallAlertOutputSchema>;
 
 export async function rainfallAlert(input: RainfallAlertInput): Promise<RainfallAlertOutput> {
   const forecastData = await weatherForecast(input);
-  if (!forecastData || !forecastData.forecast) {
-    throw new Error("Could not retrieve weather forecast to generate alerts.");
+  if (!forecastData || !forecastData.forecast || forecastData.forecast.length === 0) {
+    console.warn("Could not retrieve weather forecast to generate alerts. Returning empty alerts.");
+    return { alerts: [] };
   }
   return rainfallAlertFlow({ location: input.location, forecast: forecastData.forecast });
 }

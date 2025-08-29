@@ -159,7 +159,7 @@ export function GovernmentSchemesForm() {
                     </Button>
                 </div>
             </CardContent>
-        </Card>>
+        </Card>
         <Card>
             <CardHeader>
                 <CardTitle>Kisan Credit Card (KCC)</CardTitle>

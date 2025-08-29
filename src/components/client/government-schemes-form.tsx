@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { z } from "zod";
-import { governmentSchemes, type GovernmentSchemesOutput } from "@/ai/flows/government-schemes";
+import { governmentSchemes } from "@/ai/flows/government-schemes";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -61,6 +61,12 @@ const marketingSummary = [
     { level: "Rythu Bandhu / Pledge Loans", services: "Loan against produce stored in godowns with minimal interest" },
     { level: "Digital Platforms", services: "Adoption of e-NAM, UMP, ReMS for transparent markets" },
     { level: "APMARKFED Network", services: "Input distribution, MSP-based procurement, farmer support via cooperatives" },
+];
+
+const digitalPlatformsSummary = [
+    { scheme: "AP Farmer Registry (APFR)", portal: "https://apfr.agristack.gov.in", purpose: "Register as farmer; obtain Farmer ID; access schemes" },
+    { scheme: "e-Panta Crop Booking", portal: "http://103.210.72.120/epantarabi/", purpose: "Geo-tagged crop booking; integrate land service benefits" },
+    { scheme: "e-Karshak Portal/App", portal: "https://karshak.ap.gov.in", purpose: "Crop booking, insurance, procurement, loan facilitation" },
 ];
 
 
@@ -304,7 +310,7 @@ export function GovernmentSchemesForm() {
                     </ul>
                     <h4 className="font-semibold text-foreground mt-3 mb-2">Financing:</h4>
                     <p className="text-sm text-muted-foreground">
-                        Affordable, collateral-free loans are available with interest rates around 7%.
+                        Affordable, collateral-free loans are available with interest rates around 7%. To apply for the Rooftop Solar Financing Scheme, visit the PM Surya Ghar Portal, complete your application, and click 'Apply for Loan' to proceed on JanSamarth.
                     </p>
                 </AccordionContent>
               </AccordionItem>
@@ -331,7 +337,7 @@ export function GovernmentSchemesForm() {
       </div>
 
        <div className="grid gap-6 md:grid-cols-2">
-            <Card>
+            <Card className="md:col-span-2">
                 <CardHeader>
                     <CardTitle>Agriculture Infrastructure Fund (AIF)</CardTitle>
                     <CardDescription>A financing facility for post-harvest infrastructure and community farming assets.</CardDescription>
@@ -407,7 +413,7 @@ export function GovernmentSchemesForm() {
                 </CardContent>
             </Card>
 
-            <Card>
+            <Card className="md:col-span-2">
                 <CardHeader>
                     <CardTitle>e-Kisan Upaj Nidhi</CardTitle>
                     <CardDescription>Leverage your stored produce as collateral to secure low-interest loans and avoid distress sales.</CardDescription>
@@ -523,7 +529,7 @@ export function GovernmentSchemesForm() {
                     </Accordion>
                 </CardContent>
             </Card>
-
+            
             <Card>
                 <CardHeader>
                     <CardTitle>Annadata Sukhibhava Scheme (AP)</CardTitle>
@@ -584,21 +590,59 @@ export function GovernmentSchemesForm() {
                 </CardHeader>
                 <CardContent>
                      <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value="digital">
-                            <AccordionTrigger>Digital Integration</AccordionTrigger>
+                        <AccordionItem value="farmer-registry">
+                            <AccordionTrigger>AP Farmer Registry (AgriStack / APFR)</AccordionTrigger>
                             <AccordionContent>
-                               <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-                                    <li><span className="font-semibold text-foreground">Farmer Registry:</span> Under AgriStack, a digital ID system consolidates land and farmer data for seamless access to schemes.</li>
-                                    <li><span className="font-semibold text-foreground">e‑Panta App:</span> Android-based crop-booking system with GPS, photos, and integration into land records for insurance and loans.</li>
-                               </ul>
+                                <p className="text-sm text-muted-foreground mb-3">This digital platform enables farmers to obtain a unique Farmer ID and access benefits seamlessly.</p>
+                                <h4 className="font-semibold text-foreground mb-2">Registration Portal & Documents</h4>
+                                <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                                    <li>Visit <Link href="https://apfr.agristack.gov.in" target="_blank" rel="noopener noreferrer" className="text-primary underline">apfr.agristack.gov.in</Link> to start.</li>
+                                    <li>You will need your Aadhaar card, mobile number, land ownership documents (Pattadar passbook), bank passbook, and a recent photograph.</li>
+                                </ul>
+                                <h4 className="font-semibold text-foreground mt-3 mb-2">How to Register</h4>
+                                <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+                                    <li>Visit the portal, click "New Farmer Registration," and verify Aadhaar via OTP.</li>
+                                    <li>Fill in personal/land details, upload documents, and submit. Note your acknowledgment number to track status.</li>
+                                    <li>Alternatively, register at nearby Farmers Service Centres (RSKs/CSCs).</li>
+                                </ol>
                             </AccordionContent>
                         </AccordionItem>
-                        <AccordionItem value="ai-ml">
-                            <AccordionTrigger>AI & ML Tools</AccordionTrigger>
+                        <AccordionItem value="e-panta">
+                            <AccordionTrigger>e-Panta (Digital Crop Booking)</AccordionTrigger>
                             <AccordionContent>
+                                <p className="text-sm text-muted-foreground mb-3">Ideal for farmers wishing to digitally register their crop details and utilize crop-based schemes.</p>
+                                <h4 className="font-semibold text-foreground mb-2">How It Works</h4>
+                                <p className="text-sm text-muted-foreground mb-3">
+                                    The e-Panta app captures geo-tagged crop data (including photos), links with cadastral records, and aids in schemes like crop insurance, loans, and procurement.
+                                </p>
+                                <h4 className="font-semibold text-foreground mb-2">How to Register</h4>
                                 <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-                                    <li><span className="font-semibold text-foreground">APSS App:</span> Uses AI/ML for pest and disease detection and crop advisory services.</li>
+                                    <li>Visit the <Link href="http://103.210.72.120/epantarabi/" target="_blank" rel="noopener noreferrer" className="text-primary underline">e-Panta Crop Booking portal</Link> and follow prompts to log in and register crop details.</li>
+                                    <li>You may also use the e-Karshak app or portal at <Link href="https://karshak.ap.gov.in" target="_blank" rel="noopener noreferrer" className="text-primary underline">karshak.ap.gov.in</Link>.</li>
                                 </ul>
+                            </AccordionContent>
+                        </AccordionItem>
+                         <AccordionItem value="digital-summary">
+                            <AccordionTrigger>Digital Platform Summary</AccordionTrigger>
+                            <AccordionContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Scheme</TableHead>
+                                            <TableHead>Portal / Link</TableHead>
+                                            <TableHead>Key Purpose</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {digitalPlatformsSummary.map((item, index) => (
+                                            <TableRow key={index}>
+                                                <TableCell className="font-semibold p-2">{item.scheme}</TableCell>
+                                                <TableCell className="p-2"><Link href={item.portal} target="_blank" rel="noopener noreferrer" className="text-primary underline flex items-center gap-1">Visit <ExternalLink className="size-3" /></Link></TableCell>
+                                                <TableCell className="p-2">{item.purpose}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
                             </AccordionContent>
                         </AccordionItem>
                         <AccordionItem value="tenant">
@@ -713,4 +757,3 @@ export function GovernmentSchemesForm() {
     </div>
   );
 }
-

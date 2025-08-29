@@ -1,4 +1,6 @@
 
+"use client";
+
 import { FertilizerShopsMap } from "@/components/client/fertilizer-shops-map";
 
 export default function FertilizerShopsPage() {

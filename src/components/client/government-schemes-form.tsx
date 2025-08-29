@@ -64,11 +64,11 @@ export function GovernmentSchemesForm() {
       setResult(res);
     } catch (error: any) {
       console.error(error);
-      if (error.message && error.message.includes('403 Forbidden')) {
+       if (error.message && (error.message.includes('403 Forbidden') || error.message.includes('API_KEY_SERVICE_BLOCKED'))) {
           toast({
               variant: "destructive",
               title: "API Access Error",
-              description: "The Generative Language API is disabled or blocked. Please enable it in your Google Cloud project.",
+              description: "The Generative Language API is disabled or blocked by restrictions. Please check your Google Cloud project settings.",
           });
       } else {
           toast({
@@ -82,6 +82,11 @@ export function GovernmentSchemesForm() {
     }
   }
 
+  const handleQuickSearch = (region: string) => {
+    form.setValue("region", region);
+    form.handleSubmit(onSubmit)();
+  };
+
   return (
     <div className="grid gap-6">
       <Card>
@@ -91,30 +96,40 @@ export function GovernmentSchemesForm() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col sm:flex-row items-start gap-4">
-              <FormField
-                control={form.control}
-                name="region"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel className="sr-only">Region</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., Maharashtra, Punjab, or India for national schemes" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={loading} className="w-full sm:w-auto flex-shrink-0">
-                {loading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Icons.GovernmentSchemes className="mr-2 h-4 w-4" />
-                )}
-                Find Schemes
-              </Button>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <div className="flex flex-col sm:flex-row items-start gap-4">
+                <FormField
+                  control={form.control}
+                  name="region"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel className="sr-only">Region</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Maharashtra, Punjab, or India for national schemes" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" disabled={loading} className="w-full sm:w-auto flex-shrink-0">
+                  {loading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Icons.GovernmentSchemes className="mr-2 h-4 w-4" />
+                  )}
+                  Find Schemes
+                </Button>
+              </div>
             </form>
           </Form>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" onClick={() => handleQuickSearch('All India')} disabled={loading}>
+              Search All India
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => handleQuickSearch('Andhra Pradesh')} disabled={loading}>
+              Search Andhra Pradesh
+            </Button>
+          </div>
         </CardContent>
       </Card>
       

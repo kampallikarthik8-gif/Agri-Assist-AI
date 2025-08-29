@@ -175,7 +175,7 @@ export function GovernmentSchemesForm() {
         <Card>
             <CardHeader>
                 <CardTitle>PM Kisan Samman Nidhi</CardTitle>
-                <CardDescription>Check status, get updates, or find your registration number for the PM Kisan scheme.</CardDescription>
+                <CardDescription>Latest Updates & Key Highlights</CardDescription>
             </CardHeader>
             <CardContent>
                  <Accordion type="single" collapsible className="w-full">
@@ -516,8 +516,7 @@ export function GovernmentSchemesForm() {
             </Card>
       </div>
 
-
-      <div className="space-y-6">
+       <div className="space-y-6">
         {loading && (
           <div className="flex flex-col items-center justify-center pt-10 gap-4">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -530,40 +529,10 @@ export function GovernmentSchemesForm() {
               <div className="text-center text-muted-foreground pt-10">
                 <p>No specific schemes found for the entered region. Try a broader search (e.g., just "India").</p>
               </div>
-            ) : (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {result.schemes.map((scheme, index) => (
-                  <Card key={index}>
-                    <CardHeader>
-                      <CardTitle className="text-xl">{scheme.name}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-sm text-muted-foreground">{scheme.description}</p>
-                       <Button asChild variant="outline" size="sm">
-                        <Link href={scheme.link} target="_blank" rel="noopener noreferrer">
-                          Learn More
-                          <ExternalLink className="ml-2 h-4 w-4" />
-                        </Link>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+            ) : null}
           </>
         )}
-         {!result && !loading && (
-             <div className="flex flex-col items-center justify-center text-center text-muted-foreground pt-10">
-                <Icons.GovernmentSchemes className="size-12 mb-4"/>
-                <p>Enter a region or state to find relevant government schemes.</p>
-            </div>
-          )}
       </div>
     </div>
   );
 }
-
-    
-    
-
-    

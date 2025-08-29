@@ -14,7 +14,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, ExternalLink } from "lucide-react";
 import { Icons } from "@/components/icons";
 import { getWeather } from "@/ai/flows/weather-service";
-import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -68,7 +67,7 @@ export default function DailyNewsPage() {
         if (weatherData.locationName) {
           const region = weatherData.locationName.split(',')[0];
           form.setValue("region", region);
-          getNews(region);
+          await getNews(region);
         }
       } catch (error) {
         console.error("Failed to auto-fetch news:", error);
@@ -93,7 +92,7 @@ export default function DailyNewsPage() {
   }, []);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    getNews(values.region);
+    await getNews(values.region);
   }
 
   return (

@@ -38,8 +38,6 @@ const navItems = [
   { href: "/seed-quality", label: "Seed Quality", icon: Icons.SeedScanner },
   { href: "/market-insights", label: "Market Insights", icon: Icons.MarketInsights },
   { href: "/yield-prediction", label: "Yield Prediction", icon: Icons.YieldPrediction },
-  { href: "/profit-estimator", label: "Profit Estimator", icon: Icons.Profit },
-  { href: "/farmland-converter", label: "Farmland Converter", icon: Icons.FarmlandConverter },
   { href: "/ai-assistant", label: "AI Assistant", icon: Icons.Assistant },
 ];
 

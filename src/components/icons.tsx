@@ -23,8 +23,6 @@ import {
   ScanLine,
   Map,
   Calculator,
-  DollarSign,
-  Scale,
   Store,
 } from "lucide-react";
 
@@ -59,7 +57,5 @@ export const Icons = {
   FarmMap: Map,
   Calculator,
   YieldPrediction: TrendingUp,
-  Profit: DollarSign,
-  FarmlandConverter: Scale,
   FertilizerShops: Store,
 };

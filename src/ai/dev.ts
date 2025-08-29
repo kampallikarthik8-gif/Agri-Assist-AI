@@ -18,4 +18,3 @@ import '@/ai/flows/rainfall-alert.ts';
 import '@/ai/flows/yield-prediction.ts';
 import '@/ai/flows/pest-disease-alert.ts';
 import '@/ai/flows/soil-health-analyzer.ts';
-import '@/ai/flows/field-profit-estimator.ts';

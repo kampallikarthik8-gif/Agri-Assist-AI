@@ -196,9 +196,6 @@ export function GovernmentSchemesForm() {
             <Button variant="outline" size="sm" onClick={() => handleQuickSearch('Andhra Pradesh')} disabled={loading}>
               Search Andhra Pradesh
             </Button>
-             <Button variant="outline" size="sm" onClick={() => handleQuickSearch('Maharashtra')} disabled={loading}>
-              Search Maharashtra
-            </Button>
           </div>
         </CardContent>
       </Card>
@@ -906,19 +903,6 @@ export function GovernmentSchemesForm() {
                     </Accordion>
                 </CardContent>
             </Card>
-            <Card className="lg:col-span-3 md:col-span-2">
-                <CardHeader>
-                    <CardTitle>Mid-Day Meal & Procurement Initiatives</CardTitle>
-                    <CardDescription>Connecting farm produce directly to government programs.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-                        <li><span className="font-semibold text-foreground">Rice Procurement:</span> 3.5 lakh metric tons of fine-quality rice supplied to over 41,000 schools and 4,000 hostels, procured directly from farmers.</li>
-                        <li><span className="font-semibold text-foreground">Prompt Payments:</span> ₹12,400 crore credited quickly to farmers for their produce.</li>
-                        <li><span className="font-semibold text-foreground">Infrastructure & e-NAM:</span> Initiatives to modernize canal systems, improve soil testing, and leverage the e-NAM digital platform for transparent market access.</li>
-                    </ul>
-                </CardContent>
-            </Card>
       </div>
        <div className="space-y-6">
         {loading && (
@@ -931,3 +915,5 @@ export function GovernmentSchemesForm() {
     </div>
   );
 }
+
+    

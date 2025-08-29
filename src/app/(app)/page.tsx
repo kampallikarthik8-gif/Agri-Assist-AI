@@ -81,7 +81,7 @@ const newsFeed = [
         title: "ఈటీవీ ఆంధ్రప్రదేశ్ లైవ్",
         summary: "ఈటీవీ ఆంధ్రప్రదేశ్ ఛానెల్‌ను ప్రత్యక్షంగా చూడండి.",
         image: "https://picsum.photos/seed/etv-live/600/400",
-        link: "https://www.eenadu.net/andhra-pradesh/etv-live",
+        link: "#",
         aiHint: "television news studio"
     }
 ];

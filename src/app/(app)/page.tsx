@@ -43,6 +43,13 @@ const newsFeed = [
         aiHint: "government document"
     },
     {
+        title: "వైఎస్ఆర్ రైతు భరోసా స్థితిని తెలుసుకోండి",
+        summary: "అధికారిక పోర్టల్‌లో మీ వైఎస్ఆర్ రైతు భరోసా చెల్లింపు వివరాలు మరియు స్థితిని తనిఖీ చేయండి.",
+        image: "https://picsum.photos/seed/ysr-rythu-bharosa/600/400",
+        link: "https://annadathasukhibhava.ap.gov.in/know-your-status",
+        aiHint: "indian government scheme"
+    },
+    {
         title: "పీఎం-కిసాన్: మీ రిజిస్ట్రేషన్ స్థితిని తెలుసుకోండి",
         summary: "అధికారిక పోర్టల్‌లో మీ పీఎం-కిసాన్ రిజిస్ట్రేషన్ వివరాలు మరియు స్థితిని తనిఖీ చేయండి.",
         image: "https://picsum.photos/seed/pmkisan-registration/600/400",
@@ -196,6 +203,7 @@ export default function DashboardPage() {
     const getButtonText = (item: typeof newsFeed[0]) => {
         if (item.link?.includes("etv-live")) return "Watch Live";
         if (item.link?.includes("BeneficiaryStatus")) return "Check Beneficiary Status";
+        if (item.link?.includes("annadathasukhibhava")) return "Check YSR Rythu Bharosa Status";
         if (item.link?.includes("KnowYour_Registration")) return "Know Registration Status";
         return "Learn More";
     }

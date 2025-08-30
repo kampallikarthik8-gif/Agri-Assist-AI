@@ -41,8 +41,8 @@ export default function LoginPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: "admin@example.com",
+      password: "password",
     },
   });
 
@@ -111,7 +111,7 @@ export default function LoginPage() {
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="••••••••"
+                          placeholder="password"
                           {...field}
                         />
                       </FormControl>
@@ -132,7 +132,7 @@ export default function LoginPage() {
           </CardContent>
         </Card>
         <p className="px-8 text-center text-sm text-muted-foreground mt-4">
-          For demo purposes, use <span className="font-semibold text-primary">admin@example.com</span> and password: <span className="font-semibold text-primary">password</span>.
+          Use email: <code className="font-semibold text-primary">admin@example.com</code> and password: <code className="font-semibold text-primary">password</code> to log in.
         </p>
       </div>
     </div>

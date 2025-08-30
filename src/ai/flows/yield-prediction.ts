@@ -25,7 +25,7 @@ const MonthlyYieldSchema = z.object({
 });
 
 const YieldPredictionOutputSchema = z.object({
-  forecast: z.array(MonthlyYieldSchema).describe('A 6-month yield forecast.'),
+  forecast: z.array(MonthlyYieldSchema).describe('A 6-month yield forecast. If a forecast cannot be determined, return an empty array.'),
 });
 export type YieldPredictionOutput = z.infer<typeof YieldPredictionOutputSchema>;
 
@@ -46,7 +46,7 @@ const prompt = ai.definePrompt({
   
   Assume standard farming practices. The yield should be in tons per unit area (e.g., tons/acre or tons/hectare, be consistent).
   
-  Provide a list of 6 monthly forecasts, starting from the next full month.`,
+  Provide a list of 6 monthly forecasts, starting from the next full month. If you cannot determine a forecast, return an empty list.`,
 });
 
 const yieldPredictionFlow = ai.defineFlow(
@@ -59,12 +59,15 @@ const yieldPredictionFlow = ai.defineFlow(
     try {
       const {output} = await prompt(input);
       if (!output) {
-        throw new Error('Failed to generate a response from the AI model.');
+        console.warn("Yield prediction prompt returned no output.");
+        return { forecast: [] };
       }
       return output;
     } catch (error) {
       console.error("Error in yieldPredictionFlow", error);
-      throw new Error('Failed to generate yield prediction.');
+      // Instead of throwing, return an empty forecast to prevent crashes.
+      // The UI will handle displaying a message to the user.
+      return { forecast: [] };
     }
   }
 );

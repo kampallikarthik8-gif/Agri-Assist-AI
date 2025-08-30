@@ -25,12 +25,14 @@ import {
   Store,
   Bell,
   User,
+  Users,
   BookOpen,
   Shield,
   FolderKanban,
   LinkIcon,
   BarChart,
   PanelTop,
+  Settings,
 } from "lucide-react";
 
 export const Icons = {
@@ -67,10 +69,12 @@ export const Icons = {
   FertilizerShops: Store,
   Notification: Bell,
   User,
+  Users,
   CultivationTips: BookOpen,
   Link: LinkIcon,
   MarketInsights: BarChart,
   AdminPanel: PanelTop,
+  Settings,
   FarmEquipment: (props: LucideProps) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
       <path d="M14 4h- complicaciones- y- problemas-de-la-vida-cotidiana-de-las-personas-y-sus-familias-con-una-perspectiva-de-derechos-humanos-y-de-genero" />

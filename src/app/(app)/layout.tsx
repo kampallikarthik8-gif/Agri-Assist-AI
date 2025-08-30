@@ -40,11 +40,17 @@ const navItems = [
   { href: "/crop-recommendation", label: "Crop Recommendation", icon: Icons.CropRecommendation },
   { href: "/cultivation-tips", label: "Cultivation Tips", icon: Icons.CultivationTips },
   { href: "/fertilizer-calculator", label: "Fertilizer Calculator", icon: Icons.Calculator },
-  { href: "/fertilizer-shops", label: "Fertilizer Shops", icon: Icons.FertilizerShops },
+  { href: "/fertilizer-shops", label: "Fertilizer Shops", icon: Icons.Store },
   { href: "/seed-quality", label: "Seed Quality", icon: Icons.SeedScanner },
   { href: "/farm-equipment", label: "Farm Equipment", icon: Icons.FarmEquipment },
   { href: "/ai-assistant", label: "AI Assistant", icon: Icons.Assistant },
 ];
+
+const adminNavItems = [
+    { href: "/admin", label: "Admin Dashboard", icon: Icons.AdminPanel },
+    { href: "/admin/users", label: "User Management", icon: Icons.Users },
+    { href: "/admin/settings", label: "System Settings", icon: Icons.Settings },
+]
 
 function AppName() {
     const [isMounted, setIsMounted] = React.useState(false);
@@ -97,6 +103,22 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
+            <SidebarSeparator />
+             <SidebarMenu>
+            {adminNavItems.map((item) => (
+              <SidebarMenuItem key={item.href}>
+                <Link href={item.href}>
+                  <SidebarMenuButton
+                    isActive={pathname === item.href}
+                    tooltip={item.label}
+                  >
+                    <item.icon className="size-5" />
+                    <span>{item.label}</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
         </SidebarContent>
 
         <SidebarSeparator />
@@ -128,12 +150,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     <DropdownMenuItem>
                         <Icons.User className="mr-2 h-4 w-4" />
                         <span>Profile</span>
-                    </DropdownMenuItem>
-                </Link>
-                 <Link href="/admin">
-                    <DropdownMenuItem>
-                        <Icons.AdminPanel className="mr-2 h-4 w-4" />
-                        <span>Admin Panel</span>
                     </DropdownMenuItem>
                 </Link>
               </DropdownMenuContent>

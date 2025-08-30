@@ -1,8 +1,7 @@
-
 'use server';
 
 /**
- * @fileOverview An AI agent for providing agricultural market insights.
+ * @fileOverview An AI agent for providing agricultural market insights, including the best place to sell.
  * 
  * - marketInsights - A function that handles the market analysis process.
  * - MarketInsightsInput - The input type for the marketInsights function.
@@ -12,51 +11,83 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-// Mock function to simulate fetching crop prices.
-// In a real application, this would fetch data from a live market data API.
-async function fetchCropPrice(cropName: string, region: string): Promise<string> {
-    const prices: {[key: string]: number} = {
-        'corn': 220.50,
-        'wheat': 280.00,
-        'soybeans': 550.75,
-        'tomatoes': 1500.00,
-        'almonds': 4000.00,
+// Mock function to simulate fetching crop prices from multiple markets.
+// In a real application, this would fetch data from live market data APIs.
+async function findBestMarketForCrop(cropName: string): Promise<{ bestMarket: string; bestPrice: string; allMarkets: { market: string, price: string }[] }> {
+    const basePrices: {[key: string]: number} = {
+        'corn': 210.50,
+        'wheat': 275.00,
+        'soybeans': 540.75,
+        'tomatoes': 1450.00,
+        'almonds': 3900.00,
+        'cotton': 1600.00,
+        'sugarcane': 40.00,
+        'paddy (rice)': 250.00,
     };
-    const basePricePerTon = prices[cropName.toLowerCase()] || 300;
-    // Add some random variation to simulate market fluctuations
-    const randomFactor = (Math.random() - 0.5) * 0.1; // +/- 5%
-    const finalPricePerTon = basePricePerTon * (1 + randomFactor);
-    const finalPricePerKg = finalPricePerTon / 1000;
-    return `$${finalPricePerKg.toFixed(2)} / kg`;
+    const basePricePerTon = basePrices[cropName.toLowerCase()] || 300;
+    
+    // Simulate a few local markets with price variations
+    const markets = [
+        { name: "Main City Mandi", variation: 1.05 },
+        { name: "Regional Hub", variation: 1.02 },
+        { name: "Local Town Market", variation: 0.98 },
+        { name: "Cross-State Exchange", variation: 1.12 },
+    ];
+
+    let bestMarket = '';
+    let bestPrice = 0;
+
+    const allMarkets = markets.map(market => {
+        const marketPricePerTon = basePricePerTon * market.variation * (1 + (Math.random() - 0.5) * 0.1);
+        if (marketPricePerTon > bestPrice) {
+            bestPrice = marketPricePerTon;
+            bestMarket = market.name;
+        }
+        return {
+            market: market.name,
+            price: `$${(marketPricePerTon / 1000).toFixed(2)} / kg`
+        };
+    });
+
+    return {
+        bestMarket,
+        bestPrice: `$${(bestPrice / 1000).toFixed(2)} / kg`,
+        allMarkets,
+    };
 }
 
 
-const getCropPrice = ai.defineTool(
+const findBestMarket = ai.defineTool(
     {
-        name: 'getCropPrice',
-        description: 'Gets the current market price for a specific crop in a given region.',
+        name: 'findBestMarket',
+        description: 'Finds the best market to sell a specific crop by comparing prices across multiple local markets.',
         inputSchema: z.object({
             cropName: z.string().describe('The name of the crop.'),
-            region: z.string().describe('The region to check the price in.'),
         }),
-        outputSchema: z.string(),
+        outputSchema: z.object({
+            bestMarket: z.string().describe("The name of the market with the highest price."),
+            bestPrice: z.string().describe("The highest price found for the crop."),
+        }),
     },
-    async (input) => fetchCropPrice(input.cropName, input.region)
+    async (input) => {
+        const { bestMarket, bestPrice } = await findBestMarketForCrop(input.cropName);
+        return { bestMarket, bestPrice };
+    }
 );
 
 
 const MarketInsightsInputSchema = z.object({
   cropName: z.string().describe('The name of the crop to analyze.'),
-  region: z.string().describe('The geographical region for the market analysis (e.g., California, Midwest).'),
 });
 
 export type MarketInsightsInput = z.infer<typeof MarketInsightsInputSchema>;
 
 const MarketInsightsOutputSchema = z.object({
-  currentPrice: z.string().describe('The current market price of the crop.'),
+  bestMarket: z.string().describe("The name of the market with the best price."),
+  currentPrice: z.string().describe('The current market price of the crop in the best market.'),
   marketTrend: z.string().describe('The current market trend (e.g., Bullish, Bearish, Stable).'),
   pricePrediction: z.string().describe('A short-term price prediction (e.g., Likely to increase in the next quarter).'),
-  sellingAdvice: z.string().describe('Strategic advice on when to sell the crop for maximum profitability.'),
+  sellingAdvice: z.string().describe('Strategic advice on when and where to sell the crop for maximum profitability.'),
 });
 
 export type MarketInsightsOutput = z.infer<typeof MarketInsightsOutputSchema>;
@@ -73,17 +104,18 @@ const prompt = ai.definePrompt({
   name: 'marketInsightsPrompt',
   input: {schema: MarketInsightsInputSchema},
   output: {schema: MarketInsightsOutputSchema},
-  tools: [getCropPrice],
-  prompt: `You are an expert agricultural market analyst.
+  tools: [findBestMarket],
+  prompt: `You are an expert agricultural market analyst. Your goal is to help farmers sell at the right time and at the right place.
   
-  First, get the current price for the user's crop: {{{cropName}}} in the specified region: {{{region}}}.
+  First, find the best market to sell the user's crop: {{{cropName}}}. This involves checking prices across several local markets.
   
-  Then, based on the current price and general market knowledge, provide a concise market analysis.
+  Then, based on the best price you found and general market knowledge, provide a concise market analysis.
   
   The analysis should include:
-  - The current market trend.
+  - The name of the best market and the current price there.
+  - The current overall market trend.
   - A short-term price prediction.
-  - Actionable advice on the best time to sell.
+  - Actionable advice on the best time and place to sell, explicitly mentioning why the recommended market is the best choice.
   
   Keep the analysis brief and to the point.`,
 });

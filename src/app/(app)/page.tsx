@@ -19,6 +19,9 @@ import {
 import {
   Line,
   LineChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
 } from "recharts";
 import { Icons } from "@/components/icons";
 import { useState, useEffect } from "react";

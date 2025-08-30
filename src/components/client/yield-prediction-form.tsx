@@ -131,7 +131,7 @@ export function YieldPredictionForm() {
                   <FormItem>
                     <FormLabel>Primary Crop Type</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Wheat, Rice" {...field} />
+                      <Input placeholder="e.g., Wheat, Rice, Cotton" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -108,11 +108,11 @@ const marketInsightsFlow = ai.defineFlow(
             console.error(`Error in marketInsightsFlow on attempt ${i + 1}`, error);
             if (i === maxRetries - 1) {
                 // If it's the last retry, re-throw a more specific error
-                 throw new Error('Failed to get market insights after multiple attempts.');
+                 throw new Error('Failed to get market insights after multiple attempts. Please check your connection and try again.');
             }
         }
     }
     // If all retries fail to produce an output
-    throw new Error('Failed to get market insights.');
+    throw new Error('Failed to get market insights. The AI model did not produce an output.');
   }
 );

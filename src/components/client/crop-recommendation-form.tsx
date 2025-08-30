@@ -90,41 +90,41 @@ export function CropRecommendationForm() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
-      <Card className="lg:col-span-2">
-        <CardHeader>
-          <CardTitle>Crop Recommendation</CardTitle>
-          <CardDescription>Enter your farm's location to receive AI-powered crop suggestions. We've tried to detect your location automatically.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-1">
+      <div className="lg:col-span-2">
+        <Card>
+            <CardHeader>
+            <CardTitle>Get Crop Recommendations</CardTitle>
+            <CardDescription>Enter your farm's location to receive AI-powered crop suggestions. We've tried to detect your location automatically.</CardDescription>
+            </CardHeader>
+            <CardContent>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
-                  control={form.control}
-                  name="location"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Location</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Fresno, California" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <Button type="submit" disabled={loading} className="w-full">
-                {loading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Icons.CropRecommendation className="mr-2 h-4 w-4" />
-                )}
-                Get Recommendations
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+                    control={form.control}
+                    name="location"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>Location</FormLabel>
+                        <FormControl>
+                            <Input placeholder="e.g., Napa Valley, California" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                <Button type="submit" disabled={loading} className="w-full">
+                    {loading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                    <Icons.CropRecommendation className="mr-2 h-4 w-4" />
+                    )}
+                    Get Recommendations
+                </Button>
+                </form>
+            </Form>
+            </CardContent>
+        </Card>
+      </div>
       
       <Card className="lg:col-span-1">
         <CardHeader>

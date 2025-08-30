@@ -10,20 +10,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { BarChart as BarChartIcon, LineChart as LineChartIcon, Cloud, Sun, Wind, Cloudy, SunMoon, CloudRain, Snowflake, Bug, ExternalLink, Eye } from "lucide-react";
+import { LineChart as LineChartIcon, Bug, ExternalLink, Eye } from "lucide-react";
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import {
-  Bar,
-  BarChart,
   Line,
   LineChart,
-  XAxis,
-  YAxis,
-  CartesianGrid,
 } from "recharts";
 import { Icons } from "@/components/icons";
 import { useState, useEffect } from "react";
@@ -57,33 +52,12 @@ const newsFeed = [
         aiHint: "government office"
     },
     {
-        title: "ఈనాడు: రైతు భరోసా కేంద్రాల ద్వారా విత్తనాల పంపిణీ ప్రారంభం",
-        summary: "ఖరీఫ్ సీజన్ కు సన్నద్ధంగా, రాష్ట్ర ప్రభుత్వం రైతు భరోసా కేంద్రాల (RBKs) ద్వారా సబ్సిడీపై విత్తనాలను పంపిణీ చేయడం ప్రారంభించింది...",
-        image: "https://picsum.photos/seed/eenadu-news/600/400",
-        link: "#",
-        aiHint: "indian farmer market"
-    },
-    {
-        title: "ఆంధ్రజ్యోతి: పట్టిసీమ నుండి రాయలసీమకు నీటి విడుదల",
-        summary: "పట్టిసీమ ఎత్తిపోతల పథకం నుండి కృష్ణా డెల్టాకు నీటిని విడుదల చేయడంతో, రాయలసీమలోని రైతులు హర్షం వ్యక్తం చేస్తున్నారు...",
-        image: "https://picsum.photos/seed/andhrajyothy-news/600/400",
-        link: "#",
-        aiHint: "water dam india"
-    },
-    {
-        title: "ఈనాడు: వ్యవసాయ మార్కెట్లలో పత్తి ధరలు స్థిరంగా ఉన్నాయి",
-        summary: "గత వారం ఒడిదుడుకుల తర్వాత, ఈరోజు ప్రధాన వ్యవసాయ మార్కెట్లలో పత్తి ధరలు స్థిరంగా ఉన్నాయి, క్వింటాల్‌కు ₹7,000 వద్ద ట్రేడవుతోంది...",
-        image: "https://picsum.photos/seed/cotton-news/600/400",
-        link: "#",
-        aiHint: "cotton field"
-    },
-    {
         title: "ఈటీవీ ఆంధ్రప్రదేశ్ లైవ్",
         summary: "ఈటీవీ ఆంధ్రప్రదేశ్ ఛానెల్‌ను ప్రత్యక్షంగా చూడండి.",
         image: "https://picsum.photos/seed/etv-live/600/400",
         link: "https://www.youtube.com/watch?v=Fj2yV8cW2dY",
         aiHint: "television news studio"
-    }
+    },
 ];
 
 const chartConfig = {
@@ -98,28 +72,27 @@ const chartConfig = {
 };
 
 const weatherIconMap: { [key: string]: React.FC<any> } = {
-    "01d": Sun,
-    "01n": SunMoon,
-    "02d": Sun,
-    "02n": SunMoon,
-    "03d": Cloud,
-    "03n": Cloud,
-    "04d": Cloudy,
-    "04n": Cloudy,
-    "09d": CloudRain,
-    "09n": CloudRain,
-    "10d": CloudRain,
-    "10n": CloudRain,
-    "11d": CloudRain,
-    "11n": CloudRain,
-    "13d": Snowflake,
-    "13n": Snowflake,
-    "50d": Cloud,
-    "50n": Cloud,
+    "01d": Icons.Sun,
+    "01n": Icons.Sunset, // Using sunset for night clear
+    "02d": Icons.Sun,
+    "02n": Icons.Sunset,
+    "03d": Icons.Cloud,
+    "03n": Icons.Cloud,
+    "04d": Icons.Cloud, // Using same for overcast
+    "04n": Icons.Cloud,
+    "09d": Icons.Cloud, // Using cloud for shower rain
+    "09n": Icons.Cloud,
+    "10d": Icons.Cloud, // Using cloud for rain
+    "10n": Icons.Cloud,
+    "11d": Icons.Cloud, // Using cloud for thunderstorm
+    "11n": Icons.Cloud,
+    "13d": Icons.Cloud, // Using cloud for snow
+    "13n": Icons.Cloud,
+    "50d": Icons.Wind,
+    "50n": Icons.Wind,
   };
 
 export default function DashboardPage() {
-    const [waterUsageData, setWaterUsageData] = useState<any[]>([]);
     const [weather, setWeather] = useState<WeatherOutput | null>(null);
     const [yieldData, setYieldData] = useState<YieldPredictionOutput['forecast'] | null>(null);
     const [pestAlerts, setPestAlerts] = useState<PestDiseaseAlertOutput['alerts'] | null>(null);
@@ -128,16 +101,6 @@ export default function DashboardPage() {
     const { toast } = useToast();
 
     useEffect(() => {
-        setWaterUsageData([
-          { date: "Mon", usage: Math.floor(Math.random() * 200) + 50 },
-          { date: "Tue", usage: Math.floor(Math.random() * 200) + 50 },
-          { date: "Wed", usage: Math.floor(Math.random() * 200) + 50 },
-          { date: "Thu", usage: Math.floor(Math.random() * 200) + 50 },
-          { date: "Fri", usage: Math.floor(Math.random() * 200) + 50 },
-          { date: "Sat", usage: Math.floor(Math.random() * 200) + 50 },
-          { date: "Sun", usage: Math.floor(Math.random() * 200) + 50 },
-        ]);
-
         async function fetchDashboardData(lat: number, lon: number) {
             try {
                 setLoading(true);
@@ -148,21 +111,23 @@ export default function DashboardPage() {
                 const location = weatherData.locationName;
                 const cropType = 'Wheat'; // Default crop for prediction
 
-                const [yieldRes, pestRes] = await Promise.all([
+                const [yieldRes, pestRes] = await Promise.allSettled([
                     yieldPrediction({ location, cropType }),
                     pestDiseaseAlert({ location })
                 ]);
                 
-                if (yieldRes) {
-                    setYieldData(yieldRes.forecast);
+                if (yieldRes.status === 'fulfilled' && yieldRes.value) {
+                    setYieldData(yieldRes.value.forecast);
                 } else {
                     setYieldData([]);
+                    console.error("Yield prediction failed:", yieldRes.reason);
                 }
 
-                if (pestRes) {
-                    setPestAlerts(pestRes.alerts);
+                if (pestRes.status === 'fulfilled' && pestRes.value) {
+                    setPestAlerts(pestRes.value.alerts);
                 } else {
                     setPestAlerts([]);
+                     console.error("Pest alert failed:", pestRes.reason);
                 }
 
             } catch (error: any) {
@@ -180,7 +145,7 @@ export default function DashboardPage() {
                         description: "Please add your OpenWeatherMap API key to the .env file.",
                     });
                 } else {
-                    setLocationError("Could not fetch dashboard data.");
+                    setLocationError("Could not fetch dashboard data. Please check your API keys and connection.");
                 }
             } finally {
                 setLoading(false);
@@ -204,7 +169,7 @@ export default function DashboardPage() {
         }
     }, [toast]);
 
-    const WeatherIcon = weather ? weatherIconMap[weather.icon] || Sun : Sun;
+    const WeatherIcon = weather ? weatherIconMap[weather.icon] || Icons.Sun : Icons.Sun;
 
     const getButtonText = (item: typeof newsFeed[0]) => {
         if (item.link?.includes("youtube.com")) return "Watch Live";
@@ -248,8 +213,8 @@ export default function DashboardPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
                         <p className="flex items-center gap-2"><Icons.Thermometer className="size-4 text-muted-foreground" /> Feels like: {weather.feelsLike}°F</p>
-                        <p className="flex items-center gap-2"><Wind className="size-4 text-muted-foreground" /> Wind: {weather.windSpeed} mph</p>
-                        <p className="flex items-center gap-2"><Cloud className="size-4 text-muted-foreground" /> Humidity: {weather.humidity}%</p>
+                        <p className="flex items-center gap-2"><Icons.Wind className="size-4 text-muted-foreground" /> Wind: {weather.windSpeed} mph</p>
+                        <p className="flex items-center gap-2"><Icons.Cloud className="size-4 text-muted-foreground" /> Humidity: {weather.humidity}%</p>
                         <p className="flex items-center gap-2"><Icons.UV className="size-4 text-muted-foreground" /> UV Index: {weather.uvIndex}</p>
                         <p className="flex items-center gap-2"><Eye className="size-4 text-muted-foreground" /> Visibility: {weather.visibility} mi</p>
                     </div>
@@ -258,7 +223,7 @@ export default function DashboardPage() {
                     <p className="text-sm text-muted-foreground">{locationError || "Could not load weather data."}</p>
                 )}
             </CardContent>
-        </Card>
+        </Card>>
         
         <div className="lg:col-span-1 space-y-6">
             <Card>
@@ -348,7 +313,7 @@ export default function DashboardPage() {
                         <div className="flex-1">
                             <h3 className="font-semibold">{item.title}</h3>
                             <p className="text-sm text-muted-foreground">{item.summary}</p>
-                            {item.link && item.link !== "#" && (
+                            {item.link && (
                                 <Button asChild variant="outline" size="sm" className="mt-2">
                                     <Link href={item.link} target="_blank" rel="noopener noreferrer">
                                         {getButtonText(item)}

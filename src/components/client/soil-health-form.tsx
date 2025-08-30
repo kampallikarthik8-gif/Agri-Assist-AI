@@ -105,7 +105,7 @@ export function SoilHealthForm() {
                   <FormItem>
                     <FormLabel>Location</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Hisar, Haryana" {...field} />
+                      <Input placeholder="e.g., Hisar, Haryana, India" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

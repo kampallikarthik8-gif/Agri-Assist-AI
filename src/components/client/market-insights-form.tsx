@@ -94,7 +94,7 @@ export function MarketInsightsForm() {
                       <FormItem>
                         <FormLabel>Crop Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., Wheat, Soybeans" {...field} />
+                          <Input placeholder="e.g., Wheat, Cotton, Soybeans" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -107,7 +107,7 @@ export function MarketInsightsForm() {
                       <FormItem>
                         <FormLabel>Region</FormLabel>
                         <FormControl>
-                          <Input placeholder="e.g., Midwest, California" {...field} />
+                          <Input placeholder="e.g., Punjab, Andhra Pradesh" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

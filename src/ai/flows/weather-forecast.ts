@@ -64,16 +64,26 @@ const weatherForecastFlow = ai.defineFlow(
     outputSchema: WeatherForecastOutputSchema,
   },
   async input => {
-    try {
-        const {output} = await prompt(input);
-        if (!output) {
-          console.warn('Weather forecast prompt returned no output.');
-          return { forecast: [] };
-        }
-        return output;
-    } catch (error) {
-        console.error("Error in weatherForecastFlow, returning empty forecast.", error);
-        return { forecast: [] };
+    const maxRetries = 3;
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+          console.log(`Attempt ${i + 1} for weatherForecastFlow`);
+          const {output} = await prompt(input);
+          if (output && output.forecast.length > 0) {
+              return output;
+          }
+          console.warn(`Attempt ${i + 1} returned no forecast. Retrying...`);
+          // Optional: add a small delay before retrying
+          if (i < maxRetries - 1) await new Promise(resolve => setTimeout(resolve, 500 * (i + 1)));
+      } catch (error) {
+          console.error(`Error in weatherForecastFlow on attempt ${i + 1}`, error);
+          if (i === maxRetries - 1) {
+              // If it's the last retry, return empty instead of throwing
+              return { forecast: [] };
+          }
+      }
     }
+    // If all retries fail to produce an output
+    return { forecast: [] };
   }
 );

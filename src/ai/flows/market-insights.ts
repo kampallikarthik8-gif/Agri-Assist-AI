@@ -14,17 +14,18 @@ import {z} from 'genkit';
 // Mock function to simulate fetching crop prices from multiple markets.
 // In a real application, this would fetch data from live market data APIs.
 async function findBestMarketForCrop(cropName: string): Promise<{ bestMarket: string; bestPrice: string; allMarkets: { market: string, price: string }[] }> {
+    // Prices are now in INR per Quintal (100kg)
     const basePrices: {[key: string]: number} = {
-        'corn': 210.50,
-        'wheat': 275.00,
-        'soybeans': 540.75,
-        'tomatoes': 1450.00,
-        'almonds': 3900.00,
-        'cotton': 1600.00,
-        'sugarcane': 40.00,
-        'paddy (rice)': 250.00,
+        'corn': 2100,
+        'wheat': 2275,
+        'soybeans': 4500,
+        'tomatoes': 2500,
+        'almonds': 60000,
+        'cotton': 7000,
+        'sugarcane': 350,
+        'paddy (rice)': 2200,
     };
-    const basePricePerTon = basePrices[cropName.toLowerCase()] || 300;
+    const basePricePerQuintal = basePrices[cropName.toLowerCase()] || 3000;
     
     // Simulate a few local markets with price variations
     const markets = [
@@ -38,20 +39,20 @@ async function findBestMarketForCrop(cropName: string): Promise<{ bestMarket: st
     let bestPrice = 0;
 
     const allMarkets = markets.map(market => {
-        const marketPricePerTon = basePricePerTon * market.variation * (1 + (Math.random() - 0.5) * 0.1);
-        if (marketPricePerTon > bestPrice) {
-            bestPrice = marketPricePerTon;
+        const marketPrice = basePricePerQuintal * market.variation * (1 + (Math.random() - 0.5) * 0.1);
+        if (marketPrice > bestPrice) {
+            bestPrice = marketPrice;
             bestMarket = market.name;
         }
         return {
             market: market.name,
-            price: `$${(marketPricePerTon / 1000).toFixed(2)} / kg`
+            price: `₹${marketPrice.toFixed(2)} / quintal`
         };
     });
 
     return {
         bestMarket,
-        bestPrice: `$${(bestPrice / 1000).toFixed(2)} / kg`,
+        bestPrice: `₹${bestPrice.toFixed(2)} / quintal`,
         allMarkets,
     };
 }
@@ -105,14 +106,14 @@ const prompt = ai.definePrompt({
   input: {schema: MarketInsightsInputSchema},
   output: {schema: MarketInsightsOutputSchema},
   tools: [findBestMarket],
-  prompt: `You are an expert agricultural market analyst. Your goal is to help farmers sell at the right time and at the right place.
+  prompt: `You are an expert agricultural market analyst for the Indian market. Your goal is to help farmers sell at the right time and at the right place.
   
   First, find the best market to sell the user's crop: {{{cropName}}}. This involves checking prices across several local markets.
   
-  Then, based on the best price you found and general market knowledge, provide a concise market analysis.
+  Then, based on the best price you found and general market knowledge for India, provide a concise market analysis.
   
   The analysis should include:
-  - The name of the best market and the current price there.
+  - The name of the best market and the current price there (in Rupees).
   - The current overall market trend.
   - A short-term price prediction.
   - Actionable advice on the best time and place to sell, explicitly mentioning why the recommended market is the best choice.

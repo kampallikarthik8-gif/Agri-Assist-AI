@@ -22,11 +22,12 @@ async function fetchCropPrice(cropName: string, region: string): Promise<string>
         'tomatoes': 1500.00,
         'almonds': 4000.00,
     };
-    const basePrice = prices[cropName.toLowerCase()] || 300;
+    const basePricePerTon = prices[cropName.toLowerCase()] || 300;
     // Add some random variation to simulate market fluctuations
     const randomFactor = (Math.random() - 0.5) * 0.1; // +/- 5%
-    const finalPrice = basePrice * (1 + randomFactor);
-    return `$${finalPrice.toFixed(2)} / ton`;
+    const finalPricePerTon = basePricePerTon * (1 + randomFactor);
+    const finalPricePerKg = finalPricePerTon / 1000;
+    return `$${finalPricePerKg.toFixed(2)} / kg`;
 }
 
 

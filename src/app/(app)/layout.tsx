@@ -107,15 +107,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                   <Button variant="ghost" className="h-auto w-full justify-start p-0 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:h-auto group-data-[collapsible=icon]:justify-center">
                     <div className="flex items-center gap-3">
                         <Avatar className="size-9">
-                        <AvatarImage src="https://picsum.photos/seed/indian-farmer/100" alt="User Avatar" data-ai-hint="indian farmer" />
-                        <AvatarFallback>RS</AvatarFallback>
+                        <AvatarImage src="https://picsum.photos/seed/admin-user/100" alt="User Avatar" data-ai-hint="admin user" />
+                        <AvatarFallback>A</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col items-start group-data-[collapsible=icon]:hidden">
                         <span className="text-sm font-medium text-sidebar-foreground">
-                            Ram Singh
+                            Admin
                         </span>
                         <span className="text-xs text-sidebar-foreground/70">
-                            Farmer
+                            Administrator
                         </span>
                         </div>
                     </div>

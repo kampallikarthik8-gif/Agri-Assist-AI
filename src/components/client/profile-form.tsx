@@ -51,9 +51,9 @@ export function ProfileForm() {
   const profileForm = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      name: "Ram Singh",
-      role: "Farmer",
-      email: "ram.singh@example.com",
+      name: "Admin",
+      role: "Administrator",
+      email: "admin@example.com",
       phone: "+91 98765 43210",
     },
   });
@@ -106,11 +106,11 @@ export function ProfileForm() {
                 <div className="flex items-center gap-4">
                   <Avatar className="h-20 w-20">
                     <AvatarImage
-                      src="https://picsum.photos/seed/indian-farmer/200"
+                      src="https://picsum.photos/seed/admin-user/200"
                       alt="User Avatar"
-                      data-ai-hint="indian farmer"
+                      data-ai-hint="admin user"
                     />
-                    <AvatarFallback>RS</AvatarFallback>
+                    <AvatarFallback>A</AvatarFallback>
                   </Avatar>
                   <Button type="button" variant="outline">
                     Change Photo

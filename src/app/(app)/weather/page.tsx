@@ -2,22 +2,31 @@
 "use client"
 
 import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getWeather, WeatherOutput } from "@/ai/flows/weather-service";
 import { weatherForecast, type WeatherForecastOutput } from "@/ai/flows/weather-forecast";
 import { rainfallAlert, type RainfallAlertOutput } from "@/ai/flows/rainfall-alert";
+import { sendNotification } from "@/ai/flows/notification-service";
 import { Icons } from "@/components/icons";
-import { AlertCircle, Cloud, Cloudy, CloudRain, Snowflake, Sun, SunMoon, Wind, Gauge, Eye, Sunrise, Sunset } from "lucide-react";
+import { AlertCircle, Cloud, Cloudy, CloudRain, Snowflake, Sun, SunMoon, Wind, Gauge, Eye, Sunrise, Sunset, Loader2 } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const weatherIconMap: { [key: string]: React.FC<any> } = {
     "01d": Sun, "clear sky": Sun,
@@ -47,6 +56,107 @@ const alertSeverityColors = {
     'None': 'border-gray-500/50 bg-gray-500/10 text-gray-700',
 };
 
+const notificationFormSchema = z.object({
+  phoneNumber: z.string().min(10, "A valid phone number is required."),
+  method: z.enum(["SMS", "WhatsApp"]),
+});
+
+function NotificationSender({ alertMessage }: { alertMessage: string }) {
+    const [loading, setLoading] = useState(false);
+    const { toast } = useToast();
+
+    const form = useForm<z.infer<typeof notificationFormSchema>>({
+        resolver: zodResolver(notificationFormSchema),
+        defaultValues: {
+            phoneNumber: "",
+            method: "SMS",
+        },
+    });
+
+    async function onSubmit(values: z.infer<typeof notificationFormSchema>) {
+        setLoading(true);
+        try {
+            const result = await sendNotification({ ...values, message: alertMessage });
+            toast({
+                title: "Notification Sent (Simulated)",
+                description: `Alert sent to ${values.phoneNumber} via ${result.deliveryMethod}. Confirmation ID: ${result.confirmationId}`,
+            });
+            form.reset();
+        } catch (error: any) {
+            console.error(error);
+            toast({
+                variant: "destructive",
+                title: "Failed to Send",
+                description: error.message || "Could not send the notification.",
+            });
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    return (
+        <Card className="bg-destructive/10 border-destructive/50">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Icons.Notification className="text-destructive" /> Send High-Risk Alert</CardTitle>
+                <CardDescription>Simulate sending this critical weather alert to a phone number via SMS or WhatsApp.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <FormField
+                            control={form.control}
+                            name="phoneNumber"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Phone Number (with country code)</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="+91 98765 43210" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                         <FormField
+                            control={form.control}
+                            name="method"
+                            render={({ field }) => (
+                                <FormItem className="space-y-3">
+                                <FormLabel>Method</FormLabel>
+                                <FormControl>
+                                    <RadioGroup
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                    className="flex items-center space-x-4"
+                                    >
+                                    <FormItem className="flex items-center space-x-2 space-y-0">
+                                        <FormControl>
+                                        <RadioGroupItem value="SMS" />
+                                        </FormControl>
+                                        <FormLabel className="font-normal">SMS</FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-2 space-y-0">
+                                        <FormControl>
+                                        <RadioGroupItem value="WhatsApp" />
+                                        </FormControl>
+                                        <FormLabel className="font-normal">WhatsApp</FormLabel>
+                                    </FormItem>
+                                    </RadioGroup>
+                                </FormControl>
+                                <FormMessage />
+                                </FormItem>
+                            )}
+                            />
+                        <Button type="submit" disabled={loading} className="w-full">
+                            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Icons.Notification className="mr-2 h-4 w-4" />}
+                            Send Alert
+                        </Button>
+                    </form>
+                </Form>
+            </CardContent>
+        </Card>
+    );
+}
+
 export default function WeatherPage() {
   const [weather, setWeather] = useState<WeatherOutput | null>(null);
   const [forecast, setForecast] = useState<WeatherForecastOutput['forecast'] | null>(null);
@@ -54,6 +164,8 @@ export default function WeatherPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  
+  const highSeverityAlert = alerts?.find(a => a.severity === 'High' && a.type !== 'none');
 
   useEffect(() => {
     async function fetchAllWeatherData(lat?: number, lon?: number, location?: string) {
@@ -73,7 +185,6 @@ export default function WeatherPage() {
 
         setForecast(forecastData?.forecast);
         
-        // Filter out 'none' type alerts before setting state
         const meaningfulAlerts = alertData?.alerts?.filter(a => a.type !== 'none') || [];
         setAlerts(meaningfulAlerts);
 
@@ -123,6 +234,8 @@ export default function WeatherPage() {
 
         {loading ? (
             <Skeleton className="h-24 w-full" />
+        ) : highSeverityAlert ? (
+            <NotificationSender alertMessage={`Weather Alert: ${highSeverityAlert.title}. ${highSeverityAlert.message}`} />
         ) : alerts && alerts.length > 0 && (
             <Card>
                 <CardHeader>

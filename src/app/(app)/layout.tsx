@@ -28,6 +28,7 @@ const navItems = [
   { href: "/", label: "Dashboard", icon: Icons.Dashboard },
   { href: "/daily-news", label: "Daily News", icon: Icons.News },
   { href: "/government-schemes", label: "Govt. Schemes & Subsidies", icon: Icons.GovernmentSchemes },
+  { href: "/crop-insurance", label: "Crop Insurance", icon: Icons.CropInsurance },
   { href: "/weather", label: "Weather", icon: Icons.Weather },
   { href: "/farm-map", label: "Farm Map", icon: Icons.FarmMap },
   { href: "/irrigation-planner", label: "Irrigation Planner", icon: Icons.Irrigation },

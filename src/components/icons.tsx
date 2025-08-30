@@ -27,6 +27,7 @@ import {
   Bell,
   User,
   BookOpen,
+  Shield,
 } from "lucide-react";
 
 export const Icons = {
@@ -47,6 +48,7 @@ export const Icons = {
   Pest: Bug,
   MarketInsights: TrendingUp,
   GovernmentSchemes: Landmark,
+  CropInsurance: Shield,
   Thermometer: Thermometer,
   Pressure: Gauge,
   Visibility: Eye,

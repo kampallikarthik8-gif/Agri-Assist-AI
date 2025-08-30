@@ -20,4 +20,5 @@ import '@/ai/flows/pest-disease-alert.ts';
 import '@/ai/flows/soil-health-analyzer.ts';
 import '@/ai/flows/notification-service.ts';
 import '@/ai/flows/cultivation-tips.ts';
+import '@/ai/flows/crop-insurance-info.ts';
 

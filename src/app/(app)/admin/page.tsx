@@ -31,8 +31,8 @@ const adminFeatures = [
         title: "User Management",
         description: "View and manage all users in the application.",
         icon: <Users className="size-8 text-primary" />,
-        href: "#",
-        status: "Coming Soon"
+        href: "/admin/users",
+        status: "Active"
     },
     {
         title: "System Settings",
@@ -95,7 +95,7 @@ export default function AdminPage() {
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {adminFeatures.map((feature, index) => (
                     <Card key={index} className="hover:shadow-md transition-shadow">
-                        <Link href={feature.href}>
+                        <Link href={feature.href} className={feature.status === 'Coming Soon' ? 'pointer-events-none' : ''}>
                              <CardHeader className="flex flex-row items-center justify-between">
                                 <div>
                                     <CardTitle>{feature.title}</CardTitle>
@@ -104,7 +104,7 @@ export default function AdminPage() {
                                 {feature.icon}
                             </CardHeader>
                              <CardContent>
-                                <span className="text-xs font-semibold bg-secondary text-secondary-foreground px-2 py-1 rounded-full">{feature.status}</span>
+                                <span className={`text-xs font-semibold px-2 py-1 rounded-full ${feature.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-secondary text-secondary-foreground'}`}>{feature.status}</span>
                             </CardContent>
                         </Link>
                     </Card>

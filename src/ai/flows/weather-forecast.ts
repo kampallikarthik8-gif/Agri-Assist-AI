@@ -67,12 +67,13 @@ const weatherForecastFlow = ai.defineFlow(
     try {
         const {output} = await prompt(input);
         if (!output) {
-          throw new Error('Failed to generate a response from the AI model.');
+          console.warn('Weather forecast prompt returned no output.');
+          return { forecast: [] };
         }
         return output;
     } catch (error) {
         console.error("Error in weatherForecastFlow, returning empty forecast.", error);
-        throw new Error('Failed to generate weather forecast.');
+        return { forecast: [] };
     }
   }
 );

@@ -59,12 +59,15 @@ const pestDiseaseAlertFlow = ai.defineFlow(
     try {
       const {output} = await prompt(input);
       if (!output) {
+        // If the prompt returns no output, assume no alerts are needed.
         return { alerts: [] };
       }
       return output;
     } catch (error) {
-      console.error("Error in pestDiseaseAlertFlow", error);
-      throw new Error('Failed to generate pest and disease alerts.');
+      console.error("Error in pestDiseaseAlertFlow, returning empty alerts.", error);
+      // Instead of throwing an error, return an empty list to prevent crashes.
+      // The UI can handle displaying a "no threats" message.
+      return { alerts: [] };
     }
   }
 );

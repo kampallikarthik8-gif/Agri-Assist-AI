@@ -4,46 +4,52 @@ import { Users, Newspaper, Activity, BarChart3, UsersRound } from "lucide-react"
 import Link from "next/link";
 import { FeatureUsageChart } from "@/components/client/feature-usage-chart";
 import { UserActivityChart } from "@/components/client/user-activity-chart";
+import { users } from "@/lib/users";
 
-const overviewStats = [
-    {
-        title: "Total Users",
-        value: "1,254",
-        icon: <UsersRound className="size-6 text-primary" />,
-        change: "+12.5% from last month"
-    },
-    {
-        title: "Active Users Today",
-        value: "342",
-        icon: <Activity className="size-6 text-primary" />,
-        change: "+5.2% from yesterday"
-    },
-    {
-        title: "Most Used Feature",
-        value: "Market Insights",
-        icon: <BarChart3 className="size-6 text-primary" />,
-        change: "2,345 interactions"
-    },
-];
+export default async function AdminPage() {
+  const totalUsers = users.length;
+  const activeUsersToday = Math.floor(Math.random() * (totalUsers / 2)) + Math.floor(totalUsers / 2);
+  const activeUserChange = (((activeUsersToday - (totalUsers * 0.35)) / (totalUsers * 0.35)) * 100).toFixed(1);
 
-const adminFeatures = [
-    {
-        title: "User Management",
-        description: "View and manage all users in the application.",
-        icon: <Users className="size-8 text-primary" />,
-        href: "/admin/users",
-        status: "Active"
-    },
-    {
-        title: "News Articles Management",
-        description: "Manage news articles displayed in the application.",
-        icon: <Newspaper className="size-8 text-primary" />,
-        href: "/admin/news",
-        status: "Active"
-    }
-]
 
-export default function AdminPage() {
+    const overviewStats = [
+        {
+            title: "Total Users",
+            value: totalUsers.toLocaleString(),
+            icon: <UsersRound className="size-6 text-primary" />,
+            change: "+12.5% from last month"
+        },
+        {
+            title: "Active Users Today",
+            value: activeUsersToday.toLocaleString(),
+            icon: <Activity className="size-6 text-primary" />,
+            change: `${activeUserChange}% from yesterday`
+        },
+        {
+            title: "Most Used Feature",
+            value: "Market Insights",
+            icon: <BarChart3 className="size-6 text-primary" />,
+            change: "2,345 interactions"
+        },
+    ];
+
+    const adminFeatures = [
+        {
+            title: "User Management",
+            description: "View and manage all users in the application.",
+            icon: <Users className="size-8 text-primary" />,
+            href: "/admin/users",
+            status: "Active"
+        },
+        {
+            title: "News Articles Management",
+            description: "Manage news articles displayed in the application.",
+            icon: <Newspaper className="size-8 text-primary" />,
+            href: "/admin/news",
+            status: "Active"
+        }
+    ]
+
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>

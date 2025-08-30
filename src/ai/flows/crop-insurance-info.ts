@@ -63,15 +63,22 @@ const cropInsuranceInfoFlow = ai.defineFlow(
     outputSchema: CropInsuranceInfoOutputSchema,
   },
   async input => {
-    try {
-      const {output} = await prompt(input);
-      if (!output) {
-        throw new Error('Failed to generate a response from the AI model.');
+    const maxRetries = 3;
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        console.log(`Attempt ${i + 1} for cropInsuranceInfoFlow`);
+        const {output} = await prompt(input);
+        if (output) {
+          return output;
+        }
+        console.warn(`Attempt ${i + 1} returned null output.`);
+      } catch (error) {
+        console.error(`Error in cropInsuranceInfoFlow on attempt ${i + 1}`, error);
+        if (i === maxRetries - 1) {
+          throw new Error('Failed to fetch crop insurance information after multiple attempts.');
+        }
       }
-      return output;
-    } catch (error) {
-      console.error("Error in cropInsuranceInfoFlow", error);
-      throw new Error('Failed to fetch crop insurance information.');
     }
+    throw new Error('Failed to fetch crop insurance information.');
   }
 );

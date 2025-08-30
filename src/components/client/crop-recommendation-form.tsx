@@ -92,7 +92,7 @@ export function CropRecommendationForm() {
     <div className="grid gap-6 lg:grid-cols-3">
       <Card className="lg:col-span-2">
         <CardHeader>
-          <CardTitle>Get Crop Recommendations</CardTitle>
+          <CardTitle>Crop Recommendation</CardTitle>
           <CardDescription>Enter your farm's location to receive AI-powered crop suggestions. We've tried to detect your location automatically.</CardDescription>
         </CardHeader>
         <CardContent>

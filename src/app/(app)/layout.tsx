@@ -31,6 +31,7 @@ const navItems = [
   { href: "/crop-insurance", label: "Crop Insurance", icon: Icons.CropInsurance },
   { href: "/weather", label: "Weather", icon: Icons.Weather },
   { href: "/farm-map", label: "Farm Map", icon: Icons.FarmMap },
+  { href: "/document-locker", label: "Document Locker", icon: Icons.DocumentLocker },
   { href: "/irrigation-planner", label: "Irrigation Planner", icon: Icons.Irrigation },
   { href: "/plant-health", label: "Heal Your Crop", icon: Icons.PlantHealth },
   { href: "/soil-health", label: "Soil Health", icon: Icons.Leaf },

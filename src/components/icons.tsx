@@ -28,6 +28,7 @@ import {
   User,
   BookOpen,
   Shield,
+  FolderKanban,
 } from "lucide-react";
 
 export const Icons = {
@@ -49,6 +50,7 @@ export const Icons = {
   MarketInsights: TrendingUp,
   GovernmentSchemes: Landmark,
   CropInsurance: Shield,
+  DocumentLocker: FolderKanban,
   Thermometer: Thermometer,
   Pressure: Gauge,
   Visibility: Eye,

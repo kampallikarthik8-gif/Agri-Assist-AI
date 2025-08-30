@@ -42,6 +42,7 @@ const navItems = [
   { href: "/fertilizer-calculator", label: "Fertilizer Calculator", icon: Icons.Calculator },
   { href: "/fertilizer-shops", label: "Fertilizer Shops", icon: Icons.FertilizerShops },
   { href: "/seed-quality", label: "Seed Quality", icon: Icons.SeedScanner },
+  { href: "/farm-equipment", label: "Farm Equipment", icon: Icons.FarmEquipment },
   { href: "/ai-assistant", label: "AI Assistant", icon: Icons.Assistant },
 ];
 

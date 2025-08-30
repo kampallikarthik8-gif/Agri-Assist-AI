@@ -50,7 +50,7 @@ const adminNavItems = [
     { href: "/admin", label: "Admin Dashboard", icon: Icons.AdminPanel },
     { href: "/admin/users", label: "User Management", icon: Icons.Users },
     { href: "/admin/settings", label: "System Settings", icon: Icons.Settings },
-]
+];
 
 function AppName() {
     const [isMounted, setIsMounted] = React.useState(false);

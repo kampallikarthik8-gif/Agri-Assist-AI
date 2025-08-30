@@ -25,14 +25,14 @@ import {
   Store,
   Bell,
   User,
-  Users,
   BookOpen,
   Shield,
   FolderKanban,
   LinkIcon,
   BarChart,
-  PanelTop,
   Settings,
+  PanelTop,
+  Users,
 } from "lucide-react";
 
 export const Icons = {

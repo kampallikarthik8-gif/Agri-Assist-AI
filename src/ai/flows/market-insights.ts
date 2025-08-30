@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -44,15 +45,18 @@ async function findBestMarketForCrop(cropName: string): Promise<{ bestMarket: st
             bestPrice = marketPrice;
             bestMarket = market.name;
         }
+        const pricePerKg = marketPrice / 100;
         return {
             market: market.name,
-            price: `₹${marketPrice.toFixed(2)} / quintal`
+            price: `₹${marketPrice.toFixed(2)} / quintal (₹${pricePerKg.toFixed(2)} / kg)`
         };
     });
+    
+    const bestPricePerKg = bestPrice / 100;
 
     return {
         bestMarket,
-        bestPrice: `₹${bestPrice.toFixed(2)} / quintal`,
+        bestPrice: `₹${bestPrice.toFixed(2)} / quintal (₹${bestPricePerKg.toFixed(2)} / kg)`,
         allMarkets,
     };
 }

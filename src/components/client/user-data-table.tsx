@@ -44,6 +44,14 @@ const getStatusBadgeVariant = (status: "Active" | "Inactive" | "Invited") => {
   }
 };
 
+const LastLoginCell = ({ dateString }: { dateString: string }) => {
+    const [formattedDate, setFormattedDate] = React.useState('');
+    React.useEffect(() => {
+        setFormattedDate(new Date(dateString).toLocaleDateString());
+    }, [dateString]);
+    return <>{formattedDate || null}</>;
+};
+
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -103,7 +111,7 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "lastLogin",
     header: "Last Login",
-    cell: ({ row }) => new Date(row.getValue("lastLogin")).toLocaleDateString(),
+    cell: ({ row }) => <LastLoginCell dateString={row.getValue("lastLogin")} />,
   },
   {
     id: "actions",

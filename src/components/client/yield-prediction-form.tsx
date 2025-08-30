@@ -53,21 +53,14 @@ export function YieldPredictionForm() {
   });
 
   useEffect(() => {
-    async function fetchCity(lat: number, lon: number) {
-        try {
-            const weatherData = await getWeather({ lat, lon });
-            if (weatherData.locationName) {
-                form.setValue("location", weatherData.locationName);
-            }
-        } catch (error) {
-            console.error("Failed to fetch city from coordinates:", error);
-        }
-    }
-
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                fetchCity(position.coords.latitude, position.coords.longitude);
+                getWeather({ lat: position.coords.latitude, lon: position.coords.longitude }).then(weatherData => {
+                    if (weatherData.locationName) {
+                        form.setValue("location", weatherData.locationName);
+                    }
+                }).catch(err => console.error("Failed to fetch city from coordinates:", err));
             },
             (error) => {
                 console.error("Geolocation error:", error);
@@ -82,6 +75,12 @@ export function YieldPredictionForm() {
     try {
       const res = await yieldPrediction(values);
       setResult(res);
+      if (res.forecast.length === 0) {
+        toast({
+          title: "Could Not Generate Forecast",
+          description: "The AI could not generate a yield forecast for the given location and crop.",
+        });
+      }
     } catch (error: any) {
       console.error(error);
       if (error.message && (error.message.includes('403 Forbidden') || error.message.includes('API_KEY_SERVICE_BLOCKED'))) {
@@ -94,7 +93,7 @@ export function YieldPredictionForm() {
           toast({
               variant: "destructive",
               title: "Error",
-              description: "Failed to generate yield prediction. Please try again.",
+              description: error.message || "Failed to generate yield prediction. Please try again.",
           });
       }
     } finally {

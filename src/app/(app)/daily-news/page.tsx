@@ -22,7 +22,7 @@ const formSchema = z.object({
 });
 
 export default function DailyNewsPage() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [articles, setArticles] = useState<NewsArticle[] | null>(null);
   const { toast } = useToast();
 
@@ -62,12 +62,15 @@ export default function DailyNewsPage() {
 
   useEffect(() => {
     async function fetchRegionAndGenerateNews(lat: number, lon: number) {
+      setLoading(true);
       try {
         const weatherData = await getWeather({ lat, lon });
         if (weatherData.locationName) {
           const region = weatherData.locationName.split(',')[0];
           form.setValue("region", region);
           await getNews(region);
+        } else {
+            setLoading(false);
         }
       } catch (error) {
         console.error("Failed to auto-fetch news:", error);
@@ -76,6 +79,7 @@ export default function DailyNewsPage() {
           title: "Enter a Region",
           description: "Could not fetch your location. Please enter a region to get the news.",
         });
+        setLoading(false);
       }
     }
 
@@ -86,10 +90,13 @@ export default function DailyNewsPage() {
         },
         (error) => {
           console.error("Geolocation error:", error);
+          setLoading(false);
         }
       );
+    } else {
+        setLoading(false);
     }
-  }, []);
+  }, [form, toast]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     await getNews(values.region);
@@ -134,7 +141,7 @@ export default function DailyNewsPage() {
       {loading && (
         <div className="flex flex-col items-center justify-center pt-20 gap-4">
           <Loader2 className="h-10 w-10 animate-spin text-primary" />
-          <p className="text-muted-foreground text-lg">Fetching latest news for {form.getValues('region')}...</p>
+          <p className="text-muted-foreground text-lg">Fetching latest news for {form.getValues('region') || 'your location'}...</p>
         </div>
       )}
 

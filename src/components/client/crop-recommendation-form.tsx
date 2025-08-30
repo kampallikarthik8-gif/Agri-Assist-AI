@@ -14,6 +14,7 @@ import { Loader2 } from "lucide-react";
 import { Icons } from "../icons";
 import { Badge } from "../ui/badge";
 import { Input } from "../ui/input";
+import { getWeather } from "@/ai/flows/weather-service";
 
 const formSchema = z.object({
   location: z.string().min(3, "Location is required."),
@@ -41,14 +42,19 @@ export function CropRecommendationForm() {
             (position) => {
                 form.setValue("lat", position.coords.latitude);
                 form.setValue("lon", position.coords.longitude);
-                // We'll use a default or reverse-geocoded location name
-                form.setValue("location", `Lat: ${position.coords.latitude.toFixed(4)}, Lon: ${position.coords.longitude.toFixed(4)}`);
+                getWeather({ lat: position.coords.latitude, lon: position.coords.longitude }).then(weatherData => {
+                    if (weatherData.locationName) {
+                        form.setValue("location", weatherData.locationName);
+                    }
+                }).catch(() => {
+                     form.setValue("location", `Lat: ${position.coords.latitude.toFixed(4)}, Lon: ${position.coords.longitude.toFixed(4)}`);
+                });
             },
             (error) => {
                 console.error("Geolocation error:", error);
                 toast({
-                    variant: "destructive",
-                    title: "Location Error",
+                    variant: "default",
+                    title: "Location Unavailable",
                     description: "Could not automatically fetch your location. Please enter it manually.",
                 });
             }
@@ -74,7 +80,7 @@ export function CropRecommendationForm() {
           toast({
               variant: "destructive",
               title: "Error",
-              description: "Failed to get crop recommendations. Please try again.",
+              description: error.message || "Failed to get crop recommendations. Please try again.",
           });
       }
     } finally {

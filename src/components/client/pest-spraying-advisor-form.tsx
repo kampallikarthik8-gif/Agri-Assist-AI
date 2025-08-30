@@ -45,21 +45,14 @@ export function PestSprayingAdvisorForm() {
   });
 
   useEffect(() => {
-    async function fetchCity(lat: number, lon: number) {
-        try {
-            const weatherData = await getWeather({ lat, lon });
-            if (weatherData.locationName) {
-                form.setValue("location", weatherData.locationName);
-            }
-        } catch (error) {
-            console.error("Failed to fetch city from coordinates:", error);
-        }
-    }
-
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                fetchCity(position.coords.latitude, position.coords.longitude);
+                 getWeather({ lat: position.coords.latitude, lon: position.coords.longitude }).then(weatherData => {
+                    if (weatherData.locationName) {
+                        form.setValue("location", weatherData.locationName);
+                    }
+                }).catch(err => console.error("Failed to fetch city from coordinates:", err));
             },
             (error) => {
                 console.error("Geolocation error:", error);
@@ -86,7 +79,7 @@ export function PestSprayingAdvisorForm() {
           toast({
               variant: "destructive",
               title: "Error",
-              description: "Failed to get spraying advice. Please try again.",
+              description: error.message || "Failed to get spraying advice. Please try again.",
           });
       }
     } finally {
@@ -144,7 +137,7 @@ export function PestSprayingAdvisorForm() {
           )}
           {result && !loading && (
             <div className="space-y-4 text-center">
-              <div className={cn("p-6 rounded-lg border", recommendationColors[result.recommendation])}>
+              <div className={cn("p-6 rounded-lg border", result.recommendation in recommendationColors ? recommendationColors[result.recommendation] : '')}>
                 <div className="flex flex-col items-center gap-4">
                   {recommendationIcons[result.recommendation]}
                   <p className="text-2xl font-bold">It's a {result.recommendation.toUpperCase()} time to spray</p>

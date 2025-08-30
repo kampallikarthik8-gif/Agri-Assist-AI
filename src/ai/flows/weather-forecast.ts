@@ -67,15 +67,12 @@ const weatherForecastFlow = ai.defineFlow(
     try {
         const {output} = await prompt(input);
         if (!output) {
-          // If the model fails to return anything, return a valid object with an empty forecast.
-          return { forecast: [] };
+          throw new Error('Failed to generate a response from the AI model.');
         }
         return output;
     } catch (error) {
         console.error("Error in weatherForecastFlow, returning empty forecast.", error);
-        // If the prompt call itself throws (e.g., schema validation), catch and return a valid object.
-        return { forecast: [] };
+        throw new Error('Failed to generate weather forecast.');
     }
   }
 );
-

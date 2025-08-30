@@ -69,7 +69,7 @@ const governmentSchemesFlow = ai.defineFlow(
       return output;
     } catch (error) {
       console.error("Error in governmentSchemesFlow", error);
-      return { schemes: [] };
+      throw new Error('Failed to fetch government schemes.');
     }
   }
 );

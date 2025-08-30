@@ -149,8 +149,8 @@ export default function DashboardPage() {
                 const cropType = 'Wheat'; // Default crop for prediction
 
                 const [yieldRes, pestRes] = await Promise.all([
-                    yieldPrediction({ location, cropType }),
-                    pestDiseaseAlert({ location })
+                    yieldPrediction({ location, cropType }).catch(e => { console.error("Yield Prediction Failed:", e); return null; }),
+                    pestDiseaseAlert({ location }).catch(e => { console.error("Pest Alert Failed:", e); return null; })
                 ]);
                 
                 if (yieldRes) {
@@ -158,7 +158,12 @@ export default function DashboardPage() {
                 } else {
                     setYieldData([]);
                 }
-                setPestAlerts(pestRes.alerts);
+
+                if (pestRes) {
+                    setPestAlerts(pestRes.alerts);
+                } else {
+                    setPestAlerts([]);
+                }
 
             } catch (error: any) {
                 console.error("Failed to fetch dashboard data:", error);
@@ -174,8 +179,9 @@ export default function DashboardPage() {
                         title: "Weather API Key Missing",
                         description: "Please add your OpenWeatherMap API key to the .env file.",
                     });
+                } else {
+                    setLocationError("Could not fetch dashboard data.");
                 }
-                setLocationError("Could not fetch dashboard data.");
             } finally {
                 setLoading(false);
             }

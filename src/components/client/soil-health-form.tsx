@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Leaf, Droplets, FlaskConical, Thermometer, ExternalLink } from "lucide-react";
 import { Icons } from "../icons";
+import { getWeather } from "@/ai/flows/weather-service";
 
 const formSchema = z.object({
   location: z.string().min(3, "Location is required."),
@@ -41,13 +42,19 @@ export function SoilHealthForm() {
         (position) => {
           form.setValue("lat", position.coords.latitude);
           form.setValue("lon", position.coords.longitude);
-          form.setValue("location", `Lat: ${position.coords.latitude.toFixed(4)}, Lon: ${position.coords.longitude.toFixed(4)}`);
+           getWeather({ lat: position.coords.latitude, lon: position.coords.longitude }).then(weatherData => {
+                if (weatherData.locationName) {
+                    form.setValue("location", weatherData.locationName);
+                }
+            }).catch(() => {
+                form.setValue("location", `Lat: ${position.coords.latitude.toFixed(4)}, Lon: ${position.coords.longitude.toFixed(4)}`);
+            });
         },
         (error) => {
           console.error("Geolocation error:", error);
            toast({
-                variant: "destructive",
-                title: "Location Error",
+                variant: "default",
+                title: "Location Unavailable",
                 description: "Could not automatically fetch your location. Please enter it manually.",
             });
         }
@@ -73,7 +80,7 @@ export function SoilHealthForm() {
           toast({
               variant: "destructive",
               title: "Error",
-              description: "Failed to analyze soil health. Please try again.",
+              description: error.message || "Failed to analyze soil health. Please try again.",
           });
       }
     } finally {

@@ -34,21 +34,14 @@ export function MarketInsightsForm() {
   });
 
   useEffect(() => {
-    async function fetchCity(lat: number, lon: number) {
-        try {
-            const weatherData = await getWeather({ lat, lon });
-            if (weatherData.locationName) {
-                form.setValue("region", weatherData.locationName);
-            }
-        } catch (error) {
-            console.error("Failed to fetch city from coordinates:", error);
-        }
-    }
-
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                fetchCity(position.coords.latitude, position.coords.longitude);
+                getWeather({ lat: position.coords.latitude, lon: position.coords.longitude }).then(weatherData => {
+                    if (weatherData.locationName) {
+                        form.setValue("region", weatherData.locationName);
+                    }
+                }).catch(err => console.error("Failed to fetch city from coordinates:", err));
             },
             (error) => {
                 console.error("Geolocation error:", error);
@@ -75,7 +68,7 @@ export function MarketInsightsForm() {
           toast({
               variant: "destructive",
               title: "Error",
-              description: "Failed to fetch market insights. Please try again.",
+              description: error.message || "Failed to fetch market insights. Please try again.",
           });
       }
     } finally {

@@ -34,21 +34,14 @@ export function GovernmentSchemesForm() {
   });
 
   useEffect(() => {
-    async function fetchCity(lat: number, lon: number) {
-        try {
-            const weatherData = await getWeather({ lat, lon });
-            if (weatherData.locationName) {
-                form.setValue("region", weatherData.locationName);
-            }
-        } catch (error) {
-            console.error("Failed to fetch city from coordinates:", error);
-        }
-    }
-
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             (position) => {
-                fetchCity(position.coords.latitude, position.coords.longitude);
+                getWeather({ lat: position.coords.latitude, lon: position.coords.longitude }).then(weatherData => {
+                    if (weatherData.locationName) {
+                        form.setValue("region", weatherData.locationName);
+                    }
+                }).catch(err => console.error("Failed to fetch city from coordinates:", err));
             },
             (error) => {
                 console.error("Geolocation error:", error);
@@ -63,12 +56,18 @@ export function GovernmentSchemesForm() {
     try {
       const res = await governmentSchemes(values);
       setResult(res);
+      if (res.schemes.length === 0) {
+        toast({
+            title: "No Schemes Found",
+            description: "No specific schemes were found for your search. Try a broader region like 'All India'.",
+        });
+      }
     } catch (error: any) {
         console.error(error);
         toast({
             variant: "destructive",
             title: "Error",
-            description: "Failed to fetch government schemes. Please try again.",
+            description: error.message || "Failed to fetch government schemes. Please try again.",
         });
     } finally {
         setLoading(false);

@@ -64,7 +64,7 @@ const pestDiseaseAlertFlow = ai.defineFlow(
       return output;
     } catch (error) {
       console.error("Error in pestDiseaseAlertFlow", error);
-      return { alerts: [] };
+      throw new Error('Failed to generate pest and disease alerts.');
     }
   }
 );

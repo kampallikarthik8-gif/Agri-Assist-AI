@@ -25,6 +25,7 @@ import {
   Calculator,
   Store,
   Bell,
+  User,
 } from "lucide-react";
 
 export const Icons = {
@@ -60,4 +61,5 @@ export const Icons = {
   YieldPrediction: TrendingUp,
   FertilizerShops: Store,
   Notification: Bell,
+  User,
 };

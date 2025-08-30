@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: Icons.Dashboard },
@@ -98,20 +99,36 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <SidebarSeparator />
 
         <SidebarFooter className="p-4">
-          <div className="flex items-center gap-3">
-            <Avatar className="size-9">
-              <AvatarImage src="https://picsum.photos/seed/indian-farmer/100" alt="User Avatar" data-ai-hint="indian farmer" />
-              <AvatarFallback>RS</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-              <span className="text-sm font-medium text-sidebar-foreground">
-                Ram Singh
-              </span>
-              <span className="text-xs text-sidebar-foreground/70">
-                Farmer
-              </span>
-            </div>
-          </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-auto w-full justify-start p-0 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:h-auto group-data-[collapsible=icon]:justify-center">
+                    <div className="flex items-center gap-3">
+                        <Avatar className="size-9">
+                        <AvatarImage src="https://picsum.photos/seed/indian-farmer/100" alt="User Avatar" data-ai-hint="indian farmer" />
+                        <AvatarFallback>RS</AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col items-start group-data-[collapsible=icon]:hidden">
+                        <span className="text-sm font-medium text-sidebar-foreground">
+                            Ram Singh
+                        </span>
+                        <span className="text-xs text-sidebar-foreground/70">
+                            Farmer
+                        </span>
+                        </div>
+                    </div>
+                  </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="right" align="start" className="w-56">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <Link href="/profile">
+                    <DropdownMenuItem>
+                        <Icons.User className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                    </DropdownMenuItem>
+                </Link>
+              </DropdownMenuContent>
+            </DropdownMenu>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>

@@ -10,23 +10,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { LineChart as LineChartIcon, Bug, ExternalLink, Eye } from "lucide-react";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import {
-  Line,
-  LineChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bug, ExternalLink, Eye } from "lucide-react";
+
 import { Icons } from "@/components/icons";
 import { useState, useEffect } from "react";
 import { getWeather, WeatherOutput } from "@/ai/flows/weather-service";
-import { yieldPrediction, type YieldPredictionOutput } from "@/ai/flows/yield-prediction";
 import { pestDiseaseAlert, type PestDiseaseAlertOutput } from "@/ai/flows/pest-disease-alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -63,17 +51,6 @@ const newsFeed = [
     },
 ];
 
-const chartConfig = {
-  usage: {
-    label: "Water Usage (Liters)",
-    color: "hsl(var(--chart-2))",
-  },
-  yield: {
-    label: "Yield (Quintal)",
-    color: "hsl(var(--chart-1))",
-  },
-};
-
 const weatherIconMap: { [key: string]: React.FC<any> } = {
     "01d": Icons.Sun,
     "01n": Icons.Sunset, // Using sunset for night clear
@@ -97,7 +74,6 @@ const weatherIconMap: { [key: string]: React.FC<any> } = {
 
 export default function DashboardPage() {
     const [weather, setWeather] = useState<WeatherOutput | null>(null);
-    const [yieldData, setYieldData] = useState<YieldPredictionOutput['forecast'] | null>(null);
     const [pestAlerts, setPestAlerts] = useState<PestDiseaseAlertOutput['alerts'] | null>(null);
     const [loading, setLoading] = useState(true);
     const [locationError, setLocationError] = useState<string | null>(null);
@@ -112,25 +88,14 @@ export default function DashboardPage() {
                 setWeather(weatherData);
 
                 const location = weatherData.locationName;
-                const cropType = 'Wheat'; // Default crop for prediction
-
-                const [yieldRes, pestRes] = await Promise.allSettled([
-                    yieldPrediction({ location, cropType }),
-                    pestDiseaseAlert({ location })
-                ]);
                 
-                if (yieldRes.status === 'fulfilled' && yieldRes.value) {
-                    setYieldData(yieldRes.value.forecast);
-                } else {
-                    setYieldData([]);
-                    console.error("Yield prediction failed:", yieldRes.reason);
-                }
+                const pestRes = await pestDiseaseAlert({ location });
 
-                if (pestRes.status === 'fulfilled' && pestRes.value) {
-                    setPestAlerts(pestRes.value.alerts);
+                if (pestRes) {
+                    setPestAlerts(pestRes.alerts);
                 } else {
                     setPestAlerts([]);
-                     console.error("Pest alert failed:", pestRes.reason);
+                     console.error("Pest alert failed");
                 }
 
             } catch (error: any) {
@@ -228,70 +193,39 @@ export default function DashboardPage() {
             </CardContent>
         </Card>>
         
-        <div className="lg:col-span-1 space-y-6">
-            <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <LineChartIcon className="size-6 text-primary"/>
-                    Projected Crop Yield
-                </CardTitle>
-                <CardDescription className="text-xs">AI-powered 6-Month Forecast</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <ChartContainer config={chartConfig} className="h-32 w-full">
-                    {loading ? <Skeleton className="h-full w-full" /> : (
-                    yieldData && yieldData.length > 0 ? (
-                        <LineChart accessibilityLayer data={yieldData}>
-                            <CartesianGrid vertical={false} />
-                            <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={10} tickFormatter={(value) => value.substring(0,3)} />
-                            <YAxis hide />
-                            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-                            <Line dataKey="yield" type="natural" fill="var(--color-yield)" stroke="var(--color-yield)" strokeWidth={2} dot={false} />
-                        </LineChart>
-                    ) : (
-                        <div className="flex h-full w-full items-center justify-center text-muted-foreground">
-                        <p className="text-sm text-center">Could not generate yield prediction at this time.</p>
-                        </div>
-                    )
-                    )}
-                </ChartContainer>
-            </CardContent>
-            </Card>
-
-            <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <Bug className="size-6 text-destructive" />
-                    Pest & Disease Alerts
-                </CardTitle>
-                <CardDescription className="text-xs">Current risk factors</CardDescription>
-            </CardHeader>
-            <CardContent className="h-32">
-                {loading ? <Skeleton className="h-full w-full" /> : (
-                    pestAlerts && pestAlerts.length > 0 ? (
-                        <ul className="space-y-3">
-                            {pestAlerts.map((alert, index) => (
-                                <li key={index} className="flex items-start gap-3">
-                                    <div className="mt-1">
-                                        <Bug className="size-4 text-destructive" />
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold">{alert.name}</p>
-                                        <p className="text-sm text-muted-foreground">{alert.riskLevel} risk</p>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
-                            <Icons.PlantHealth className="size-10 mb-2"/>
-                            <p className="text-sm">No immediate pest or disease threats detected.</p>
-                        </div>
-                    )
-                )}
-            </CardContent>
-            </Card>
-        </div>
+        <Card>
+          <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                  <Bug className="size-6 text-destructive" />
+                  Pest & Disease Alerts
+              </CardTitle>
+              <CardDescription className="text-xs">Current risk factors</CardDescription>
+          </CardHeader>
+          <CardContent className="h-full">
+              {loading ? <Skeleton className="h-full w-full" /> : (
+                  pestAlerts && pestAlerts.length > 0 ? (
+                      <ul className="space-y-3">
+                          {pestAlerts.map((alert, index) => (
+                              <li key={index} className="flex items-start gap-3">
+                                  <div className="mt-1">
+                                      <Bug className="size-4 text-destructive" />
+                                  </div>
+                                  <div>
+                                      <p className="font-semibold">{alert.name}</p>
+                                      <p className="text-sm text-muted-foreground">{alert.riskLevel} risk</p>
+                                  </div>
+                              </li>
+                          ))}
+                      </ul>
+                  ) : (
+                      <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+                          <Icons.PlantHealth className="size-10 mb-2"/>
+                          <p className="text-sm">No immediate pest or disease threats detected.</p>
+                      </div>
+                  )
+              )}
+          </CardContent>
+        </Card>
 
 
         <Card className="md:col-span-2 lg:col-span-3">

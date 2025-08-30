@@ -61,18 +61,22 @@ async function findBestMarketForCrop(cropName: string): Promise<{ bestMarket: st
 const findBestMarket = ai.defineTool(
     {
         name: 'findBestMarket',
-        description: 'Finds the best market to sell a specific crop by comparing prices across multiple local markets.',
+        description: 'Finds the best market to sell a specific crop by comparing prices across multiple local markets. Returns the best market, its price, and a list of all markets checked.',
         inputSchema: z.object({
             cropName: z.string().describe('The name of the crop.'),
         }),
         outputSchema: z.object({
             bestMarket: z.string().describe("The name of the market with the highest price."),
             bestPrice: z.string().describe("The highest price found for the crop."),
+            allMarkets: z.array(z.object({
+                market: z.string(),
+                price: z.string(),
+            })).describe('A list of all markets checked and their respective prices.'),
         }),
     },
     async (input) => {
-        const { bestMarket, bestPrice } = await findBestMarketForCrop(input.cropName);
-        return { bestMarket, bestPrice };
+        const { bestMarket, bestPrice, allMarkets } = await findBestMarketForCrop(input.cropName);
+        return { bestMarket, bestPrice, allMarkets };
     }
 );
 
@@ -89,6 +93,10 @@ const MarketInsightsOutputSchema = z.object({
   marketTrend: z.string().describe('The current market trend (e.g., Bullish, Bearish, Stable).'),
   pricePrediction: z.string().describe('A short-term price prediction (e.g., Likely to increase in the next quarter).'),
   sellingAdvice: z.string().describe('Strategic advice on when and where to sell the crop for maximum profitability.'),
+  allMarkets: z.array(z.object({
+    market: z.string(),
+    price: z.string(),
+  })).describe('A list of all markets checked and their respective prices.'),
 });
 
 export type MarketInsightsOutput = z.infer<typeof MarketInsightsOutputSchema>;
@@ -110,10 +118,11 @@ const prompt = ai.definePrompt({
   
   First, find the best market to sell the user's crop: {{{cropName}}}. This involves checking prices across several local markets.
   
-  Then, based on the best price you found and general market knowledge for India, provide a concise market analysis.
+  Then, based on the price data you found and general market knowledge for India, provide a concise market analysis.
   
   The analysis should include:
   - The name of the best market and the current price there (in Rupees).
+  - A list of all markets checked with their prices.
   - The current overall market trend.
   - A short-term price prediction.
   - Actionable advice on the best time and place to sell, explicitly mentioning why the recommended market is the best choice.

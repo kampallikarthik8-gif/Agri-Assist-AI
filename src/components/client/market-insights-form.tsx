@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, TrendingUp, CircleDollarSign, BarChart, ShoppingCart, Store } from "lucide-react";
 import { Icons } from "../icons";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 
 const formSchema = z.object({
   cropName: z.string().min(2, "Crop name is required."),
@@ -125,6 +126,28 @@ export function MarketInsightsForm() {
                         <InfoCard icon={<CircleDollarSign />} title="Best Price" value={result.currentPrice} />
                         <InfoCard icon={<TrendingUp />} title="Market Trend" value={result.marketTrend} />
                     </div>
+                    
+                    {result.allMarkets && result.allMarkets.length > 0 && (
+                        <div className="pt-4 border-t">
+                            <h3 className="font-semibold text-lg flex items-center gap-2 mb-2"><Store /> All Market Prices</h3>
+                             <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                    <TableHead>Market</TableHead>
+                                    <TableHead className="text-right">Price</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {result.allMarkets.map((marketData) => (
+                                    <TableRow key={marketData.market}>
+                                        <TableCell className="font-medium">{marketData.market}</TableCell>
+                                        <TableCell className="text-right">{marketData.price}</TableCell>
+                                    </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    )}
 
                     <div className="pt-4 border-t">
                         <h3 className="font-semibold text-lg flex items-center gap-2 mb-2"><BarChart /> Price Prediction</h3>

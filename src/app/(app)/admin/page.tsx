@@ -38,8 +38,8 @@ const adminFeatures = [
         title: "System Settings",
         description: "Configure application-wide settings and integrations.",
         icon: <Settings className="size-8 text-primary" />,
-        href: "#",
-        status: "Coming Soon"
+        href: "/admin/settings",
+        status: "Active"
     }
 ]
 

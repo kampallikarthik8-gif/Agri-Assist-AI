@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import * as React from "react";
@@ -35,6 +34,7 @@ const navItems = [
   { href: "/plant-health", label: "Heal Your Crop", icon: Icons.PlantHealth },
   { href: "/soil-health", label: "Soil Health", icon: Icons.Leaf },
   { href: "/crop-recommendation", label: "Crop Recommendation", icon: Icons.CropRecommendation },
+  { href: "/cultivation-tips", label: "Cultivation Tips", icon: Icons.CultivationTips },
   { href: "/fertilizer-calculator", label: "Fertilizer Calculator", icon: Icons.Calculator },
   { href: "/fertilizer-shops", label: "Fertilizer Shops", icon: Icons.FertilizerShops },
   { href: "/seed-quality", label: "Seed Quality", icon: Icons.SeedScanner },

@@ -26,6 +26,7 @@ import {
   Store,
   Bell,
   User,
+  BookOpen,
 } from "lucide-react";
 
 export const Icons = {
@@ -62,4 +63,5 @@ export const Icons = {
   FertilizerShops: Store,
   Notification: Bell,
   User,
+  CultivationTips: BookOpen,
 };

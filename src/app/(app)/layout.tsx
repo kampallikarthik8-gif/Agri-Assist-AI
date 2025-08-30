@@ -44,12 +44,9 @@ const navItems = [
   { href: "/seed-quality", label: "Seed Quality", icon: Icons.SeedScanner },
   { href: "/farm-equipment", label: "Farm Equipment", icon: Icons.FarmEquipment },
   { href: "/ai-assistant", label: "AI Assistant", icon: Icons.Assistant },
-];
-
-const adminNavItems = [
-    { href: "/admin", label: "Admin Dashboard", icon: Icons.AdminPanel },
-    { href: "/admin/users", label: "User Management", icon: Icons.Users },
-    { href: "/admin/news", label: "News Management", icon: Icons.News },
+  { href: "/admin", label: "Admin Dashboard", icon: Icons.AdminPanel, admin: true },
+  { href: "/admin/users", label: "User Management", icon: Icons.Users, admin: true },
+  { href: "/admin/news", label: "News Management", icon: Icons.News, admin: true },
 ];
 
 function AppName() {
@@ -73,6 +70,9 @@ function AppName() {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
+  const mainNavItems = navItems.filter(item => !item.admin);
+  const adminNavItems = navItems.filter(item => item.admin);
+
   return (
     <SidebarProvider>
       <Sidebar>
@@ -89,7 +89,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         <SidebarContent>
           <SidebarMenu>
-            {navItems.map((item) => (
+            {mainNavItems.map((item) => (
               <SidebarMenuItem key={item.href}>
                 <Link href={item.href}>
                   <SidebarMenuButton
@@ -150,6 +150,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     <Link href="/profile">
                         <Icons.User className="mr-2 h-4 w-4" />
                         <span>Profile</span>
+                    </Link>
+                </DropdownMenuItem>
+                 <DropdownMenuItem asChild>
+                    <Link href="/login">
+                        <Icons.Login className="mr-2 h-4 w-4" />
+                        <span>Login</span>
                     </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>

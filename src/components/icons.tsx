@@ -33,7 +33,8 @@ import {
   Settings,
   PanelTop,
   Users,
-  Tractor
+  Tractor,
+  LogIn
 } from "lucide-react";
 
 export const Icons = {
@@ -77,4 +78,5 @@ export const Icons = {
   AdminPanel: PanelTop,
   Settings,
   FarmEquipment: Tractor,
+  Login: LogIn
 };

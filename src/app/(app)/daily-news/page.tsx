@@ -60,43 +60,51 @@ export default function DailyNewsPage() {
         }
     }
 
-  useEffect(() => {
-    async function fetchRegionAndGenerateNews(lat: number, lon: number) {
-      setLoading(true);
-      try {
-        const weatherData = await getWeather({ lat, lon });
-        if (weatherData.locationName) {
-          const region = weatherData.locationName.split(',')[0];
-          form.setValue("region", region);
-          await getNews(region);
-        } else {
-            setLoading(false);
-        }
-      } catch (error) {
-        console.error("Failed to auto-fetch news:", error);
-        toast({
-          variant: "default",
-          title: "Enter a Region",
-          description: "Could not fetch your location. Please enter a region to get the news.",
-        });
-        setLoading(false);
-      }
-    }
+    useEffect(() => {
+        const fetchInitialNews = async (lat?: number, lon?: number) => {
+            setLoading(true);
+            try {
+                let region = "India"; 
+                if (lat && lon) {
+                    const weatherData = await getWeather({ lat, lon });
+                    if (weatherData.locationName) {
+                        region = weatherData.locationName.split(',')[0];
+                    }
+                } else {
+                     toast({
+                        variant: "default",
+                        title: "Showing news for India",
+                        description: "Could not fetch your location automatically.",
+                    });
+                }
+                form.setValue("region", region);
+                await getNews(region);
+            } catch (error) {
+                console.error("Failed to auto-fetch news:", error);
+                toast({
+                    variant: "destructive",
+                    title: "Error fetching initial news",
+                    description: "Showing default news for India.",
+                });
+                form.setValue("region", "India");
+                await getNews("India");
+            }
+        };
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          fetchRegionAndGenerateNews(position.coords.latitude, position.coords.longitude);
-        },
-        (error) => {
-          console.error("Geolocation error:", error);
-          setLoading(false);
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    fetchInitialNews(position.coords.latitude, position.coords.longitude);
+                },
+                (error) => {
+                    console.error("Geolocation error:", error);
+                    fetchInitialNews();
+                }
+            );
+        } else {
+            fetchInitialNews();
         }
-      );
-    } else {
-        setLoading(false);
-    }
-  }, [form, toast]);
+    }, [form, toast]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     await getNews(values.region);

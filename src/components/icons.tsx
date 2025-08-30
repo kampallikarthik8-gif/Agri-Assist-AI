@@ -29,6 +29,7 @@ import {
   Shield,
   FolderKanban,
   LinkIcon,
+  BarChart,
 } from "lucide-react";
 
 export const Icons = {
@@ -67,4 +68,5 @@ export const Icons = {
   User,
   CultivationTips: BookOpen,
   Link: LinkIcon,
+  MarketInsights: BarChart,
 };

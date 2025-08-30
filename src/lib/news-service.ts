@@ -60,3 +60,9 @@ export async function fetchNews(query: string): Promise<{ articles?: NewsArticle
         return { error: `Could not connect to the news service. Details: ${error.message}` };
     }
 }
+
+// Mock function for admin panel
+export async function getNewsForAdmin(): Promise<NewsArticle[]> {
+    const newsResponse = await fetchNews("agriculture India");
+    return newsResponse.articles?.slice(0, 20) || [];
+}

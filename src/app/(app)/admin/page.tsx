@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Settings, Activity, BarChart3, UsersRound } from "lucide-react";
+import { Users, Newspaper, Activity, BarChart3, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { FeatureUsageChart } from "@/components/client/feature-usage-chart";
 import { UserActivityChart } from "@/components/client/user-activity-chart";
@@ -35,10 +35,10 @@ const adminFeatures = [
         status: "Active"
     },
     {
-        title: "System Settings",
-        description: "Configure application-wide settings and integrations.",
-        icon: <Settings className="size-8 text-primary" />,
-        href: "/admin/settings",
+        title: "News Articles Management",
+        description: "Manage news articles displayed in the application.",
+        icon: <Newspaper className="size-8 text-primary" />,
+        href: "/admin/news",
         status: "Active"
     }
 ]

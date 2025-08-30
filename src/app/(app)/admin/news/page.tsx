@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { NewsDataTable } from "@/components/client/news-data-table";
 import { getNewsForAdmin } from "@/lib/news-service";

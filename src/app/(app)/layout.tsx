@@ -49,7 +49,7 @@ const navItems = [
 const adminNavItems = [
     { href: "/admin", label: "Admin Dashboard", icon: Icons.AdminPanel },
     { href: "/admin/users", label: "User Management", icon: Icons.Users },
-    { href: "/admin/settings", label: "System Settings", icon: Icons.Settings },
+    { href: "/admin/news", label: "News Management", icon: Icons.News },
 ];
 
 function AppName() {

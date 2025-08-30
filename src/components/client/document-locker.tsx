@@ -64,7 +64,7 @@ const LOCAL_STORAGE_KEY = 'document_locker_files';
 
 const externalLinks = [
     {
-        title: "Download Adangal/Pahani (మీ భూమి)",
+        title: "మీ అడంగల్ (గ్రామ లెక్కలు 3)",
         description: "Access your village Adangal/Pahani records from the official Andhra Pradesh Meebhoomi portal.",
         href: "https://meebhoomi.ap.gov.in/VAdangal/Index",
     }

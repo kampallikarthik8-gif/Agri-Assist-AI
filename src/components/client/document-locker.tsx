@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, FileText, Trash2, Eye, Loader2 } from "lucide-react";
+import { Upload, FileText, Trash2, Eye, Loader2, ExternalLink, LinkIcon } from "lucide-react";
 import { Icons } from "../icons";
 import Link from "next/link";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
@@ -61,6 +61,14 @@ const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) 
 });
 
 const LOCAL_STORAGE_KEY = 'document_locker_files';
+
+const externalLinks = [
+    {
+        title: "Download Adangal/Pahani (మీ భూమి)",
+        description: "Access your village Adangal/Pahani records from the official Andhra Pradesh Meebhoomi portal.",
+        href: "https://meebhoomi.ap.gov.in/VAdangal/Index",
+    }
+]
 
 export function DocumentLocker() {
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -159,122 +167,155 @@ export function DocumentLocker() {
   }
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-            <CardTitle>Your Documents</CardTitle>
-            <CardDescription>
-                Securely store and manage your important farm documents like land passbooks, loan papers, and more.
-            </CardDescription>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+            <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>Your Documents</CardTitle>
+                    <CardDescription>
+                        Securely store and manage your important farm documents like land passbooks, loan papers, and more.
+                    </CardDescription>
+                </div>
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button>
+                            <Upload className="mr-2 size-4" />
+                            Upload Document
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                        <DialogTitle>Upload New Document</DialogTitle>
+                        <DialogDescription>
+                            Give your document a name and select the file to upload. Max file size is 10MB.
+                        </DialogDescription>
+                        </DialogHeader>
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+                                <FormField
+                                    control={form.control}
+                                    name="name"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                        <FormLabel>Document Name</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="e.g., Land Passbook 2024" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="file"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                        <FormLabel>File</FormLabel>
+                                        <FormControl>
+                                            <Input type="file" onChange={handleFileChange} />
+                                        </FormControl>
+                                        <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <DialogFooter>
+                                    <DialogClose asChild>
+                                        <Button type="button" variant="secondary">Cancel</Button>
+                                    </DialogClose>
+                                    <Button type="submit" disabled={isUploading}>
+                                        {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 size-4" />}
+                                        Upload
+                                    </Button>
+                                </DialogFooter>
+                            </form>
+                        </Form>
+                    </DialogContent>
+                </Dialog>
+            </CardHeader>
+            <CardContent>
+                {documents.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {documents.map((doc) => (
+                    <Card key={doc.id} className="group relative">
+                        <CardHeader className="flex flex-col items-center justify-center text-center p-6">
+                        <FileText className="size-12 text-muted-foreground mb-4" />
+                        <CardTitle className="text-base font-semibold truncate w-full">{doc.name}</CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-center p-4 pt-0">
+                            <p className="text-xs text-muted-foreground">{new Date(doc.uploadedAt).toLocaleDateString()}</p>
+                            <p className="text-xs text-muted-foreground">{(doc.size / 1024 / 1024).toFixed(2)} MB</p>
+                        </CardContent>
+                        <CardFooter className="flex justify-center gap-2 p-4 pt-0">
+                            <Button asChild variant="outline" size="sm">
+                                <Link href={doc.dataUrl} target="_blank" rel="noopener noreferrer">
+                                    <Eye className="size-4" />
+                                </Link>
+                            </Button>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="destructive" size="sm">
+                                        <Trash2 className="size-4" />
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently delete the document "{doc.name}" from your locker.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => deleteDocument(doc.id)}>
+                                        Delete
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </CardFooter>
+                    </Card>
+                    ))}
+                </div>
+                ) : (
+                <div className="flex flex-col items-center justify-center text-center text-muted-foreground py-20 border-2 border-dashed rounded-lg">
+                    <Icons.DocumentLocker className="size-16 mb-4" />
+                    <h3 className="text-xl font-semibold">Your Document Locker is Empty</h3>
+                    <p className="text-sm">Click "Upload Document" to add your first file.</p>
+                </div>
+                )}
+            </CardContent>
+            </Card>
         </div>
-         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-                <Button>
-                    <Upload className="mr-2 size-4" />
-                    Upload Document
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                <DialogTitle>Upload New Document</DialogTitle>
-                <DialogDescription>
-                    Give your document a name and select the file to upload. Max file size is 10MB.
-                </DialogDescription>
-                </DialogHeader>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-                        <FormField
-                            control={form.control}
-                            name="name"
-                            render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Document Name</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="e.g., Land Passbook 2024" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="file"
-                            render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>File</FormLabel>
-                                <FormControl>
-                                    <Input type="file" onChange={handleFileChange} />
-                                </FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                         <DialogFooter>
-                            <DialogClose asChild>
-                                <Button type="button" variant="secondary">Cancel</Button>
-                            </DialogClose>
-                            <Button type="submit" disabled={isUploading}>
-                                {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 size-4" />}
-                                Upload
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </Form>
-            </DialogContent>
-        </Dialog>
-      </CardHeader>
-      <CardContent>
-        {documents.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {documents.map((doc) => (
-              <Card key={doc.id} className="group relative">
-                <CardHeader className="flex flex-col items-center justify-center text-center p-6">
-                  <FileText className="size-12 text-muted-foreground mb-4" />
-                  <CardTitle className="text-base font-semibold truncate w-full">{doc.name}</CardTitle>
+        <div className="lg:col-span-1">
+             <Card>
+                <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <LinkIcon className="size-6 text-primary" />
+                    Official Document Services
+                </CardTitle>
+                <CardDescription>
+                    Download official government documents from these verified portals.
+                </CardDescription>
                 </CardHeader>
-                <CardContent className="text-center p-4 pt-0">
-                    <p className="text-xs text-muted-foreground">{new Date(doc.uploadedAt).toLocaleDateString()}</p>
-                    <p className="text-xs text-muted-foreground">{(doc.size / 1024 / 1024).toFixed(2)} MB</p>
-                </CardContent>
-                <CardFooter className="flex justify-center gap-2 p-4 pt-0">
-                    <Button asChild variant="outline" size="sm">
-                        <Link href={doc.dataUrl} target="_blank" rel="noopener noreferrer">
-                            <Eye className="size-4" />
-                        </Link>
-                    </Button>
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="destructive" size="sm">
-                                <Trash2 className="size-4" />
+                <CardContent>
+                    <ul className="space-y-4">
+                        {externalLinks.map((link, index) => (
+                        <li key={index}>
+                           <h4 className="font-semibold">{link.title}</h4>
+                           <p className="text-sm text-muted-foreground mb-2">{link.description}</p>
+                            <Button asChild size="sm" variant="outline">
+                            <Link href={link.href} target="_blank" rel="noopener noreferrer">
+                                Visit Site
+                                <ExternalLink className="ml-2 size-4" />
+                            </Link>
                             </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete the document "{doc.name}" from your locker.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => deleteDocument(doc.id)}>
-                                Delete
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center text-center text-muted-foreground py-20 border-2 border-dashed rounded-lg">
-            <Icons.DocumentLocker className="size-16 mb-4" />
-            <h3 className="text-xl font-semibold">Your Document Locker is Empty</h3>
-            <p className="text-sm">Click "Upload Document" to add your first file.</p>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                        </li>
+                        ))}
+                    </ul>
+                </CardContent>
+            </Card>
+        </div>
+    </div>
   );
 }

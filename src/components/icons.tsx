@@ -29,6 +29,7 @@ import {
   BookOpen,
   Shield,
   FolderKanban,
+  LinkIcon,
 } from "lucide-react";
 
 export const Icons = {
@@ -68,4 +69,5 @@ export const Icons = {
   Notification: Bell,
   User,
   CultivationTips: BookOpen,
+  Link: LinkIcon,
 };

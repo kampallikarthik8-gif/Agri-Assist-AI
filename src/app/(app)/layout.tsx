@@ -30,6 +30,7 @@ const navItems = [
   { href: "/government-schemes", label: "Govt. Schemes & Subsidies", icon: Icons.GovernmentSchemes },
   { href: "/crop-insurance", label: "Crop Insurance", icon: Icons.CropInsurance },
   { href: "/weather", label: "Weather", icon: Icons.Weather },
+  { href: "/pest-disease-alerts", label: "Pest & Disease Alerts", icon: Icons.Pest },
   { href: "/farm-map", label: "Farm Map", icon: Icons.FarmMap },
   { href: "/document-locker", label: "Document Locker", icon: Icons.DocumentLocker },
   { href: "/irrigation-planner", label: "Irrigation Planner", icon: Icons.Irrigation },

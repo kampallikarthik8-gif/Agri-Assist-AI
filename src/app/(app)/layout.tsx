@@ -130,6 +130,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         <span>Profile</span>
                     </DropdownMenuItem>
                 </Link>
+                 <Link href="/admin">
+                    <DropdownMenuItem>
+                        <Icons.AdminPanel className="mr-2 h-4 w-4" />
+                        <span>Admin Panel</span>
+                    </DropdownMenuItem>
+                </Link>
               </DropdownMenuContent>
             </DropdownMenu>
         </SidebarFooter>

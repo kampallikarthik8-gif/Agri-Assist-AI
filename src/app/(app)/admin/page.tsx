@@ -1,15 +1,27 @@
 
+"use client";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Newspaper, Activity, BarChart3, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { FeatureUsageChart } from "@/components/client/feature-usage-chart";
 import { UserActivityChart } from "@/components/client/user-activity-chart";
 import { users } from "@/lib/users";
+import { useEffect, useState } from "react";
 
-export default async function AdminPage() {
+export default function AdminPage() {
+  const [activeUsersToday, setActiveUsersToday] = useState(0);
+  const [activeUserChange, setActiveUserChange] = useState("0.0");
+  
   const totalUsers = users.length;
-  const activeUsersToday = Math.floor(Math.random() * (totalUsers / 2)) + Math.floor(totalUsers / 2);
-  const activeUserChange = (((activeUsersToday - (totalUsers * 0.35)) / (totalUsers * 0.35)) * 100).toFixed(1);
+
+  useEffect(() => {
+    const activeToday = Math.floor(Math.random() * (totalUsers / 2)) + Math.floor(totalUsers / 2);
+    setActiveUsersToday(activeToday);
+
+    const change = (((activeToday - (totalUsers * 0.35)) / (totalUsers * 0.35)) * 100).toFixed(1);
+    setActiveUserChange(change);
+  }, [totalUsers]);
 
 
     const overviewStats = [

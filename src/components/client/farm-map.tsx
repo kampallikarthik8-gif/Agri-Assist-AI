@@ -99,7 +99,7 @@ export function FarmMap() {
   }, []);
 
   useEffect(() => {
-    if (isMounted) {
+    if (isLoaded) { // Check if the map API is loaded before accessing google.maps
       const savedShapes = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (savedShapes) {
           try {
@@ -123,7 +123,7 @@ export function FarmMap() {
           }
       }
     }
-  }, [isMounted]);
+  }, [isLoaded]);
 
   useEffect(() => {
     if (isMounted) {
@@ -577,5 +577,3 @@ export function FarmMap() {
     <Skeleton className="h-full w-full rounded-lg" />
   );
 }
-
-    

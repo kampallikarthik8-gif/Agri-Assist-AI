@@ -28,7 +28,9 @@ const defaultCenter = {
   lng: 77.2090,
 };
 
-const libraries: ("places" | "drawing" | "geometry")[] = ["places", "drawing", "geometry"];
+const libraries: ("drawing" | "geometry" | "places")[] = ["drawing", "geometry", "places"];
+libraries.sort();
+
 
 type PlaceResult = google.maps.places.PlaceResult;
 
@@ -273,3 +275,5 @@ export function FertilizerShopsMap() {
     <Skeleton className="h-full w-full" />
   );
 }
+
+    

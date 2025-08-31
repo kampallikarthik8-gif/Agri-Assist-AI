@@ -106,9 +106,11 @@ export function FarmMap() {
             const shapesFromStorage = JSON.parse(savedShapes);
             if (Array.isArray(shapesFromStorage)) {
                  const shapes = shapesFromStorage.map((shape: any) => {
-                    const center = shape.center || getCenterOfPolygon(shape.path);
+                    const path = shape.path || [];
+                    const center = shape.center || getCenterOfPolygon(path);
                     return {
                         ...shape,
+                        path,
                         center,
                         infoWindowPos: new google.maps.LatLng(center.lat, center.lng),
                     };
@@ -217,7 +219,7 @@ export function FarmMap() {
     setAnalysisResult(null);
     setCurrentShapeForAnalysis(shape);
 
-    if (!shape.center || typeof shape.center.lat !== 'number' || typeof shape.center.lon !== 'number') {
+    if (!shape.center || typeof shape.center.lat !== 'number' || typeof shape.center.lng !== 'number') {
         toast({
             variant: "destructive",
             title: "Analysis Failed",
@@ -226,7 +228,7 @@ export function FarmMap() {
         setIsAnalysisLoading(false);
         return;
     }
-    const locationStr = `Field at ${shape.center.lat.toFixed(4)}, ${shape.center.lon.toFixed(4)}`;
+    const locationStr = `Field at ${shape.center.lat.toFixed(4)}, ${shape.center.lng.toFixed(4)}`;
 
 
     if (analysisType === 'irrigation') {
@@ -241,7 +243,7 @@ export function FarmMap() {
         setAnalysisTitle("Fertilizer Calculator");
         setIsDialogOpen(true);
         try {
-            const soilData = await soilHealthAnalyzer({ location: locationStr, lat: shape.center.lat, lon: shape.center.lon });
+            const soilData = await soilHealthAnalyzer({ location: locationStr, lat: shape.center.lat, lon: shape.center.lng });
             setDialogInput({ type: 'fertilizer', crop: '', soilData: soilData.report });
         } catch (error: any) {
             toast({ variant: "destructive", title: "Soil Analysis Failed", description: "Could not get soil data needed for fertilizer calculation." });
@@ -257,10 +259,10 @@ export function FarmMap() {
         let result: AnalysisResult | null = null;
         if (analysisType === 'soil') {
             setAnalysisTitle("Soil Health Analysis");
-            result = await soilHealthAnalyzer({ location: locationStr, lat: shape.center.lat, lon: shape.center.lon });
+            result = await soilHealthAnalyzer({ location: locationStr, lat: shape.center.lat, lon: shape.center.lng });
         } else if (analysisType === 'crop') {
             setAnalysisTitle("Crop Recommendation");
-            result = await cropRecommendationEngine({ location: locationStr, lat: shape.center.lat, lon: shape.center.lon });
+            result = await cropRecommendationEngine({ location: locationStr, lat: shape.center.lat, lon: shape.center.lng });
         } else if (analysisType === 'pest') {
             setAnalysisTitle("Pest & Disease Alerts");
             result = await pestDiseaseAlert({ location: locationStr });
@@ -289,7 +291,7 @@ export function FarmMap() {
       if (!dialogInput.crop || !currentShapeForAnalysis) return;
       setIsAnalysisLoading(true);
       setAnalysisResult(null);
-      const locationStr = `Field at ${currentShapeForAnalysis.center.lat.toFixed(4)}, ${currentShapeForAnalysis.center.lon.toFixed(4)}`;
+      const locationStr = `Field at ${currentShapeForAnalysis.center.lat.toFixed(4)}, ${currentShapeForAnalysis.center.lng.toFixed(4)}`;
       try {
           let result: AnalysisResult | null = null;
           if (dialogInput.type === 'irrigation') {
@@ -575,3 +577,5 @@ export function FarmMap() {
     <Skeleton className="h-full w-full rounded-lg" />
   );
 }
+
+    

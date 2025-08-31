@@ -37,20 +37,6 @@ export default function AdminSettingsPage() {
            </div>
         </CardContent>
       </Card>
-       <Card>
-        <CardHeader>
-          <CardTitle>Feature Flags</CardTitle>
-          <CardDescription>
-            Enable or disable specific features across the application. (This is a mock-up and not functional).
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-            <div className="space-y-2">
-                <Button variant="outline">Toggle News Feature</Button>
-                <Button variant="outline">Toggle Farm Map</Button>
-            </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

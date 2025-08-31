@@ -54,7 +54,7 @@ const prompt = ai.definePrompt({
   Region: {{{region}}}, India
   Crop: {{{crop}}}
   
-  Return a list of at least 3-5 major markets for the given region.`,
+  Return a list of at least 5-7 major markets for the given region.`,
 });
 
 const mandiPricesFlow = ai.defineFlow(

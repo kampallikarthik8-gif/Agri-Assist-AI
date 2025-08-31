@@ -11,11 +11,13 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Star, Search, Loader2, Phone, Clock, MapPin, ExternalLink } from "lucide-react";
+import { Star, Search, Loader2, Phone, Clock, MapPin, ExternalLink, Tags } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
 import { ScrollArea } from "../ui/scroll-area";
 import { Badge } from "../ui/badge";
+import { getFertilizerPrices, type FertilizerPricesOutput } from "@/ai/flows/fertilizer-prices";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 
 const containerStyle = {
   width: "100%",
@@ -30,14 +32,20 @@ const defaultCenter = {
 const libraries: ("drawing" | "geometry" | "places")[] = ["drawing", "geometry", "places"];
 libraries.sort();
 
+const commonFertilizers = ["Urea", "DAP (Di-Ammonium Phosphate)", "MOP (Muriate of Potash)", "10-26-26", "20-20-0-13"];
 
 type PlaceResult = google.maps.places.PlaceResult;
+
+type PlaceWithPrices = PlaceResult & {
+    fertilizerPrices?: FertilizerPricesOutput['prices'];
+    pricesLoading?: boolean;
+};
 
 export function FertilizerShopsMap() {
   const mapRef = useRef<google.maps.Map | null>(null);
   const [center, setCenter] = useState(defaultCenter);
-  const [places, setPlaces] = useState<PlaceResult[]>([]);
-  const [selectedPlace, setSelectedPlace] = useState<PlaceResult | null>(null);
+  const [places, setPlaces] = useState<PlaceWithPrices[]>([]);
+  const [selectedPlace, setSelectedPlace] = useState<PlaceWithPrices | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -82,19 +90,44 @@ export function FertilizerShopsMap() {
     });
   }, [toast]);
   
-  const handleSelectPlace = useCallback((place: PlaceResult) => {
+  const handleSelectPlace = useCallback((place: PlaceWithPrices) => {
     if (!mapRef.current) return;
     const service = new google.maps.places.PlacesService(mapRef.current);
+    
+    // Set prices loading state immediately
+    const updatedPlace = { ...place, pricesLoading: true, fertilizerPrices: undefined };
+    setSelectedPlace(updatedPlace);
+    setPlaces(prev => prev.map(p => p.place_id === place.place_id ? updatedPlace : p));
+
     service.getDetails({ placeId: place.place_id!, fields: ['name', 'rating', 'user_ratings_total', 'vicinity', 'geometry', 'formatted_phone_number', 'opening_hours', 'place_id', 'url', 'types'] }, (detailedPlace, status) => {
       if (status === google.maps.places.PlacesServiceStatus.OK && detailedPlace) {
-        setSelectedPlace(detailedPlace);
         if(detailedPlace.geometry?.location) {
             mapRef.current?.panTo(detailedPlace.geometry.location);
             mapRef.current?.setZoom(15);
         }
+
+        // Fetch fertilizer prices
+        getFertilizerPrices({ location: detailedPlace.vicinity || detailedPlace.name || 'India', fertilizers: commonFertilizers })
+          .then(priceResult => {
+            const finalPlace = { ...detailedPlace, fertilizerPrices: priceResult.prices, pricesLoading: false };
+            setSelectedPlace(finalPlace);
+            setPlaces(prev => prev.map(p => p.place_id === place.place_id ? finalPlace : p));
+          })
+          .catch(err => {
+            console.error("Failed to fetch fertilizer prices", err);
+            const finalPlace = { ...detailedPlace, pricesLoading: false, fertilizerPrices: [] };
+            setSelectedPlace(finalPlace);
+            setPlaces(prev => prev.map(p => p.place_id === place.place_id ? finalPlace : p));
+            toast({ variant: "destructive", title: "Could not fetch prices", description: "Failed to get fertilizer prices for this shop." });
+          });
+
+      } else {
+         const finalPlace = { ...place, pricesLoading: false, fertilizerPrices: [] };
+         setSelectedPlace(finalPlace);
+         setPlaces(prev => prev.map(p => p.place_id === place.place_id ? finalPlace : p));
       }
     });
-  }, []);
+  }, [toast]);
 
   const handleSearch = useCallback(async () => {
     if (!searchQuery || !isLoaded || !mapRef.current) return;
@@ -215,6 +248,17 @@ export function FertilizerShopsMap() {
                       <span>{place.rating} ({place.user_ratings_total} reviews)</span>
                     </div>
                   )}
+                  {place.pricesLoading && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span className="text-sm text-muted-foreground">Fetching prices...</span>
+                    </div>
+                  )}
+                  {place.fertilizerPrices && place.fertilizerPrices.length > 0 && (
+                     <div className="mt-2 text-sm text-green-600 font-semibold flex items-center gap-2">
+                       <Tags className="size-4" /> Price info available
+                     </div>
+                  )}
                 </div>
               )) : (
                 <p className="text-sm text-muted-foreground text-center py-10">No shops found in this area.</p>
@@ -253,7 +297,7 @@ export function FertilizerShopsMap() {
               position={selectedPlace.geometry?.location}
               onCloseClick={() => setSelectedPlace(null)}
             >
-               <div className="p-1 w-64 space-y-2">
+               <div className="p-1 w-72 space-y-2">
                 <h3 className="font-bold text-base">{selectedPlace.name}</h3>
                 <p className="text-sm text-muted-foreground flex items-start gap-2"><MapPin className="size-4 mt-0.5 shrink-0" />{selectedPlace.vicinity}</p>
                 {selectedPlace.formatted_phone_number && <p className="text-sm text-muted-foreground flex items-center gap-2"><Phone className="size-4" />{selectedPlace.formatted_phone_number}</p>}
@@ -271,7 +315,39 @@ export function FertilizerShopsMap() {
                     <span>{selectedPlace.rating} ({selectedPlace.user_ratings_total} reviews)</span>
                     </div>
                 )}
-                <Button size="sm" className="w-full" onClick={() => getDirections(selectedPlace)}>
+                
+                <div className="pt-2 border-t">
+                  {selectedPlace.pricesLoading ? (
+                    <div className="flex items-center gap-2 mt-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span className="text-sm text-muted-foreground">Fetching prices...</span>
+                    </div>
+                  ) : selectedPlace.fertilizerPrices && selectedPlace.fertilizerPrices.length > 0 ? (
+                    <div>
+                      <h4 className="font-semibold text-sm mb-1">Fertilizer Prices:</h4>
+                       <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="h-8">Fertilizer</TableHead>
+                              <TableHead className="h-8 text-right">Price</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {selectedPlace.fertilizerPrices.map((item, index) => (
+                              <TableRow key={index} className="text-xs">
+                                <TableCell className="font-medium p-1">{item.name}</TableCell>
+                                <TableCell className="p-1 text-right">{item.price}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground text-center">No price information available.</p>
+                  )}
+                </div>
+
+                <Button size="sm" className="w-full mt-2" onClick={() => getDirections(selectedPlace)}>
                     <ExternalLink className="mr-2 size-4" />
                     Get Directions
                 </Button>

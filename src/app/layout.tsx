@@ -20,6 +20,20 @@ export default function RootLayout({
       <head />
       <body className={cn("min-h-screen bg-background font-body antialiased", inter.variable)}>
         {children}
+        <script
+          type="text/javascript"
+          src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+        ></script>
+        <script
+          type="text/javascript"
+          dangerouslySetInnerHTML={{
+            __html: `
+              function googleTranslateElementInit() {
+                new google.translate.Element({pageLanguage: 'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+              }
+            `,
+          }}
+        ></script>
       </body>
     </html>
   );

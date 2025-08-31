@@ -168,6 +168,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <SidebarInset>
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 sm:pt-2">
             <SidebarTrigger className="md:hidden" />
+            <div className="ml-auto flex items-center gap-2">
+                <div id="google_translate_element"></div>
+            </div>
         </header>
         <main className="flex-1 overflow-auto p-4 sm:px-6">{children}</main>
         <Toaster />

@@ -37,6 +37,7 @@ import {
   LogIn,
   Warehouse,
   LineChart,
+  Globe,
 } from "lucide-react";
 
 export const Icons = {
@@ -81,5 +82,6 @@ export const Icons = {
   AdminPanel: PanelTop,
   Settings,
   FarmEquipment: Tractor,
-  Login: LogIn
+  Login: LogIn,
+  Translate: Globe,
 };

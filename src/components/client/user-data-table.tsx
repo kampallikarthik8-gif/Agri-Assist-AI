@@ -45,11 +45,11 @@ const getStatusBadgeVariant = (status: "Active" | "Inactive" | "Invited") => {
 };
 
 const LastLoginCell = ({ dateString }: { dateString: string }) => {
-    const [formattedDate, setFormattedDate] = React.useState('');
+    const [isClient, setIsClient] = React.useState(false);
     React.useEffect(() => {
-        setFormattedDate(new Date(dateString).toLocaleDateString());
-    }, [dateString]);
-    return <>{formattedDate || null}</>;
+        setIsClient(true);
+    }, []);
+    return <>{isClient ? new Date(dateString).toLocaleDateString() : null}</>;
 };
 
 

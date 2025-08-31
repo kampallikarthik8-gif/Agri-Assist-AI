@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Toaster } from "@/components/ui/toaster";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: Icons.Dashboard },
@@ -178,6 +179,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarTrigger className="md:hidden" />
         </header>
         <main className="flex-1 overflow-auto p-4 sm:px-6">{children}</main>
+        <Toaster />
       </SidebarInset>
     </SidebarProvider>
   );

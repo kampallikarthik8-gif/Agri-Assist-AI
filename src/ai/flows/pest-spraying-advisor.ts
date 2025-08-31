@@ -23,7 +23,7 @@ const PestSprayingAdvisorOutputSchema = z.object({
     recommendation: z.enum(['Good', 'Caution', 'Bad']).describe('The overall recommendation for spraying.'),
     rationale: z.string().describe('A detailed explanation for the recommendation, considering weather factors.'),
     windSpeed: z.number().describe('The current wind speed in mph.'),
-    chanceOfRain: z.string().describe('The likelihood of rain in the next few hours.'),
+    chanceOfRain: z.string().describe('The likelihood of rain in the next few hours (e.g., "Low", "Medium", "High").'),
 });
 
 export type PestSprayingAdvisorOutput = z.infer<typeof PestSprayingAdvisorOutputSchema>;
@@ -48,7 +48,10 @@ const prompt = ai.definePrompt({
   - Precipitation: Avoid spraying if rain is imminent, as it will wash the pesticide off.
   - Temperature: Consider extreme temperatures that might affect pesticide efficacy or plant stress.
 
-  Based on your analysis, provide a clear recommendation ('Good', 'Caution', 'or 'Bad') and a concise rationale. Also return the current wind speed and a qualitative chance of rain (e.g., 'Low', 'Medium', 'High').
+  Based on your analysis, provide a clear recommendation ('Good', 'Caution', 'or 'Bad') and a concise rationale. 
+  
+  Crucially, you must return a numeric value for the current wind speed in the 'windSpeed' field.
+  You must also return a qualitative chance of rain (a string: 'Low', 'Medium', or 'High') in the 'chanceOfRain' field.
 
   Location: {{{location}}}
   `,

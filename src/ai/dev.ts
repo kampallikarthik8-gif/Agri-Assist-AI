@@ -20,6 +20,8 @@ import '@/ai/flows/notification-service.ts';
 import '@/ai/flows/cultivation-tips.ts';
 import '@/ai/flows/crop-insurance-info.ts';
 import '@/ai/flows/mandi-prices.ts';
+import '@/ai/flows/market-insights.ts';
+
 
 
 

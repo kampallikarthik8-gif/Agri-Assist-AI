@@ -36,6 +36,7 @@ import {
   Tractor,
   LogIn,
   Warehouse,
+  LineChart,
 } from "lucide-react";
 
 export const Icons = {
@@ -76,6 +77,7 @@ export const Icons = {
   CultivationTips: BookOpen,
   Link: LinkIcon,
   MandiPrices: Warehouse,
+  MarketInsights: LineChart,
   AdminPanel: PanelTop,
   Settings,
   FarmEquipment: Tractor,

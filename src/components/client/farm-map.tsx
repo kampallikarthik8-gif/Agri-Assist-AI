@@ -66,6 +66,13 @@ type AnalysisResult =
 
 const LOCAL_STORAGE_KEY = 'farm_map_fields';
 
+const getCenterOfPolygon = (path: google.maps.LatLngLiteral[]) => {
+    const bounds = new google.maps.LatLngBounds();
+    path.forEach(p => bounds.extend(p));
+    const center = bounds.getCenter();
+    return { lat: center.lat(), lng: center.lng() };
+};
+
 export function FarmMap() {
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [center, setCenter] = useState(defaultCenter);
@@ -96,11 +103,18 @@ export function FarmMap() {
       const savedShapes = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (savedShapes) {
           try {
-            const shapes = JSON.parse(savedShapes).map((shape: any) => ({
-                ...shape,
-                infoWindowPos: new google.maps.LatLng(shape.infoWindowPos.lat, shape.infoWindowPos.lng),
-            }));
-            setDrawnShapes(shapes);
+            const shapesFromStorage = JSON.parse(savedShapes);
+            if (Array.isArray(shapesFromStorage)) {
+                 const shapes = shapesFromStorage.map((shape: any) => {
+                    const center = shape.center || getCenterOfPolygon(shape.path);
+                    return {
+                        ...shape,
+                        center,
+                        infoWindowPos: new google.maps.LatLng(center.lat, center.lng),
+                    };
+                });
+                setDrawnShapes(shapes);
+            }
           } catch (e) {
               console.error("Failed to parse shapes from local storage", e);
               setDrawnShapes([]);
@@ -183,12 +197,6 @@ export function FarmMap() {
       overlay.setMap(null); 
   };
 
-  const getCenterOfPolygon = (path: google.maps.LatLngLiteral[]) => {
-      const bounds = new google.maps.LatLngBounds();
-      path.forEach(p => bounds.extend(p));
-      const center = bounds.getCenter();
-      return { lat: center.lat(), lng: center.lng() };
-  };
 
   const clearAllDrawings = () => {
     setDrawnShapes([]);
@@ -208,7 +216,18 @@ export function FarmMap() {
     setIsAnalysisLoading(true);
     setAnalysisResult(null);
     setCurrentShapeForAnalysis(shape);
+
+    if (!shape.center || typeof shape.center.lat !== 'number' || typeof shape.center.lon !== 'number') {
+        toast({
+            variant: "destructive",
+            title: "Analysis Failed",
+            description: "Could not determine the center of the selected field. Please try redrawing it.",
+        });
+        setIsAnalysisLoading(false);
+        return;
+    }
     const locationStr = `Field at ${shape.center.lat.toFixed(4)}, ${shape.center.lon.toFixed(4)}`;
+
 
     if (analysisType === 'irrigation') {
         setDialogInput({ type: 'irrigation', crop: '' });
@@ -556,6 +575,3 @@ export function FarmMap() {
     <Skeleton className="h-full w-full rounded-lg" />
   );
 }
-
-
-    

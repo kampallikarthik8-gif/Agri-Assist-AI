@@ -11,7 +11,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { getWeather } from './weather-service';
+import { getWeather, type WeatherOutput } from './weather-service';
 
 const PestSprayingAdvisorInputSchema = z.object({
   location: z.string().describe('The location of the field to check conditions for.'),
@@ -34,28 +34,27 @@ export async function pestSprayingAdvisor(
   return pestSprayingAdvisorFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'pestSprayingAdvisorPrompt',
-  input: {schema: PestSprayingAdvisorInputSchema},
-  output: {schema: PestSprayingAdvisorOutputSchema},
-  tools: [getWeather],
-  prompt: `You are an expert agricultural advisor specializing in pesticide application.
-
-  First, get the current weather for the user's location: {{{location}}}.
-
-  The weather tool will provide you with data including wind speed and a description of precipitation. Use this data to determine if conditions are suitable for spraying pesticides.
-  - Wind speed: Avoid spraying if wind is too high (e.g., above 10 mph) to prevent drift. Set the 'recommendation' to 'Bad'.
-  - Precipitation: If the weather description from the tool includes the words "rain", "drizzle", or "thunderstorm", you must set 'chanceOfRain' to 'High' and the 'recommendation' to 'Bad'. Otherwise, set 'chanceOfRain' to 'Low'.
-  - Temperature: Consider extreme temperatures that might affect pesticide efficacy or plant stress in your rationale.
-
-  Based on your analysis, provide a clear recommendation ('Good', 'Caution', or 'Bad') and a concise rationale.
+const rationalePrompt = ai.definePrompt({
+  name: 'pestSprayingRationalePrompt',
+  input: { schema: z.object({
+      recommendation: z.string(),
+      weather: WeatherOutputSchema,
+  })},
+  output: { schema: z.object({ rationale: z.string() }) },
+  prompt: `You are an expert agricultural advisor. Based on the following weather data and a pre-determined recommendation, provide a concise, helpful rationale (1-2 sentences) explaining *why* the recommendation was made.
   
-  Crucially, you must return a numeric value for the current wind speed in the 'windSpeed' field.
-  You must also return a qualitative chance of rain ('Low', 'Medium', or 'High') in the 'chanceOfRain' field.
-
-  Location: {{{location}}}
-  `,
+  Weather:
+  - Condition: {{weather.description}}
+  - Temperature: {{weather.temperature}}°F
+  - Wind Speed: {{weather.windSpeed}} mph
+  - Humidity: {{weather.humidity}}%
+  - Chance of Rain: {{weather.chanceOfRain}}
+  
+  Recommendation: {{recommendation}}
+  
+  Explain the reasoning. For example, if the recommendation is 'Bad' due to high wind, explain that high wind can cause spray drift. If it's 'Bad' due to rain, explain that rain can wash away the pesticide.`,
 });
+
 
 const pestSprayingAdvisorFlow = ai.defineFlow(
   {
@@ -63,25 +62,45 @@ const pestSprayingAdvisorFlow = ai.defineFlow(
     inputSchema: PestSprayingAdvisorInputSchema,
     outputSchema: PestSprayingAdvisorOutputSchema,
   },
-  async input => {
-    const maxRetries = 3;
-    for (let i = 0; i < maxRetries; i++) {
-        try {
-            console.log(`Attempt ${i + 1} for pestSprayingAdvisorFlow`);
-            const {output} = await prompt(input);
-            if (output) {
-                return output;
-            }
-            console.warn(`Attempt ${i + 1} returned null output.`);
-        } catch (error) {
-            console.error(`Error in pestSprayingAdvisorFlow on attempt ${i + 1}`, error);
-            if (i === maxRetries - 1) {
-                // If it's the last retry, rethrow the error
-                throw new Error('Failed to generate a response from the AI model after multiple attempts.');
-            }
+  async ({ location }) => {
+    try {
+        const weather = await getWeather( { location });
+        
+        let recommendation: 'Good' | 'Caution' | 'Bad' = 'Good';
+        let chanceOfRain: 'Low' | 'Medium' | 'High' = 'Low';
+
+        const hasRain = /rain|drizzle|thunderstorm/i.test(weather.description);
+
+        if (hasRain) {
+            chanceOfRain = 'High';
+            recommendation = 'Bad';
         }
+
+        if (weather.windSpeed > 10) {
+            recommendation = 'Bad';
+        } else if (weather.windSpeed > 7) {
+            recommendation = 'Caution';
+        }
+
+        const { output } = await rationalePrompt({
+            recommendation,
+            weather: { ...weather, chanceOfRain },
+        });
+
+        if (!output?.rationale) {
+            throw new Error('Failed to generate a rationale from the AI model.');
+        }
+
+        return {
+            recommendation,
+            rationale: output.rationale,
+            windSpeed: weather.windSpeed,
+            chanceOfRain,
+        };
+
+    } catch (error) {
+        console.error(`Error in pestSprayingAdvisorFlow:`, error);
+        throw new Error('Failed to generate pest spraying advice. Please try again.');
     }
-    // If all retries fail to produce an output
-    throw new Error('Failed to generate a response from the AI model after multiple attempts.');
   }
 );

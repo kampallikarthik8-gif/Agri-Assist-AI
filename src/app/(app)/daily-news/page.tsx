@@ -21,6 +21,16 @@ const formSchema = z.object({
   region: z.string().min(2, "Region/State is required."),
 });
 
+const FormattedDate = ({ dateString }: { dateString: string }) => {
+    const [isClient, setIsClient] = useState(false)
+ 
+    useEffect(() => {
+        setIsClient(true)
+    }, [])
+
+    return <>{isClient ? new Date(dateString).toLocaleDateString() : null}</>
+};
+
 export default function DailyNewsPage() {
   const [loading, setLoading] = useState(true);
   const [articles, setArticles] = useState<NewsArticle[] | null>(null);
@@ -172,7 +182,7 @@ export default function DailyNewsPage() {
                         </div>
                         <div className="md:col-span-3 p-6 flex flex-col">
                             <h2 className="text-xl font-semibold tracking-tight mb-2">{article.title}</h2>
-                            <p className="text-sm text-muted-foreground mb-1">{new Date(article.publishedAt).toLocaleDateString()} &middot; {article.source.name}</p>
+                            <p className="text-sm text-muted-foreground mb-1"><FormattedDate dateString={article.publishedAt} /> &middot; {article.source.name}</p>
                             <p className="text-base text-foreground mb-4 flex-grow">{article.description}</p>
                             <Button asChild size="sm" className="self-start">
                                 <Link href={article.url} target="_blank" rel="noopener noreferrer">

@@ -27,9 +27,9 @@ export default async function AdminPage() {
         },
         {
             title: "Most Used Feature",
-            value: "Market Insights",
+            value: "Govt. Schemes",
             icon: <BarChart3 className="size-6 text-primary" />,
-            change: "2,345 interactions"
+            change: "1,890 interactions"
         },
     ];
 

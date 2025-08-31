@@ -9,21 +9,17 @@ import {
 } from "@/components/ui/chart"
 
 const chartData = [
-  { feature: "Market Insights", interactions: 2345, fill: "var(--color-market)" },
   { feature: "Govt. Schemes", interactions: 1890, fill: "var(--color-schemes)" },
   { feature: "Weather", interactions: 1700, fill: "var(--color-weather)" },
   { feature: "Crop Insurance", interactions: 1520, fill: "var(--color-insurance)" },
   { feature: "Plant Health", interactions: 1300, fill: "var(--color-health)" },
   { feature: "AI Assistant", interactions: 980, fill: "var(--color-assistant)" },
+  { feature: "Pest Alerts", interactions: 850, fill: "var(--color-pests)" },
 ]
 
 const chartConfig = {
   interactions: {
     label: "Interactions",
-  },
-  market: {
-    label: "Market Insights",
-    color: "hsl(var(--chart-1))",
   },
   schemes: {
     label: "Govt. Schemes",
@@ -44,6 +40,10 @@ const chartConfig = {
   assistant: {
       label: "AI Assistant",
       color: "hsl(var(--muted-foreground))"
+  },
+  pests: {
+      label: "Pest Alerts",
+      color: "hsl(var(--chart-1))"
   }
 } satisfies ChartConfig
 

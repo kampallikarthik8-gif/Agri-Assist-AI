@@ -64,16 +64,22 @@ const marketInsightsFlow = ai.defineFlow(
     outputSchema: MarketInsightsOutputSchema,
   },
   async input => {
-    try {
-      const {output} = await prompt(input);
-      if (!output) {
-        throw new Error('Failed to generate a response from the AI model.');
-      }
-      return output;
-    } catch (error) {
-      console.error("Error in marketInsightsFlow", error);
-      throw new Error('Failed to generate market insights.');
+    const maxRetries = 3;
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            console.log(`Attempt ${i + 1} for marketInsightsFlow`);
+            const {output} = await prompt(input);
+            if (output) {
+                return output;
+            }
+            console.warn(`Attempt ${i + 1} returned null output.`);
+        } catch (error) {
+            console.error(`Error in marketInsightsFlow on attempt ${i + 1}`, error);
+            if (i === maxRetries - 1) {
+                throw new Error('Failed to generate market insights after multiple attempts.');
+            }
+        }
     }
+    throw new Error('Failed to generate market insights.');
   }
 );
-

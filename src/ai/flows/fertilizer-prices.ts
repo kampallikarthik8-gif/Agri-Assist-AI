@@ -17,13 +17,13 @@ const FertilizerPriceSchema = z.object({
   price: z.string().describe('The simulated price for a standard bag (e.g., "₹266.50 per 45kg bag").'),
 });
 
-export const FertilizerPricesInputSchema = z.object({
+const FertilizerPricesInputSchema = z.object({
   location: z.string().describe('The location of the shop for which to generate prices.'),
   fertilizers: z.array(z.string()).describe('A list of common fertilizer names to get prices for.'),
 });
 export type FertilizerPricesInput = z.infer<typeof FertilizerPricesInputSchema>;
 
-export const FertilizerPricesOutputSchema = z.object({
+const FertilizerPricesOutputSchema = z.object({
   prices: z.array(FertilizerPriceSchema).describe('A list of fertilizers and their simulated prices.'),
 });
 export type FertilizerPricesOutput = z.infer<typeof FertilizerPricesOutputSchema>;

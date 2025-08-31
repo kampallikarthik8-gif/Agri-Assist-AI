@@ -19,7 +19,7 @@ const WeatherInputSchema = z.object({
 });
 export type WeatherInput = z.infer<typeof WeatherInputSchema>;
 
-export const WeatherOutputSchema = z.object({
+const WeatherOutputSchema = z.object({
   locationName: z.string().describe('The name of the location.'),
   temperature: z.number().describe('The current temperature in Fahrenheit.'),
   feelsLike: z.number().describe('The "feels like" temperature in Fahrenheit.'),

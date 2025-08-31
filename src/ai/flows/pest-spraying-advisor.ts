@@ -11,7 +11,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { getWeather, WeatherOutputSchema } from './weather-service';
+import { getWeather } from './weather-service';
 import type { WeatherOutput } from './weather-service';
 
 
@@ -36,6 +36,22 @@ export async function pestSprayingAdvisor(
 ): Promise<PestSprayingAdvisorOutput> {
   return pestSprayingAdvisorFlow(input);
 }
+
+const WeatherOutputSchema = z.object({
+  locationName: z.string(),
+  temperature: z.number(),
+  feelsLike: z.number(),
+  humidity: z.number(),
+  windSpeed: z.number(),
+  description: z.string(),
+  icon: z.string(),
+  uvIndex: z.number(),
+  visibility: z.number(),
+  pressure: z.number(),
+  sunrise: z.string(),
+  sunset: z.string(),
+  chanceOfRain: z.enum(['Low', 'Medium', 'High']),
+});
 
 const rationalePrompt = ai.definePrompt({
   name: 'pestSprayingRationalePrompt',

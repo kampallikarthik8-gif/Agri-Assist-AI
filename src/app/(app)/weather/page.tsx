@@ -2,24 +2,21 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getWeather, WeatherOutput } from "@/ai/flows/weather-service";
 import { weatherForecast, type WeatherForecastOutput } from "@/ai/flows/weather-forecast";
 import { rainfallAlert, type RainfallAlertOutput } from "@/ai/flows/rainfall-alert";
+import { pestSprayingAdvisor, type PestSprayingAdvisorOutput } from "@/ai/flows/pest-spraying-advisor";
 import { sendNotification } from "@/ai/flows/notification-service";
 import { Icons } from "@/components/icons";
-import { AlertCircle, Cloud, Cloudy, CloudRain, Snowflake, Sun, SunMoon, Wind, Gauge, Eye, Sunrise, Sunset, Loader2 } from "lucide-react";
+import { AlertCircle, Cloud, Cloudy, CloudRain, Snowflake, Sun, SunMoon, Wind, Gauge, Eye, Sunrise, Sunset, Loader2, ShieldCheck, ShieldAlert, ShieldX } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -55,6 +52,19 @@ const alertSeverityColors = {
     'Low': 'border-blue-500/50 bg-blue-500/10 text-blue-700',
     'None': 'border-gray-500/50 bg-gray-500/10 text-gray-700',
 };
+
+const recommendationIcons: { [key: string]: React.ReactElement } = {
+    'Good': <ShieldCheck className="size-8 text-green-500" />,
+    'Caution': <ShieldAlert className="size-8 text-yellow-500" />,
+    'Bad': <ShieldX className="size-8 text-red-500" />,
+};
+
+const recommendationColors: { [key: string]: string } = {
+    'Good': 'border-green-500/50 bg-green-500/10',
+    'Caution': 'border-yellow-500/50 bg-yellow-500/10',
+    'Bad': 'border-red-500/50 bg-red-500/10',
+};
+
 
 const notificationFormSchema = z.object({
   phoneNumber: z.string().min(10, "A valid phone number is required."),
@@ -161,6 +171,7 @@ export default function WeatherPage() {
   const [weather, setWeather] = useState<WeatherOutput | null>(null);
   const [forecast, setForecast] = useState<WeatherForecastOutput['forecast'] | null>(null);
   const [alerts, setAlerts] = useState<RainfallAlertOutput['alerts'] | null>(null);
+  const [sprayingAdvice, setSprayingAdvice] = useState<PestSprayingAdvisorOutput | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -178,12 +189,14 @@ export default function WeatherPage() {
 
         const locationName = weatherData.locationName;
 
-        const [forecastData, alertData] = await Promise.all([
+        const [forecastData, alertData, adviceData] = await Promise.all([
             weatherForecast({ location: locationName }),
-            rainfallAlert({ location: locationName })
+            rainfallAlert({ location: locationName }),
+            pestSprayingAdvisor({ location: locationName }),
         ]);
 
         setForecast(forecastData?.forecast);
+        setSprayingAdvice(adviceData);
         
         const meaningfulAlerts = alertData?.alerts?.filter(a => a.type !== 'none') || [];
         setAlerts(meaningfulAlerts);
@@ -194,7 +207,7 @@ export default function WeatherPage() {
           toast({
               variant: "destructive",
               title: "API Access Error",
-              description: "The Generative Language API is disabled or blocked by restrictions. Please check your Google Cloud project settings.",
+              description: "The Generative Language API is disabled or blocked. Please check your Google Cloud project settings.",
           });
         } else if (e.message && e.message.includes('OPENWEATHER_API_KEY')) {
             toast({
@@ -233,26 +246,48 @@ export default function WeatherPage() {
       <h1 className="text-3xl font-bold tracking-tight">Live Weather & Forecast</h1>
 
         {loading ? (
-            <Skeleton className="h-24 w-full" />
-        ) : highSeverityAlert ? (
-            <NotificationSender alertMessage={`Weather Alert: ${highSeverityAlert.title}. ${highSeverityAlert.message}`} />
-        ) : alerts && alerts.length > 0 && (
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><AlertCircle className="text-destructive" /> Weather Alerts</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                     {alerts.map((alert, index) => (
-                        <Alert key={index} className={cn(alertSeverityColors[alert.severity])}>
-                            <AlertCircle className="h-4 w-4" />
-                            <AlertTitle>{alert.title} ({alert.severity})</AlertTitle>
-                            <AlertDescription>
-                                {alert.message}
-                            </AlertDescription>
-                        </Alert>
-                    ))}
-                </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Skeleton className="h-48 w-full" />
+                <Skeleton className="h-48 w-full" />
+            </div>
+        ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {highSeverityAlert ? (
+                    <NotificationSender alertMessage={`Weather Alert: ${highSeverityAlert.title}. ${highSeverityAlert.message}`} />
+                ) : alerts && alerts.length > 0 ? (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><AlertCircle className="text-destructive" /> Weather Alerts</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            {alerts.map((alert, index) => (
+                                <Alert key={index} className={cn(alertSeverityColors[alert.severity])}>
+                                    <AlertCircle className="h-4 w-4" />
+                                    <AlertTitle>{alert.title} ({alert.severity})</AlertTitle>
+                                    <AlertDescription>
+                                        {alert.message}
+                                    </AlertDescription>
+                                </Alert>
+                            ))}
+                        </CardContent>
+                    </Card>
+                ) : <div />}
+                
+                {sprayingAdvice && (
+                     <Card className={cn("flex flex-col", recommendationColors[sprayingAdvice.recommendation])}>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                {recommendationIcons[sprayingAdvice.recommendation]}
+                                Spraying Conditions
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex-grow flex flex-col justify-center items-center text-center gap-2">
+                            <p className="text-xl font-bold">It's a {sprayingAdvice.recommendation.toUpperCase()} time to spray</p>
+                            <p className="text-sm text-muted-foreground">{sprayingAdvice.rationale}</p>
+                        </CardContent>
+                    </Card>
+                )}
+            </div>
         )}
 
       <Card>

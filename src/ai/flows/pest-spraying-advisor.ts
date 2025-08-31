@@ -28,6 +28,7 @@ const PestSprayingAdvisorOutputSchema = z.object({
     chanceOfRain: z.enum(['Low', 'Medium', 'High']).describe('The likelihood of rain in the next few hours (e.g., "Low", "Medium", "High").'),
 });
 
+
 export type PestSprayingAdvisorOutput = z.infer<typeof PestSprayingAdvisorOutputSchema>;
 
 export async function pestSprayingAdvisor(

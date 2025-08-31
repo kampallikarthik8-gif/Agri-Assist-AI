@@ -27,6 +27,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 const navItems = [
   { href: "/", label: "Dashboard", icon: Icons.Dashboard },
   { href: "/daily-news", label: "Daily News", icon: Icons.News },
+  { href: "/mandi-prices", label: "Mandi Prices", icon: Icons.MandiPrices },
   { href: "/government-schemes", label: "Govt. Schemes & Subsidies", icon: Icons.GovernmentSchemes },
   { href: "/crop-insurance", label: "Crop Insurance", icon: Icons.CropInsurance },
   { href: "/weather", label: "Weather", icon: Icons.Weather },
@@ -43,10 +44,14 @@ const navItems = [
   { href: "/seed-quality", label: "Seed Quality", icon: Icons.SeedScanner },
   { href: "/farm-equipment", label: "Farm Equipment", icon: Icons.FarmEquipment },
   { href: "/ai-assistant", label: "AI Assistant", icon: Icons.Assistant },
-  { href: "/admin", label: "Admin Dashboard", icon: Icons.AdminPanel, admin: true },
-  { href: "/admin/users", label: "User Management", icon: Icons.Users, admin: true },
-  { href: "/admin/news", label: "News Management", icon: Icons.News, admin: true },
 ];
+
+const adminNavItems = [
+  { href: "/admin", label: "Admin Dashboard", icon: Icons.AdminPanel },
+  { href: "/admin/users", label: "User Management", icon: Icons.Users },
+  { href: "/admin/news", label: "News Management", icon: Icons.News },
+];
+
 
 function AppName() {
     const [isMounted, setIsMounted] = React.useState(false);
@@ -69,9 +74,6 @@ function AppName() {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  const mainNavItems = navItems.filter(item => !item.admin);
-  const adminNavItems = navItems.filter(item => item.admin);
-
   return (
     <SidebarProvider>
       <Sidebar>
@@ -88,7 +90,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         <SidebarContent>
           <SidebarMenu>
-            {mainNavItems.map((item) => (
+            {navItems.map((item) => (
               <SidebarMenuItem key={item.href}>
                 <Link href={item.href}>
                   <SidebarMenuButton

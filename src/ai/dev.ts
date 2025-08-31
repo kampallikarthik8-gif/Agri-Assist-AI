@@ -22,3 +22,4 @@ import '@/ai/flows/crop-insurance-info.ts';
 import '@/ai/flows/mandi-prices.ts';
 import '@/ai/flows/fertilizer-prices.ts';
 
+

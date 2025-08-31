@@ -30,12 +30,14 @@ import { NewsArticle } from "@/lib/news-service"
 import { NewsTableActions } from "./news-table-actions"
 import Image from "next/image"
 
-const LastLoginCell = ({ dateString }: { dateString: string }) => {
-    const [formattedDate, setFormattedDate] = React.useState('');
+const PublishedDateCell = ({ dateString }: { dateString: string }) => {
+    const [isClient, setIsClient] = React.useState(false)
+ 
     React.useEffect(() => {
-        setFormattedDate(new Date(dateString).toLocaleDateString());
-    }, [dateString]);
-    return <>{formattedDate || null}</>;
+        setIsClient(true)
+    }, [])
+
+    return <>{isClient ? new Date(dateString).toLocaleDateString() : null}</>
 };
 
 export const columns: ColumnDef<NewsArticle>[] = [
@@ -86,7 +88,7 @@ export const columns: ColumnDef<NewsArticle>[] = [
   {
     accessorKey: "publishedAt",
     header: "Published Date",
-    cell: ({ row }) => <LastLoginCell dateString={row.getValue("publishedAt")} />,
+    cell: ({ row }) => <PublishedDateCell dateString={row.getValue("publishedAt")} />,
   },
   {
     id: "actions",

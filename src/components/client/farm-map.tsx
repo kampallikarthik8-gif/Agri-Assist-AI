@@ -11,9 +11,11 @@ import {
 } from "@react-google-maps/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Trash2, Leaf, BrainCircuit, Loader2 } from "lucide-react";
+import { Trash2, Leaf, BrainCircuit, Loader2, Droplets, Bug } from "lucide-react";
 import { soilHealthAnalyzer, SoilHealthAnalyzerOutput } from "@/ai/flows/soil-health-analyzer";
 import { cropRecommendationEngine, CropRecommendationEngineOutput } from "@/ai/flows/crop-recommendation-engine";
+import { smartIrrigationPlanner, SmartIrrigationPlannerOutput } from "@/ai/flows/smart-irrigation-planner";
+import { pestDiseaseAlert, PestDiseaseAlertOutput } from "@/ai/flows/pest-disease-alert";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -22,6 +24,8 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { Input } from "../ui/input";
+import { Badge } from "../ui/badge";
 
 const containerStyle = {
   width: "100%",
@@ -45,6 +49,9 @@ type DrawnShape = {
     center: google.maps.LatLngLiteral;
 };
 
+type AnalysisResult = SoilHealthAnalyzerOutput | CropRecommendationEngineOutput | SmartIrrigationPlannerOutput | PestDiseaseAlertOutput | { error: string };
+
+
 const LOCAL_STORAGE_KEY = 'farm_map_fields';
 
 export function FarmMap() {
@@ -53,10 +60,13 @@ export function FarmMap() {
   const [drawnShapes, setDrawnShapes] = useState<DrawnShape[]>([]);
   const [activeInfoWindow, setActiveInfoWindow] = useState<number | null>(null);
   const [isMounted, setIsMounted] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<SoilHealthAnalyzerOutput | CropRecommendationEngineOutput | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [analysisTitle, setAnalysisTitle] = useState("");
   const [isAnalysisLoading, setIsAnalysisLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [irrigationCrop, setIrrigationCrop] = useState("");
+  const [currentShapeForAnalysis, setCurrentShapeForAnalysis] = useState<DrawnShape | null>(null);
+
   const { toast } = useToast();
 
   const { isLoaded, loadError } = useJsApiLoader({
@@ -73,11 +83,16 @@ export function FarmMap() {
     if (isMounted) {
       const savedShapes = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (savedShapes) {
-          const shapes = JSON.parse(savedShapes).map((shape: any) => ({
-              ...shape,
-              infoWindowPos: new google.maps.LatLng(shape.infoWindowPos.lat, shape.infoWindowPos.lng),
-          }));
-          setDrawnShapes(shapes);
+          try {
+            const shapes = JSON.parse(savedShapes).map((shape: any) => ({
+                ...shape,
+                infoWindowPos: new google.maps.LatLng(shape.infoWindowPos.lat, shape.infoWindowPos.lng),
+            }));
+            setDrawnShapes(shapes);
+          } catch (e) {
+              console.error("Failed to parse shapes from local storage", e);
+              setDrawnShapes([]);
+          }
       }
     }
   }, [isMounted]);
@@ -177,22 +192,33 @@ export function FarmMap() {
     setActiveInfoWindow(shapeId);
   }
 
-  const handleAnalysis = async (shape: DrawnShape, analysisType: 'soil' | 'crop') => {
+  const handleAnalysis = async (shape: DrawnShape, analysisType: 'soil' | 'crop' | 'irrigation' | 'pest') => {
     setIsAnalysisLoading(true);
     setAnalysisResult(null);
-    setIsDialogOpen(true);
-    setActiveInfoWindow(null);
+    setCurrentShapeForAnalysis(shape);
+    const locationStr = `Field at ${shape.center.lat.toFixed(4)}, ${shape.center.lon.toFixed(4)}`;
 
+    if (analysisType === 'irrigation') {
+        setIsDialogOpen(true);
+        setAnalysisTitle("Smart Irrigation Planner");
+        setIsAnalysisLoading(false);
+        return;
+    }
+
+    setIsDialogOpen(true);
     try {
+        let result: AnalysisResult | null = null;
         if (analysisType === 'soil') {
             setAnalysisTitle("Soil Health Analysis");
-            const result = await soilHealthAnalyzer({ location: `Field at ${shape.center.lat.toFixed(4)}, ${shape.center.lon.toFixed(4)}`, lat: shape.center.lat, lon: shape.center.lon });
-            setAnalysisResult(result);
-        } else {
+            result = await soilHealthAnalyzer({ location: locationStr, lat: shape.center.lat, lon: shape.center.lon });
+        } else if (analysisType === 'crop') {
             setAnalysisTitle("Crop Recommendation");
-            const result = await cropRecommendationEngine({ location: `Field at ${shape.center.lat.toFixed(4)}, ${shape.center.lon.toFixed(4)}`, lat: shape.center.lat, lon: shape.center.lon });
-            setAnalysisResult(result);
+            result = await cropRecommendationEngine({ location: locationStr, lat: shape.center.lat, lon: shape.center.lon });
+        } else if (analysisType === 'pest') {
+            setAnalysisTitle("Pest & Disease Alerts");
+            result = await pestDiseaseAlert({ location: locationStr });
         }
+        setAnalysisResult(result);
     } catch (error: any) {
       console.error(error);
       toast({
@@ -200,10 +226,39 @@ export function FarmMap() {
           title: "Analysis Failed",
           description: error.message || "Could not retrieve AI analysis for this field.",
       });
-      setIsDialogOpen(false);
+      setAnalysisResult({ error: error.message || "An unknown error occurred." });
     } finally {
         setIsAnalysisLoading(false);
     }
+  }
+
+  const handleIrrigationAnalysis = async () => {
+      if (!irrigationCrop || !currentShapeForAnalysis) return;
+      setIsAnalysisLoading(true);
+      setAnalysisResult(null);
+      const locationStr = `Field at ${currentShapeForAnalysis.center.lat.toFixed(4)}, ${currentShapeForAnalysis.center.lon.toFixed(4)}`;
+      try {
+          const result = await smartIrrigationPlanner({ location: locationStr, cropType: irrigationCrop });
+          setAnalysisResult(result);
+      } catch (error: any) {
+          console.error(error);
+          toast({
+              variant: "destructive",
+              title: "Analysis Failed",
+              description: error.message || "Could not retrieve AI analysis for this field.",
+          });
+          setAnalysisResult({ error: error.message || "An unknown error occurred." });
+      } finally {
+          setIsAnalysisLoading(false);
+          setIrrigationCrop("");
+      }
+  }
+
+  const closeDialog = () => {
+      setIsDialogOpen(false);
+      setAnalysisResult(null);
+      setIrrigationCrop("");
+      setCurrentShapeForAnalysis(null);
   }
 
   if (!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
@@ -217,9 +272,56 @@ export function FarmMap() {
   if (loadError) {
     return (
       <div className="flex items-center justify-center h-full text-center text-muted-foreground p-4">
-        Could not load the map. Please ensure you have a valid Google Maps API key in your environment variables and that it is correctly configured in the Google Cloud Console.
+        Could not load the map. Please ensure you have a valid Google Maps API key and that it is correctly configured in the Google Cloud Console.
       </div>
     );
+  }
+
+  const renderAnalysisContent = () => {
+    if (!analysisResult) return null;
+    if ('error' in analysisResult) {
+        return <p className="text-destructive">{analysisResult.error}</p>;
+    }
+    if ("report" in analysisResult) { // SoilHealthAnalyzerOutput
+        return (
+            <div className="space-y-2">
+                <p><strong>Organic Matter:</strong> {analysisResult.report.organicMatter}</p>
+                <p><strong>Nitrogen:</strong> {analysisResult.report.nitrogen}</p>
+                <p><strong>Phosphorus:</strong> {analysisResult.report.phosphorus}</p>
+                <p><strong>Potassium:</strong> {analysisResult.report.potassium}</p>
+                <p><strong>pH:</strong> {analysisResult.report.ph}</p>
+                <p><strong>Moisture:</strong> {analysisResult.report.moisture}</p>
+                <p className="pt-2 border-t mt-2"><strong>Summary:</strong> {analysisResult.summary}</p>
+            </div>
+        );
+    }
+    if ("recommendedCrops" in analysisResult) { // CropRecommendationEngineOutput
+        return (
+            <div className="space-y-2">
+                <p><strong>Recommended Crops:</strong> {analysisResult.recommendedCrops.join(', ')}</p>
+                <p className="pt-2 border-t mt-2"><strong>Rationale:</strong> {analysisResult.rationale}</p>
+            </div>
+        );
+    }
+    if ("irrigationPlan" in analysisResult) { // SmartIrrigationPlannerOutput
+        return (
+            <div className="space-y-2">
+                <p className="whitespace-pre-line">{analysisResult.irrigationPlan}</p>
+            </div>
+        );
+    }
+    if ("alerts" in analysisResult) { // PestDiseaseAlertOutput
+        return (
+            <div className="space-y-2">
+                {analysisResult.alerts.length > 0 ? analysisResult.alerts.map((alert, index) => (
+                    <div key={index} className="border-l-4 pl-3 py-1" style={{ borderColor: alert.riskLevel === 'High' ? 'red' : alert.riskLevel === 'Medium' ? 'orange' : 'blue' }}>
+                        <p><strong>{alert.name}</strong> - <Badge variant={alert.riskLevel === 'High' ? "destructive" : "secondary"}>{alert.riskLevel} Risk</Badge></p>
+                    </div>
+                )) : <p>No immediate pest or disease threats detected for this location.</p>}
+            </div>
+        );
+    }
+    return null;
   }
 
   return isLoaded ? (
@@ -304,6 +406,12 @@ export function FarmMap() {
                            <Button size="sm" className="w-full" onClick={() => handleAnalysis(activeShape, 'crop')}>
                             <BrainCircuit className="mr-2 size-4"/> Get Crop Recs
                            </Button>
+                            <Button size="sm" className="w-full" onClick={() => handleAnalysis(activeShape, 'irrigation')}>
+                                <Droplets className="mr-2 size-4"/> Plan Irrigation
+                            </Button>
+                            <Button size="sm" className="w-full" onClick={() => handleAnalysis(activeShape, 'pest')}>
+                                <Bug className="mr-2 size-4"/> Check for Pests
+                            </Button>
                         </div>
                         <Button
                             variant="destructive"
@@ -331,7 +439,7 @@ export function FarmMap() {
         </Button>
       )}
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isDialogOpen} onOpenChange={closeDialog}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>{analysisTitle}</DialogTitle>
@@ -342,22 +450,21 @@ export function FarmMap() {
               <div className="flex justify-center items-center h-24">
                 <Loader2 className="size-8 animate-spin text-primary" />
               </div>
-            ) : analysisResult && "report" in analysisResult ? (
-              <div className="space-y-2">
-                <p><strong>Organic Matter:</strong> {analysisResult.report.organicMatter}</p>
-                <p><strong>Nitrogen:</strong> {analysisResult.report.nitrogen}</p>
-                <p><strong>Phosphorus:</strong> {analysisResult.report.phosphorus}</p>
-                <p><strong>Potassium:</strong> {analysisResult.report.potassium}</p>
-                <p><strong>pH:</strong> {analysisResult.report.ph}</p>
-                <p><strong>Moisture:</strong> {analysisResult.report.moisture}</p>
-                <p className="pt-2 border-t mt-2"><strong>Summary:</strong> {analysisResult.summary}</p>
-              </div>
-            ) : analysisResult && "recommendedCrops" in analysisResult ? (
-              <div className="space-y-2">
-                <p><strong>Recommended Crops:</strong> {analysisResult.recommendedCrops.join(', ')}</p>
-                <p className="pt-2 border-t mt-2"><strong>Rationale:</strong> {analysisResult.rationale}</p>
-              </div>
-            ) : null}
+            ) : analysisResult ? (
+                renderAnalysisContent()
+            ) : (
+                <div className="space-y-4">
+                    <p>Enter the crop you are growing to get a customized irrigation plan.</p>
+                    <Input 
+                        placeholder="e.g., Rice, Wheat, Corn"
+                        value={irrigationCrop}
+                        onChange={(e) => setIrrigationCrop(e.target.value)}
+                    />
+                    <Button className="w-full" onClick={handleIrrigationAnalysis} disabled={!irrigationCrop}>
+                        Generate Plan
+                    </Button>
+                </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>

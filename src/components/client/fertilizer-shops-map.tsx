@@ -16,7 +16,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
 import { ScrollArea } from "../ui/scroll-area";
 import { Badge } from "../ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../ui/dialog";
 
 const containerStyle = {
   width: "100%",
@@ -66,11 +65,22 @@ export function FertilizerShopsMap() {
     service.nearbySearch(request, (results, status) => {
       if (status === google.maps.places.PlacesServiceStatus.OK && results) {
         setPlaces(results);
+        if(results.length === 0) {
+             toast({
+                title: "No shops found",
+                description: "No fertilizer shops or RBKs found within a 10km radius of this location.",
+            });
+        }
       } else {
         setPlaces([]);
+         toast({
+            variant: "destructive",
+            title: "Search failed",
+            description: "Could not fetch nearby locations. Please try a different area.",
+        });
       }
     });
-  }, []);
+  }, [toast]);
   
   const handleSelectPlace = useCallback((place: PlaceResult) => {
     if (!mapRef.current) return;
@@ -275,5 +285,3 @@ export function FertilizerShopsMap() {
     <Skeleton className="h-full w-full" />
   );
 }
-
-    

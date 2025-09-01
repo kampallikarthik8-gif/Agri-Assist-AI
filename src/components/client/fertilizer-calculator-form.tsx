@@ -32,7 +32,7 @@ export function FertilizerCalculatorForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      cropType: "",
+      cropType: "Rice",
       soilNitrogen: 15,
       soilPhosphorus: 25,
       soilPotassium: 50,
@@ -49,7 +49,7 @@ export function FertilizerCalculatorForm() {
       setResult(res);
     } catch (error: any) {
       console.error(error);
-      if (error.message && error.message.includes('403 Forbidden')) {
+      if (error.message && (error.message.includes('403 Forbidden'))) {
           toast({
               variant: "destructive",
               title: "API Access Error",
@@ -133,7 +133,7 @@ export function FertilizerCalculatorForm() {
                 />
               </div>
 
-               <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                  <FormField
                   control={form.control}
                   name="farmArea"
@@ -152,12 +152,12 @@ export function FertilizerCalculatorForm() {
                     name="areaUnit"
                     render={({ field }) => (
                         <FormItem className="space-y-3">
-                        <FormLabel>Unit</FormLabel>
+                        <FormLabel>Unit of Measurement</FormLabel>
                         <FormControl>
                             <RadioGroup
                             onValueChange={field.onChange}
                             defaultValue={field.value}
-                            className="flex items-center space-x-4"
+                            className="flex items-center space-x-4 pt-1"
                             >
                             <FormItem className="flex items-center space-x-2 space-y-0">
                                 <FormControl>
@@ -169,7 +169,7 @@ export function FertilizerCalculatorForm() {
                                 <FormControl>
                                 <RadioGroupItem value="gunts" />
                                 </FormControl>
-                                <FormLabel className="font-normal">Gunts</FormLabel>
+                                <FormLabel className="font-normal">Guntas</FormLabel>
                             </FormItem>
                             <FormItem className="flex items-center space-x-2 space-y-0">
                                 <FormControl>

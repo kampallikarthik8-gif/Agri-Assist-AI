@@ -11,9 +11,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, FlaskConical, ExternalLink } from "lucide-react";
 import { Icons } from "../icons";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import Link from "next/link";
 
 const formSchema = z.object({
   cropType: z.string().min(2, "Crop type is required."),
@@ -90,6 +91,17 @@ export function FertilizerCalculatorForm() {
                   </FormItem>
                 )}
               />
+
+              <div className="space-y-1">
+                <p className="text-sm font-medium">Soil Nutrient Levels</p>
+                <p className="text-sm text-muted-foreground">Enter values from your soil test report. If you don't have one, use our AI Soil Health tool for an estimate.</p>
+                 <Button variant="outline" className="w-full" asChild>
+                    <Link href="/soil-health">
+                        <Icons.Leaf className="mr-2 h-4 w-4" />
+                        Go to AI Soil Health Analysis
+                    </Link>
+                </Button>
+              </div>
 
               <div className="grid grid-cols-3 gap-4">
                  <FormField
@@ -185,14 +197,23 @@ export function FertilizerCalculatorForm() {
                     />
               </div>
               
-              <Button type="submit" disabled={loading} className="w-full">
-                {loading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Icons.Calculator className="mr-2 h-4 w-4" />
-                )}
-                Calculate
-              </Button>
+                <div className="space-y-2 pt-2">
+                    <Button type="submit" disabled={loading} className="w-full">
+                        {loading ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                        <Icons.Calculator className="mr-2 h-4 w-4" />
+                        )}
+                        Calculate
+                    </Button>
+                     <Button variant="outline" className="w-full" asChild>
+                        <Link href="https://soilhealth.dac.gov.in/soilTestingLabs" target="_blank">
+                            <FlaskConical className="mr-2 h-4 w-4" />
+                            Find a Soil Testing Lab
+                            <ExternalLink className="ml-auto h-4 w-4" />
+                        </Link>
+                    </Button>
+                </div>
             </form>
           </Form>
         </CardContent>

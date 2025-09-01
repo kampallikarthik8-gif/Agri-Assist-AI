@@ -22,6 +22,12 @@ const FertilizerCalculatorInputSchema = z.object({
 });
 export type FertilizerCalculatorInput = z.infer<typeof FertilizerCalculatorInputSchema>;
 
+const FertilizerProductSchema = z.object({
+    productName: z.string().describe('The name of the fertilizer product (e.g., Urea, DAP).'),
+    npkRatio: z.string().describe('The N-P-K ratio of the product (e.g., "46-0-0").'),
+    quantity: z.number().describe('The recommended quantity of this product in kg.'),
+});
+
 const FertilizerCalculatorOutputSchema = z.object({
   fertilizerAmounts: z.object({
     nitrogen: z.number().describe('The recommended amount of nitrogen fertilizer in kg.'),
@@ -30,6 +36,7 @@ const FertilizerCalculatorOutputSchema = z.object({
   }),
   unit: z.string().describe('The unit for the fertilizer amounts, which must be "kg".'),
   recommendation: z.string().describe('A detailed explanation of the recommendation, including application timing and methods.'),
+  fertilizerProducts: z.array(FertilizerProductSchema).describe('A list of common fertilizer products and the quantities needed to achieve the recommended nutrient levels.'),
 });
 export type FertilizerCalculatorOutput = z.infer<typeof FertilizerCalculatorOutputSchema>;
 
@@ -45,6 +52,7 @@ const StandardizedInputSchema = z.object({
     soilNitrogen: z.number(),
     soilPhosphorus: z.number(),
     soilPotassium: z.number(),
+    farmAreaAcres: z.number(),
 });
 
 const IdealNutrientsSchema = z.object({
@@ -54,9 +62,9 @@ const IdealNutrientsSchema = z.object({
     rationale: z.string().describe('A brief rationale for these recommendations and advice on application timing.'),
 });
 
-const prompt = ai.definePrompt({
+const getIdealNutrientsPrompt = ai.definePrompt({
   name: 'idealNutrientFinderPrompt',
-  input: {schema: StandardizedInputSchema},
+  input: {schema: z.object({ cropType: z.string(), soilNitrogen: z.number(), soilPhosphorus: z.number(), soilPotassium: z.number()})},
   output: {schema: IdealNutrientsSchema},
   prompt: `You are an expert agronomist specializing in crop nutrition for Indian agriculture.
 
@@ -71,6 +79,24 @@ Do not consider the provided soil levels in your calculation for the ideal amoun
 
 Also provide a concise rationale explaining why these amounts are recommended and general advice on application timing (e.g., basal dose, top dressing).`,
 });
+
+const getProductRecommendationsPrompt = ai.definePrompt({
+    name: 'fertilizerProductRecommendationPrompt',
+    input: { schema: z.object({ totalN: z.number(), totalP: z.number(), totalK: z.number(), farmAreaAcres: z.number(), cropType: z.string() }) },
+    output: { schema: z.object({ fertilizerProducts: z.array(FertilizerProductSchema) }) },
+    prompt: `You are an agronomist providing practical fertilizer recommendations.
+    
+Based on the total required nutrients (in kg) for a farm, suggest a combination of common fertilizers (like Urea, DAP, MOP, SSP) to meet these needs. Calculate the amount of each product required in kg.
+
+Total Required Nitrogen (N): {{totalN}} kg
+Total Required Phosphorus (P2O5): {{totalP}} kg
+Total Required Potassium (K2O): {{totalK}} kg
+Farm Area: {{farmAreaAcres}} acres
+Crop: {{cropType}}
+
+Provide a list of fertilizer products and their quantities. The goal is to get as close as possible to the required N, P, and K values using standard, widely available fertilizers.`,
+});
+
 
 // Conversion factors to acres
 const ACRES_PER_GUNT = 0.025;
@@ -93,7 +119,7 @@ const fertilizerCalculatorFlow = ai.defineFlow(
         }
         
         // 2. Get ideal nutrient requirements per acre from the AI
-        const { output: idealNutrients } = await prompt({
+        const { output: idealNutrients } = await getIdealNutrientsPrompt({
             cropType: input.cropType,
             soilNitrogen: input.soilNitrogen,
             soilPhosphorus: input.soilPhosphorus,
@@ -106,20 +132,32 @@ const fertilizerCalculatorFlow = ai.defineFlow(
 
         // 3. Perform calculations in code for accuracy
         // Conversion from ppm to kg/acre is approx. `ppm * 0.8`. This is a simplification.
-        // A more accurate model would involve soil depth and bulk density.
         const availableN = input.soilNitrogen * 0.8;
-        const availableP = input.soilPhosphorus * 0.8; // Assuming P ppm is available P
-        const availableK = input.soilPotassium * 0.8; // Assuming K ppm is available K
+        const availableP = input.soilPhosphorus * 0.8; 
+        const availableK = input.soilPotassium * 0.8; 
 
         // Recommended fertilizer = (Ideal for crop - Already available in soil)
-        const requiredN = Math.max(0, idealNutrients.idealNitrogen - availableN);
-        const requiredP = Math.max(0, idealNutrients.idealPhosphorus - availableP);
-        const requiredK = Math.max(0, idealNutrients.idealPotassium - availableK);
+        const requiredN_perAcre = Math.max(0, idealNutrients.idealNitrogen - availableN);
+        const requiredP_perAcre = Math.max(0, idealNutrients.idealPhosphorus - availableP);
+        const requiredK_perAcre = Math.max(0, idealNutrients.idealPotassium - availableK);
 
         // 4. Calculate total amount for the entire farm area
-        const totalN = requiredN * areaInAcres;
-        const totalP = requiredP * areaInAcres;
-        const totalK = requiredK * areaInAcres;
+        const totalN = requiredN_perAcre * areaInAcres;
+        const totalP = requiredP_perAcre * areaInAcres;
+        const totalK = requiredK_perAcre * areaInAcres;
+
+        // 5. Get product recommendations from AI
+        const { output: productRecommendations } = await getProductRecommendationsPrompt({
+            totalN,
+            totalP,
+            totalK,
+            farmAreaAcres: areaInAcres,
+            cropType: input.cropType,
+        });
+
+        if (!productRecommendations) {
+             throw new Error('Failed to determine fertilizer product recommendations from AI model.');
+        }
 
         const fullRecommendation = `Based on an ideal requirement of ${idealNutrients.idealNitrogen}kg N, ${idealNutrients.idealPhosphorus}kg P, and ${idealNutrients.idealPotassium}kg K per acre for ${input.cropType}, and considering your soil's current nutrient levels, the following amounts are recommended for your ${input.farmArea} ${input.areaUnit} farm.\n\n${idealNutrients.rationale}`;
 
@@ -131,6 +169,7 @@ const fertilizerCalculatorFlow = ai.defineFlow(
             },
             unit: 'kg',
             recommendation: fullRecommendation,
+            fertilizerProducts: productRecommendations.fertilizerProducts,
         };
     } catch (error) {
       console.error("Error in fertilizerCalculatorFlow", error);

@@ -15,6 +15,7 @@ import { Loader2, FlaskConical, ExternalLink } from "lucide-react";
 import { Icons } from "../icons";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import Link from "next/link";
+import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from "../ui/table";
 
 const formSchema = z.object({
   cropType: z.string().min(2, "Crop type is required."),
@@ -224,7 +225,7 @@ export function FertilizerCalculatorForm() {
           <CardTitle>AI Fertilizer Report</CardTitle>
           <CardDescription>Customized nutrient recommendations.</CardDescription>
         </CardHeader>
-        <CardContent className="min-h-[20rem]">
+        <CardContent className="min-h-[20rem] overflow-y-auto">
           {loading && (
             <div className="flex flex-col items-center justify-center h-full gap-4">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -252,10 +253,33 @@ export function FertilizerCalculatorForm() {
                 </div>
                  <div>
                     <h3 className="font-semibold text-lg mb-2">Recommendation</h3>
-                    <div className="prose prose-sm max-w-none text-foreground">
+                    <div className="prose prose-sm max-w-none text-foreground whitespace-pre-line">
                         <p>{result.recommendation}</p>
                     </div>
                 </div>
+                {result.fertilizerProducts.length > 0 && (
+                    <div>
+                        <h3 className="font-semibold text-lg mb-2">Product Suggestions</h3>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Product</TableHead>
+                                    <TableHead>N-P-K</TableHead>
+                                    <TableHead className="text-right">Quantity</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {result.fertilizerProducts.map((product, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell className="font-medium">{product.productName}</TableCell>
+                                        <TableCell>{product.npkRatio}</TableCell>
+                                        <TableCell className="text-right">{product.quantity.toFixed(1)} kg</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                )}
             </div>
           )}
           {!result && !loading && (

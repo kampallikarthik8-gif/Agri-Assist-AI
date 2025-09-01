@@ -32,6 +32,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+
 
 const cropSchema = z.object({
   cropName: z.string().min(2, "Crop name is required."),
@@ -117,6 +119,7 @@ export default function MyCropsPage() {
     setCrops((prev) => prev.filter((crop) => crop.id !== id));
     toast({
       title: "Crop Removed",
+      variant: "destructive",
       description: "The selected crop has been removed from your list.",
     });
   };
@@ -155,9 +158,27 @@ export default function MyCropsPage() {
                               </CardDescription>
                            </div>
                          </div>
-                          <Button variant="ghost" size="icon" onClick={() => deleteCrop(crop.id)}>
-                            <Trash2 className="size-4 text-destructive" />
-                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <Trash2 className="size-4 text-destructive" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. This will permanently delete your entry for "{crop.cropName}".
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => deleteCrop(crop.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                       </CardHeader>
                       <CardContent className="flex-grow">
                         <div className="text-sm text-muted-foreground">
@@ -318,5 +339,3 @@ export default function MyCropsPage() {
     </div>
   );
 }
-
-    

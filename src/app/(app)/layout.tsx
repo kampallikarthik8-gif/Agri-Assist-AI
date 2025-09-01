@@ -38,13 +38,12 @@ const navItems = [
   { href: "/my-crops", label: "My Crops", icon: Icons.MyCrops },
   { href: "/document-locker", label: "Document Locker", icon: Icons.DocumentLocker },
   { href: "/irrigation-planner", label: "Irrigation Planner", icon: Icons.Irrigation },
-  { href: "/plant-health", label: "Heal Your Crop", icon: Icons.PlantHealth },
+  { href: "/plant-health", label: "AI Vision", icon: Icons.PlantHealth },
   { href: "/soil-health", label: "Soil Health", icon: Icons.Leaf },
   { href: "/crop-recommendation", label: "Crop Recommendation", icon: Icons.CropRecommendation },
   { href: "/cultivation-tips", label: "Cultivation Tips", icon: Icons.CultivationTips },
   { href: "/fertilizer-calculator", label: "Fertilizer Calculator", icon: Icons.Calculator },
   { href: "/fertilizer-shops", label: "Fertilizer Shops", icon: Icons.Store },
-  { href: "/seed-quality", label: "Seed Quality", icon: Icons.SeedScanner },
   { href: "/farm-equipment", label: "Farm Equipment", icon: Icons.FarmEquipment },
   { href: "/ai-assistant", label: "AI Assistant", icon: Icons.Assistant },
 ];
@@ -73,10 +72,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     setIsMounted(true);
     
     // @ts-ignore
-    window.googleTranslateElementInit = () => {
-      // @ts-ignore
-      new window.google.translate.Element({pageLanguage: 'en', layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
-    };
+    if (!window.googleTranslateElementInit) {
+        // @ts-ignore
+        window.googleTranslateElementInit = () => {
+            // @ts-ignore
+            new window.google.translate.Element({pageLanguage: 'en', layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+        };
+    }
   }, []);
 
   if (!isMounted) {

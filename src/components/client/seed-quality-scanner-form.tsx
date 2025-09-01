@@ -190,7 +190,6 @@ export function SeedQualityScannerForm() {
                                   <>
                                       <div className="flex flex-col items-center gap-2 text-muted-foreground p-4 text-center">
                                           <Icons.SeedScanner className="size-8" />
-                                          <span>Click to upload or use camera</span>
                                           <span className="text-xs">PNG, JPG, or WEBP (max 4MB)</span>
                                       </div>
                                       <Input type="file" accept="image/png, image/jpeg, image/webp" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={handleFileChange} />

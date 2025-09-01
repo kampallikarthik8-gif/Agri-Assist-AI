@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, type ChangeEvent } from "react";
+import { useState, type ChangeEvent, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
@@ -12,10 +12,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, Camera, Upload, Trash2 } from "lucide-react";
 import { Icons } from "../icons";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
 import { Badge } from "../ui/badge";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 const formSchema = z.object({
   photoDataUri: z.string().refine(val => val.startsWith('data:image/'), {
@@ -34,6 +35,10 @@ export function PestWeedIdForm() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<PestWeedIdentificationOutput | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [showCamera, setShowCamera] = useState(false);
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -42,6 +47,16 @@ export function PestWeedIdForm() {
       photoDataUri: "",
     },
   });
+  
+  useEffect(() => {
+    return () => {
+      // Cleanup: stop video stream when component unmounts or camera is closed
+      if (videoRef.current?.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -56,6 +71,58 @@ export function PestWeedIdForm() {
       form.clearErrors("photoDataUri");
     }
   };
+  
+  const startCamera = async () => {
+      setShowCamera(true);
+      setPreview(null);
+      form.setValue("photoDataUri", "");
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        setHasCameraPermission(true);
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setHasCameraPermission(false);
+        setShowCamera(false);
+        toast({
+          variant: 'destructive',
+          title: 'Camera Access Denied',
+          description: 'Please enable camera permissions in your browser settings.',
+        });
+      }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current?.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+        videoRef.current.srcObject = null;
+    }
+    setShowCamera(false);
+  }
+
+  const takePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext('2d');
+      context?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+      const dataUri = canvas.toDataURL('image/jpeg');
+      setPreview(dataUri);
+      form.setValue("photoDataUri", dataUri);
+      form.clearErrors("photoDataUri");
+      stopCamera();
+    }
+  };
+
+  const clearPreview = () => {
+    setPreview(null);
+    form.setValue("photoDataUri", "");
+  }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
@@ -88,7 +155,7 @@ export function PestWeedIdForm() {
       <Card>
         <CardHeader>
           <CardTitle>Identify Pest or Weed</CardTitle>
-          <CardDescription>Upload a photo to get an AI-powered identification and control strategy.</CardDescription>
+          <CardDescription>Upload or take a photo to get an AI-powered identification and control strategy.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -99,20 +166,50 @@ export function PestWeedIdForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Pest/Weed Photo</FormLabel>
-                    <FormControl>
-                        <div className="relative flex justify-center items-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted">
-                            {preview ? (
-                                <Image src={preview} alt="Pest or weed preview" fill className="object-contain rounded-lg p-2" />
-                            ) : (
-                                <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                                    <Icons.Pest className="size-8" />
-                                    <span>Click to upload or drag & drop</span>
-                                    <span className="text-xs">PNG, JPG, or WEBP (max 4MB)</span>
-                                </div>
-                            )}
-                            <Input type="file" accept="image/png, image/jpeg, image/webp" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={handleFileChange} />
-                        </div>
-                    </FormControl>
+                     <div className="flex flex-col gap-2">
+                       <FormControl>
+                          <div className="relative flex justify-center items-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                              {preview ? (
+                                  <>
+                                      <Image src={preview} alt="Pest or weed preview" fill className="object-contain rounded-lg p-2" />
+                                      <Button type="button" variant="destructive" size="icon" className="absolute top-2 right-2 z-10" onClick={clearPreview}>
+                                          <Trash2 className="size-4" />
+                                      </Button>
+                                  </>
+                              ) : showCamera ? (
+                                    <>
+                                        <video ref={videoRef} className="w-full h-full object-cover rounded-md" autoPlay playsInline muted />
+                                        <canvas ref={canvasRef} className="hidden" />
+                                    </>
+                              ) : (
+                                  <>
+                                      <div className="flex flex-col items-center gap-2 text-muted-foreground p-4 text-center">
+                                          <Icons.Pest className="size-8" />
+                                          <span>Click to upload or use camera</span>
+                                          <span className="text-xs">PNG, JPG, or WEBP (max 4MB)</span>
+                                      </div>
+                                      <Input type="file" accept="image/png, image/jpeg, image/webp" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={handleFileChange} />
+                                  </>
+                              )}
+                          </div>
+                      </FormControl>
+                       <div className="flex gap-2">
+                        {!showCamera ? (
+                            <Button type="button" variant="outline" className="w-full" onClick={startCamera}>
+                                <Camera className="mr-2 size-4"/> Use Camera
+                            </Button>
+                        ) : (
+                           <>
+                                <Button type="button" variant="secondary" className="w-full" onClick={stopCamera}>
+                                    Cancel
+                                </Button>
+                                <Button type="button" className="w-full" onClick={takePhoto}>
+                                    <Camera className="mr-2 size-4"/> Take Photo
+                                </Button>
+                           </>
+                        )}
+                       </div>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}

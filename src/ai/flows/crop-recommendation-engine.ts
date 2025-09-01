@@ -54,9 +54,7 @@ const prompt = ai.definePrompt({
 First, get the current weather for the user's location.
 If lat/lon are provided, use them. Otherwise, use the location name.
 
-Then, based on the provided location, infer the typical soil composition for that area.
-
-Based on your inferred soil analysis and the weather data you fetched, recommend the most suitable crops to plant. Also consider general market demand for commodity crops in your recommendation.
+Then, based on the provided location and the weather data you fetched, recommend the most suitable crops to plant. Also consider general market demand and typical soil conditions for the area in your recommendation.
 
 Location: {{{location}}}
 

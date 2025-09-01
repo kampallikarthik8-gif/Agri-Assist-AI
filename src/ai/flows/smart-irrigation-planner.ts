@@ -11,7 +11,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { getWeather } from './weather-service';
+import { getWeather, type WeatherOutput } from './weather-service';
 
 const SmartIrrigationPlannerInputSchema = z.object({
   location: z.string().describe("The location of the field (e.g. 'San Francisco, CA')."),
@@ -30,15 +30,23 @@ export async function smartIrrigationPlanner(input: SmartIrrigationPlannerInput)
 
 const prompt = ai.definePrompt({
   name: 'smartIrrigationPlannerPrompt',
-  input: {schema: SmartIrrigationPlannerInputSchema},
+  input: {schema: z.object({
+    location: z.string(),
+    cropType: z.string(),
+    weather: z.any(),
+  })},
   output: {schema: SmartIrrigationPlannerOutputSchema},
-  tools: [getWeather],
   prompt: `You are an expert agricultural advisor specializing in irrigation planning.
 
-  First, get the current weather for the user's location.
+  Based on the field's location: {{{location}}}, the type of crop being grown: {{{cropType}}}, and the following real-time weather data, generate a customized irrigation plan that optimizes water usage and crop yield. 
   
-  Then, based on the field's location: {{{location}}}, the type of crop being grown: {{{cropType}}}, and the real-time weather data you fetched, generate a customized irrigation plan that optimizes water usage and crop yield. Consider current and future weather conditions in your plan.
   The plan should include frequency, duration, and amount of water needed. Output the plan in a clear and concise manner.
+  
+  Current Weather:
+  - Temperature: {{weather.temperature}}°F
+  - Condition: {{weather.description}}
+  - Humidity: {{weather.humidity}}%
+  - Wind Speed: {{weather.windSpeed}} mph
   `,
 });
 
@@ -48,12 +56,18 @@ const smartIrrigationPlannerFlow = ai.defineFlow(
     inputSchema: SmartIrrigationPlannerInputSchema,
     outputSchema: SmartIrrigationPlannerOutputSchema,
   },
-  async input => {
+  async (input) => {
     const maxRetries = 3;
     for (let i = 0; i < maxRetries; i++) {
       try {
         console.log(`Attempt ${i + 1} for smartIrrigationPlannerFlow`);
-        const {output} = await prompt(input);
+        
+        // Step 1: Fetch weather data first
+        const weather = await getWeather(input);
+
+        // Step 2: Call the prompt with the weather data included
+        const {output} = await prompt({ ...input, weather });
+
         if (output) {
             return output;
         }

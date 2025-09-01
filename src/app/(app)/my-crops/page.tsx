@@ -35,15 +35,17 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Trash2, Leaf, Edit } from "lucide-react";
+import { Loader2, Plus, Trash2, Leaf, Edit, Calendar as CalendarIcon } from "lucide-react";
 import { Icons } from "@/components/icons";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
+const growthStages = ["Sowing", "Germination", "Vegetative", "Flowering", "Fruiting", "Harvesting", "Post-Harvest"];
 
 const cropSchema = z.object({
   cropName: z.string().min(2, "Crop name is required."),
@@ -53,6 +55,7 @@ const cropSchema = z.object({
   }),
   area: z.coerce.number().min(0.1, "Area must be greater than 0."),
   areaUnit: z.string().min(1, "Unit is required, e.g., acres."),
+  growthStage: z.string().min(1, "Growth stage is required."),
 });
 
 type Crop = z.infer<typeof cropSchema> & { id: string };
@@ -94,6 +97,28 @@ function EditCropForm({ crop, onUpdate, closeDialog }: { crop: Crop, onUpdate: (
                     </FormItem>
                     )}
                 />
+                 <FormField
+                    control={form.control}
+                    name="growthStage"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Growth Stage</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select the current growth stage" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {growthStages.map(stage => (
+                                <SelectItem key={stage} value={stage}>{stage}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 <FormField
                     control={form.control}
                     name="variety"
@@ -231,6 +256,7 @@ export default function MyCropsPage() {
       plantingDate: undefined,
       area: 1,
       areaUnit: "acres",
+      growthStage: "Sowing",
     },
   });
 
@@ -254,6 +280,7 @@ export default function MyCropsPage() {
         plantingDate: undefined,
         area: 1,
         areaUnit: "acres",
+        growthStage: "Sowing",
     });
     setLoading(false);
   }
@@ -303,48 +330,53 @@ export default function MyCropsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {crops.map((crop) => (
                     <Card key={crop.id} className="flex flex-col">
-                      <CardHeader className="flex flex-row items-start justify-between">
-                         <div className="flex items-center gap-4">
-                           <div className="bg-primary/10 p-3 rounded-full">
-                             <Icons.MyCrops className="size-6 text-primary" />
-                           </div>
-                           <div>
-                              <CardTitle>{crop.cropName} {crop.variety && `(${crop.variety})`}</CardTitle>
-                              <CardDescription>
-                                  Planted: {format(crop.plantingDate, "PP")}
-                              </CardDescription>
-                           </div>
-                         </div>
-                         <div className="flex items-center">
-                            <Button variant="ghost" size="icon" onClick={() => openEditDialog(crop)}>
-                                <Edit className="size-4" />
-                            </Button>
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                    <Trash2 className="size-4 text-destructive" />
+                      <CardHeader className="pb-4">
+                         <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="bg-primary/10 p-3 rounded-full">
+                                    <Icons.MyCrops className="size-6 text-primary" />
+                                </div>
+                                <div>
+                                    <CardTitle>{crop.cropName} {crop.variety && `(${crop.variety})`}</CardTitle>
+                                    <CardDescription>
+                                        Planted: {format(crop.plantingDate, "PP")}
+                                    </CardDescription>
+                                </div>
+                            </div>
+                             <div className="flex items-center -mr-2 -mt-2">
+                                <Button variant="ghost" size="icon" onClick={() => openEditDialog(crop)}>
+                                    <Edit className="size-4" />
                                 </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                    This action cannot be undone. This will permanently delete your entry for "{crop.cropName}".
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => deleteCrop(crop.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                    Delete
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="icon">
+                                        <Trash2 className="size-4 text-destructive" />
+                                    </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently delete your entry for "{crop.cropName}".
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => deleteCrop(crop.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                        Delete
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </div>
                          </div>
                       </CardHeader>
                       <CardContent className="flex-grow">
-                        <div className="text-sm text-muted-foreground">
+                         <div className="text-sm text-muted-foreground space-y-2">
                             <p><strong>Area:</strong> {crop.area} {crop.areaUnit}</p>
+                            <div>
+                                <Badge variant="outline">Stage: {crop.growthStage}</Badge>
+                            </div>
                         </div>
                       </CardContent>
                       <CardFooter className="flex flex-col sm:flex-row gap-2">
@@ -398,6 +430,28 @@ export default function MyCropsPage() {
                         <FormControl>
                           <Input placeholder="e.g., Wheat, Rice" {...field} />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="growthStage"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Growth Stage</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select the current growth stage" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {growthStages.map(stage => (
+                                <SelectItem key={stage} value={stage}>{stage}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}

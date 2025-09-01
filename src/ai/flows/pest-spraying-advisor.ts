@@ -35,35 +35,6 @@ export async function pestSprayingAdvisor(
   return pestSprayingAdvisorFlow(input);
 }
 
-
-const rationalePrompt = ai.definePrompt({
-  name: 'pestSprayingRationalePrompt',
-  input: { schema: z.object({
-      recommendation: z.string(),
-      weather: z.object({
-          description: z.string(),
-          temperature: z.number(),
-          windSpeed: z.number(),
-          humidity: z.number(),
-          chanceOfRain: z.enum(['Low', 'Medium', 'High']),
-        }),
-  })},
-  output: { schema: z.object({ rationale: z.string() }) },
-  prompt: `You are an expert agricultural advisor. Based on the following weather data and a pre-determined recommendation, provide a concise, helpful rationale (1-2 sentences) explaining *why* the recommendation was made.
-  
-  Weather:
-  - Condition: {{weather.description}}
-  - Temperature: {{weather.temperature}}°F
-  - Wind Speed: {{weather.windSpeed}} mph
-  - Humidity: {{weather.humidity}}%
-  - Chance of Rain: {{weather.chanceOfRain}}
-  
-  Recommendation: {{recommendation}}
-  
-  Explain the reasoning. For example, if the recommendation is 'Bad' due to high wind, explain that high wind can cause spray drift. If it's 'Bad' due to rain, explain that rain can wash away the pesticide.`,
-});
-
-
 const pestSprayingAdvisorFlow = ai.defineFlow(
   {
     name: 'pestSprayingAdvisorFlow',
@@ -75,46 +46,38 @@ const pestSprayingAdvisorFlow = ai.defineFlow(
         // 1. Get the real weather data.
         const weather = await getWeather( { location });
         
-        // 2. Determine recommendation and infer chance of rain based on logic.
+        // 2. Determine recommendation, rationale, and chance of rain based on deterministic logic.
         let recommendation: 'Good' | 'Caution' | 'Bad' = 'Good';
+        let rationale: string = '';
         let chanceOfRain: 'Low' | 'Medium' | 'High' = 'Low';
 
         const hasRain = /rain|drizzle|thunderstorm/i.test(weather.description);
+        const highWind = weather.windSpeed > 10;
+        const moderateWind = weather.windSpeed > 7;
 
-        if (hasRain) {
+        if (hasRain && highWind) {
+            recommendation = 'Bad';
+            rationale = 'Conditions are poor. High winds will cause spray drift, and rain will wash away the pesticide.';
             chanceOfRain = 'High';
+        } else if (hasRain) {
             recommendation = 'Bad';
-        }
-
-        if (weather.windSpeed > 10) {
+            rationale = 'Conditions are poor. Upcoming rain will likely wash away the pesticide before it can be effective.';
+            chanceOfRain = 'High';
+        } else if (highWind) {
             recommendation = 'Bad';
-        } else if (weather.windSpeed > 7) {
-            // If it's not already bad due to rain, set to caution for wind.
-            if (recommendation !== 'Bad') {
-                recommendation = 'Caution';
-            }
+            rationale = 'Conditions are poor. Wind speeds are too high, which can cause significant spray drift and uneven application.';
+        } else if (moderateWind) {
+            recommendation = 'Caution';
+            rationale = 'Use caution. Moderate winds may cause some spray drift. Spraying is possible but not ideal.';
+        } else {
+            recommendation = 'Good';
+            rationale = 'Conditions are good for spraying. Winds are calm and there is no rain expected.';
         }
 
-        // 3. Call the rationale prompt with the complete, consistent weather data.
-        const { output } = await rationalePrompt({
-            recommendation,
-            weather: { 
-                description: weather.description,
-                temperature: weather.temperature,
-                windSpeed: weather.windSpeed,
-                humidity: weather.humidity,
-                chanceOfRain 
-            }, 
-        });
-
-        if (!output?.rationale) {
-            throw new Error('Failed to generate a rationale from the AI model.');
-        }
-
-        // 4. Return the final, complete output.
+        // 3. Return the final, complete output.
         return {
             recommendation,
-            rationale: output.rationale,
+            rationale,
             windSpeed: weather.windSpeed,
             chanceOfRain,
         };

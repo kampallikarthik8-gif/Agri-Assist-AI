@@ -141,7 +141,7 @@ export function IrrigationPlannerForm() {
             </div>
           )}
           {result && !loading && (
-            <div className="prose prose-sm max-w-none text-foreground">
+            <div className="prose prose-sm max-w-none text-foreground whitespace-pre-line">
                 <p>{result.irrigationPlan}</p>
             </div>
           )}

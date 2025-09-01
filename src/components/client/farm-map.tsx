@@ -340,7 +340,7 @@ export function FarmMap() {
   if (loadError) {
     return (
       <div className="flex items-center justify-center h-full text-center text-muted-foreground p-4">
-        Could not load the map. Please ensure you have a valid Google Maps API key and that it is correctly configured in the Google Cloud Console.
+        Could not load the map. The Drawing and Geometry libraries require billing to be enabled on your Google Cloud project. Please ensure you have a valid, unrestricted Google Maps API key and that billing is enabled.
       </div>
     );
   }

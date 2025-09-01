@@ -1,11 +1,12 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { z } from "zod";
+import { useSearchParams } from 'next/navigation'
 import { cropInsuranceInfo, type CropInsuranceInfoOutput } from "@/ai/flows/crop-insurance-info";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +27,7 @@ export function CropInsuranceForm() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CropInsuranceInfoOutput | null>(null);
   const { toast } = useToast();
+  const searchParams = useSearchParams();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -35,24 +37,7 @@ export function CropInsuranceForm() {
     },
   });
 
-  useEffect(() => {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                getWeather({ lat: position.coords.latitude, lon: position.coords.longitude }).then(weatherData => {
-                    if (weatherData.locationName) {
-                        form.setValue("region", weatherData.locationName);
-                    }
-                }).catch(err => console.error("Failed to fetch city from coordinates:", err));
-            },
-            (error) => {
-                console.error("Geolocation error:", error);
-            }
-        );
-    }
-  }, [form]);
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = useCallback(async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     setResult(null);
     try {
@@ -74,7 +59,40 @@ export function CropInsuranceForm() {
     } finally {
         setLoading(false);
     }
-  }
+  }, [toast]);
+
+  useEffect(() => {
+    const cropFromUrl = searchParams.get('crop');
+    if (cropFromUrl) {
+      form.setValue('crop', cropFromUrl);
+      if (form.getValues('region')) {
+        onSubmit(form.getValues());
+      }
+    }
+  }, [searchParams, form, onSubmit]);
+
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                getWeather({ lat: position.coords.latitude, lon: position.coords.longitude }).then(weatherData => {
+                    if (weatherData.locationName) {
+                        form.setValue("region", weatherData.locationName);
+                        if (form.getValues('crop')) {
+                           onSubmit(form.getValues());
+                        }
+                    }
+                }).catch(err => console.error("Failed to fetch city from coordinates:", err));
+            },
+            (error) => {
+                console.error("Geolocation error:", error);
+            }
+        );
+    }
+  }, [form, onSubmit]);
+
+
 
   return (
     <div className="grid gap-6">

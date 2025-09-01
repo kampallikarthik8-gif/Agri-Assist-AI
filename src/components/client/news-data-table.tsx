@@ -29,16 +29,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { NewsArticle } from "@/lib/news-service"
 import { NewsTableActions } from "./news-table-actions"
 import Image from "next/image"
-
-const PublishedDateCell = ({ dateString }: { dateString: string }) => {
-    const [isClient, setIsClient] = React.useState(false)
- 
-    React.useEffect(() => {
-        setIsClient(true)
-    }, [])
-
-    return <>{isClient ? new Date(dateString).toLocaleDateString() : null}</>
-};
+import { FormattedDate } from "./formatted-date"
 
 export const columns: ColumnDef<NewsArticle>[] = [
   {
@@ -88,7 +79,7 @@ export const columns: ColumnDef<NewsArticle>[] = [
   {
     accessorKey: "publishedAt",
     header: "Published Date",
-    cell: ({ row }) => <PublishedDateCell dateString={row.getValue("publishedAt")} />,
+    cell: ({ row }) => <FormattedDate dateString={row.getValue("publishedAt")} />,
   },
   {
     id: "actions",

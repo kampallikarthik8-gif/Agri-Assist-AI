@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
@@ -20,6 +20,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "..
 
 const formSchema = z.object({
   region: z.string().min(2, "Region/State is required."),
+  // A hidden field to pass crop info if available, but not required for validation
+  crop: z.string().optional(),
 });
 
 export function GovernmentSchemesForm() {
@@ -32,57 +34,15 @@ export function GovernmentSchemesForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       region: "",
+      crop: "",
     },
   });
-
-  useEffect(() => {
-    const regionFromUrl = searchParams.get('region');
-    const cropFromUrl = searchParams.get('crop');
-    
-    if (regionFromUrl) {
-      form.setValue('region', regionFromUrl);
-      if (regionFromUrl.trim()) {
-        onSubmit({ region: regionFromUrl });
-      }
-    } else if (cropFromUrl) {
-        //If only crop is provided, we still need a region. We will try to get it.
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    getWeather({ lat: position.coords.latitude, lon: position.coords.longitude }).then(weatherData => {
-                        if (weatherData.locationName) {
-                            form.setValue("region", weatherData.locationName);
-                            onSubmit({ region: weatherData.locationName });
-                        }
-                    });
-                }
-            );
-        }
-    } else {
-         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    getWeather({ lat: position.coords.latitude, lon: position.coords.longitude }).then(weatherData => {
-                        if (weatherData.locationName) {
-                            form.setValue("region", weatherData.locationName);
-                        }
-                    }).catch(err => console.error("Failed to fetch city from coordinates:", err));
-                },
-                (error) => {
-                    console.error("Geolocation error:", error);
-                }
-            );
-        }
-    }
-  }, [searchParams, form]);
-
-
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  
+  const onSubmit = useCallback(async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     setResult(null);
     try {
-      const res = await governmentSchemes(values);
+      const res = await governmentSchemes({ region: values.region });
       setResult(res);
       if (res.schemes.length === 0) {
         toast({
@@ -100,7 +60,39 @@ export function GovernmentSchemesForm() {
     } finally {
         setLoading(false);
     }
-  }
+  }, [toast]);
+
+  useEffect(() => {
+    const regionFromUrl = searchParams.get('region');
+    const cropFromUrl = searchParams.get('crop');
+    
+    if (cropFromUrl) {
+      form.setValue('crop', cropFromUrl);
+    }
+
+    if (regionFromUrl) {
+      form.setValue('region', regionFromUrl);
+      // Only submit if region is not empty (it can be passed as empty from other pages)
+      if (regionFromUrl.trim()) {
+        onSubmit({ region: regionFromUrl });
+      }
+    } else {
+         if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    getWeather({ lat: position.coords.latitude, lon: position.coords.longitude }).then(weatherData => {
+                        if (weatherData.locationName) {
+                            form.setValue("region", weatherData.locationName);
+                        }
+                    }).catch(err => console.error("Failed to fetch city from coordinates:", err));
+                },
+                (error) => {
+                    console.error("Geolocation error:", error);
+                }
+            );
+        }
+    }
+  }, [searchParams, form, onSubmit]);
 
 
   const handleQuickSearch = (region: string) => {
@@ -210,5 +202,3 @@ export function GovernmentSchemesForm() {
     </div>
   );
 }
-
-    

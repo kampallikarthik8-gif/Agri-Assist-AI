@@ -37,29 +37,18 @@ export async function pestSprayingAdvisor(
   return pestSprayingAdvisorFlow(input);
 }
 
-// This internal schema is used for the rationale prompt and must match the data we construct.
-const RationalePromptWeatherSchema = z.object({
-  locationName: z.string(),
-  temperature: z.number(),
-  feelsLike: z.number(),
-  humidity: z.number(),
-  windSpeed: z.number(),
-  description: z.string(),
-  icon: z.string(),
-  uvIndex: z.number(),
-  visibility: z.number(),
-  pressure: z.number(),
-  sunrise: z.string(),
-  sunset: z.string(),
-  chanceOfRain: z.enum(['Low', 'Medium', 'High']),
-});
-
 
 const rationalePrompt = ai.definePrompt({
   name: 'pestSprayingRationalePrompt',
   input: { schema: z.object({
       recommendation: z.string(),
-      weather: RationalePromptWeatherSchema,
+      weather: z.object({
+          description: z.string(),
+          temperature: z.number(),
+          windSpeed: z.number(),
+          humidity: z.number(),
+          chanceOfRain: z.enum(['Low', 'Medium', 'High']),
+        }),
   })},
   output: { schema: z.object({ rationale: z.string() }) },
   prompt: `You are an expert agricultural advisor. Based on the following weather data and a pre-determined recommendation, provide a concise, helpful rationale (1-2 sentences) explaining *why* the recommendation was made.
@@ -111,7 +100,13 @@ const pestSprayingAdvisorFlow = ai.defineFlow(
         // 3. Call the rationale prompt with the complete, consistent weather data.
         const { output } = await rationalePrompt({
             recommendation,
-            weather: { ...weather, chanceOfRain }, // Add the inferred chanceOfRain to the object
+            weather: { 
+                description: weather.description,
+                temperature: weather.temperature,
+                windSpeed: weather.windSpeed,
+                humidity: weather.humidity,
+                chanceOfRain 
+            }, 
         });
 
         if (!output?.rationale) {

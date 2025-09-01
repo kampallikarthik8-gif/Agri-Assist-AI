@@ -67,12 +67,12 @@ const pestWeedIdentificationFlow = ai.defineFlow(
     try {
       const {output} = await prompt(input);
       if (!output) {
-        throw new Error('Failed to generate a response from the AI model.');
+        throw new Error('The AI model did not generate a response.');
       }
       return output;
     } catch (error) {
-      console.error("Error in pestWeedIdentificationFlow", error);
-      throw new Error('Failed to identify pest or weed.');
+      console.error("Error in pestWeedIdentificationFlow:", error);
+      throw new Error('Failed to identify pest or weed from the provided image.');
     }
   }
 );

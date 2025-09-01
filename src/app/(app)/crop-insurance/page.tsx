@@ -1,4 +1,6 @@
 
+"use client";
+
 import { CropInsuranceForm } from "@/components/client/crop-insurance-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

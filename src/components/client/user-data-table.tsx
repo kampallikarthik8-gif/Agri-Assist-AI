@@ -30,6 +30,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { UserTableActions } from "./user-table-actions"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { Badge } from "../ui/badge"
+import { FormattedDate } from "./formatted-date"
 
 const getStatusBadgeVariant = (status: "Active" | "Inactive" | "Invited") => {
   switch (status) {
@@ -43,15 +44,6 @@ const getStatusBadgeVariant = (status: "Active" | "Inactive" | "Invited") => {
       return "default";
   }
 };
-
-const LastLoginCell = ({ dateString }: { dateString: string }) => {
-    const [isClient, setIsClient] = React.useState(false);
-    React.useEffect(() => {
-        setIsClient(true);
-    }, []);
-    return <>{isClient ? new Date(dateString).toLocaleDateString() : null}</>;
-};
-
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -111,7 +103,7 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "lastLogin",
     header: "Last Login",
-    cell: ({ row }) => <LastLoginCell dateString={row.getValue("lastLogin")} />,
+    cell: ({ row }) => <FormattedDate dateString={row.getValue("lastLogin")} />,
   },
   {
     id: "actions",

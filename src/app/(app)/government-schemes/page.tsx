@@ -1,4 +1,6 @@
 
+"use client";
+
 import { GovernmentSchemesForm } from "@/components/client/government-schemes-form";
 
 export default function GovernmentSchemesPage() {

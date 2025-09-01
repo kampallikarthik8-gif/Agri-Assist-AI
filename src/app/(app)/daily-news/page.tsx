@@ -16,20 +16,11 @@ import { Icons } from "@/components/icons";
 import { getWeather } from "@/ai/flows/weather-service";
 import Image from "next/image";
 import Link from "next/link";
+import { FormattedDate } from "@/components/client/formatted-date";
 
 const formSchema = z.object({
   region: z.string().min(2, "Region/State is required."),
 });
-
-const FormattedDate = ({ dateString }: { dateString: string }) => {
-    const [isClient, setIsClient] = useState(false)
- 
-    useEffect(() => {
-        setIsClient(true)
-    }, [])
-
-    return <>{isClient ? new Date(dateString).toLocaleDateString() : null}</>
-};
 
 export default function DailyNewsPage() {
   const [loading, setLoading] = useState(true);
@@ -79,6 +70,10 @@ export default function DailyNewsPage() {
                     const weatherData = await getWeather({ lat, lon });
                     if (weatherData.locationName) {
                         region = weatherData.locationName.split(',')[0];
+                         toast({
+                            title: `Showing news for ${region}`,
+                            description: "Your location was automatically detected.",
+                        });
                     }
                 } else {
                      toast({
@@ -114,7 +109,8 @@ export default function DailyNewsPage() {
         } else {
             fetchInitialNews();
         }
-    }, [form, toast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     await getNews(values.region);

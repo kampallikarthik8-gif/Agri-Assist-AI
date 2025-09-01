@@ -64,12 +64,12 @@ const seedQualityScannerFlow = ai.defineFlow(
     try {
       const {output} = await prompt(input);
       if (!output) {
-        throw new Error('Failed to generate a response from the AI model.');
+        throw new Error('The AI model did not generate a response.');
       }
       return output;
     } catch (error) {
-      console.error("Error in seedQualityScannerFlow", error);
-      throw new Error('Failed to analyze seed quality.');
+      console.error("Error in seedQualityScannerFlow:", error);
+      throw new Error('Failed to analyze seed quality from the provided image.');
     }
   }
 );

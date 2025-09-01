@@ -175,6 +175,7 @@ export default function DailyNewsPage() {
                                 src={article.urlToImage || "https://picsum.photos/seed/news-fallback/600/400"}
                                 alt={article.title}
                                 fill
+                                sizes="(max-width: 768px) 100vw, 25vw"
                                 className="object-cover"
                                 data-ai-hint="news article"
                             />

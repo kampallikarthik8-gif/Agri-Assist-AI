@@ -412,10 +412,10 @@ export function FarmMap() {
     if ("recommendation" in analysisResult && "windSpeed" in analysisResult) { // PestSprayingAdvisorOutput
         return (
             <div className="space-y-3">
-                <p><strong>Recommendation:</strong> <Badge variant={analysisResult.recommendation === 'Good' ? 'default' : analysisResult.recommendation === 'Caution' ? 'secondary' : 'destructive'}>{analysisResult.recommendation}</Badge></p>
-                <p><strong>Wind Speed:</strong> {analysisResult.windSpeed} mph</p>
-                <p><strong>Chance of Rain:</strong> {analysisResult.chanceOfRain}</p>
-                <p className="pt-2 border-t mt-2"><strong>Rationale:</strong> {analysisResult.rationale}</p>
+                <div className="font-semibold">Recommendation: <Badge variant={analysisResult.recommendation === 'Good' ? 'default' : analysisResult.recommendation === 'Caution' ? 'secondary' : 'destructive'}>{analysisResult.recommendation}</Badge></div>
+                <div><strong>Wind Speed:</strong> {analysisResult.windSpeed} mph</div>
+                <div><strong>Chance of Rain:</strong> {analysisResult.chanceOfRain}</div>
+                <div className="pt-2 border-t mt-2"><strong>Rationale:</strong> {analysisResult.rationale}</div>
             </div>
         )
     }

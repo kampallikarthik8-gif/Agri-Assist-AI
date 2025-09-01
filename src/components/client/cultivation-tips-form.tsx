@@ -33,16 +33,8 @@ export function CultivationTipsForm() {
     },
   });
 
-  useEffect(() => {
-    const cropFromUrl = searchParams.get('crop');
-    if (cropFromUrl) {
-      form.setValue('cropName', cropFromUrl);
-      onSubmit({ cropName: cropFromUrl });
-    }
-  }, [searchParams, form]);
-
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleOnSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     setResult(null);
     try {
@@ -68,9 +60,18 @@ export function CultivationTipsForm() {
     }
   }
 
+  useEffect(() => {
+    const cropFromUrl = searchParams.get('crop');
+    if (cropFromUrl) {
+      form.setValue('cropName', cropFromUrl);
+      handleOnSubmit({ cropName: cropFromUrl });
+    }
+  }, [searchParams, form, handleOnSubmit]);
+
+
   const handleQuickSearch = (crop: string) => {
     form.setValue("cropName", crop);
-    form.handleSubmit(onSubmit)();
+    form.handleSubmit(handleOnSubmit)();
   };
 
   return (
@@ -82,7 +83,7 @@ export function CultivationTipsForm() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(handleOnSubmit)} className="space-y-4">
               <div className="flex flex-col sm:flex-row items-start gap-4">
                 <FormField
                   control={form.control}
@@ -172,5 +173,3 @@ function TipItem({ value, title, content }: { value: string, title: string, cont
         </AccordionItem>
     );
 }
-
-    

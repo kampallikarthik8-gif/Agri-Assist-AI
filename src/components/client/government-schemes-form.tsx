@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { z } from "zod";
+import { useSearchParams } from 'next/navigation';
 import { governmentSchemes, type GovernmentSchemesOutput } from "@/ai/flows/government-schemes";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,6 +26,7 @@ export function GovernmentSchemesForm() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<GovernmentSchemesOutput | null>(null);
   const { toast } = useToast();
+  const searchParams = useSearchParams();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -34,21 +36,47 @@ export function GovernmentSchemesForm() {
   });
 
   useEffect(() => {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                getWeather({ lat: position.coords.latitude, lon: position.coords.longitude }).then(weatherData => {
-                    if (weatherData.locationName) {
-                        form.setValue("region", weatherData.locationName);
-                    }
-                }).catch(err => console.error("Failed to fetch city from coordinates:", err));
-            },
-            (error) => {
-                console.error("Geolocation error:", error);
-            }
-        );
+    const regionFromUrl = searchParams.get('region');
+    const cropFromUrl = searchParams.get('crop');
+    
+    if (regionFromUrl) {
+      form.setValue('region', regionFromUrl);
+      if (regionFromUrl.trim()) {
+        onSubmit({ region: regionFromUrl });
+      }
+    } else if (cropFromUrl) {
+        //If only crop is provided, we still need a region. We will try to get it.
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    getWeather({ lat: position.coords.latitude, lon: position.coords.longitude }).then(weatherData => {
+                        if (weatherData.locationName) {
+                            form.setValue("region", weatherData.locationName);
+                            onSubmit({ region: weatherData.locationName });
+                        }
+                    });
+                }
+            );
+        }
+    } else {
+         if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    getWeather({ lat: position.coords.latitude, lon: position.coords.longitude }).then(weatherData => {
+                        if (weatherData.locationName) {
+                            form.setValue("region", weatherData.locationName);
+                        }
+                    }).catch(err => console.error("Failed to fetch city from coordinates:", err));
+                },
+                (error) => {
+                    console.error("Geolocation error:", error);
+                }
+            );
+        }
     }
-  }, [form]);
+  }, [searchParams, form]);
+
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
@@ -182,3 +210,5 @@ export function GovernmentSchemesForm() {
     </div>
   );
 }
+
+    

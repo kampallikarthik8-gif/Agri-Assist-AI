@@ -1,10 +1,11 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useSearchParams } from 'next/navigation';
 import { cultivationTips, type CultivationTipsOutput } from "@/ai/flows/cultivation-tips";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +24,7 @@ export function CultivationTipsForm() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CultivationTipsOutput | null>(null);
   const { toast } = useToast();
+  const searchParams = useSearchParams();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -30,6 +32,15 @@ export function CultivationTipsForm() {
       cropName: "",
     },
   });
+
+  useEffect(() => {
+    const cropFromUrl = searchParams.get('crop');
+    if (cropFromUrl) {
+      form.setValue('cropName', cropFromUrl);
+      onSubmit({ cropName: cropFromUrl });
+    }
+  }, [searchParams, form]);
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
@@ -161,3 +172,5 @@ function TipItem({ value, title, content }: { value: string, title: string, cont
         </AccordionItem>
     );
 }
+
+    

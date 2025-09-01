@@ -4,6 +4,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { z } from "zod";
 import {
   Card,
@@ -11,6 +12,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -89,7 +91,6 @@ export default function MyCropsPage() {
 
   async function onSubmit(values: z.infer<typeof cropSchema>) {
     setLoading(true);
-    // Simulate async operation
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     const newCrop: Crop = {
@@ -130,35 +131,59 @@ export default function MyCropsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-3xl font-bold tracking-tight">My Crops</h1>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">My Crops</h1>
+          <p className="text-muted-foreground">Manage your current crops and get quick access to relevant AI tools.</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Current Crop List</CardTitle>
-              <CardDescription>
-                A list of all the crops you are currently managing.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {crops.length > 0 ? (
-                <div className="space-y-4">
+            {crops.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {crops.map((crop) => (
-                    <Card key={crop.id} className="p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                         <div className="bg-primary/10 p-3 rounded-full">
-                           <Leaf className="size-6 text-primary" />
+                    <Card key={crop.id} className="flex flex-col">
+                      <CardHeader className="flex flex-row items-start justify-between">
+                         <div className="flex items-center gap-4">
+                           <div className="bg-primary/10 p-3 rounded-full">
+                             <Icons.MyCrops className="size-6 text-primary" />
+                           </div>
+                           <div>
+                              <CardTitle>{crop.cropName} {crop.variety && `(${crop.variety})`}</CardTitle>
+                              <CardDescription>
+                                  Planted: {format(crop.plantingDate, "PP")}
+                              </CardDescription>
+                           </div>
                          </div>
-                         <div>
-                            <p className="font-semibold text-lg">{crop.cropName} <span className="text-sm text-muted-foreground">{crop.variety && `(${crop.variety})`}</span></p>
-                            <p className="text-sm text-muted-foreground">
-                                Planted on {format(crop.plantingDate, "PPP")} &middot; {crop.area} {crop.areaUnit}
-                            </p>
-                         </div>
-                      </div>
-                      <Button variant="ghost" size="icon" onClick={() => deleteCrop(crop.id)}>
-                        <Trash2 className="size-5 text-destructive" />
-                      </Button>
+                          <Button variant="ghost" size="icon" onClick={() => deleteCrop(crop.id)}>
+                            <Trash2 className="size-4 text-destructive" />
+                          </Button>
+                      </CardHeader>
+                      <CardContent className="flex-grow">
+                        <div className="text-sm text-muted-foreground">
+                            <p><strong>Area:</strong> {crop.area} {crop.areaUnit}</p>
+                        </div>
+                      </CardContent>
+                      <CardFooter className="flex flex-col sm:flex-row gap-2">
+                          <Button asChild variant="outline" size="sm" className="w-full">
+                            <Link href={`/cultivation-tips?crop=${encodeURIComponent(crop.cropName)}`}>
+                                <Icons.CultivationTips className="mr-2"/>
+                                Tips
+                            </Link>
+                          </Button>
+                          <Button asChild variant="outline" size="sm" className="w-full">
+                            <Link href={`/market-insights?crop=${encodeURIComponent(crop.cropName)}`}>
+                                <Icons.MarketInsights className="mr-2"/>
+                                Insights
+                            </Link>
+                          </Button>
+                          <Button asChild variant="outline" size="sm" className="w-full">
+                             <Link href={`/government-schemes?region=&crop=${encodeURIComponent(crop.cropName)}`}>
+                                <Icons.GovernmentSchemes className="mr-2"/>
+                                Schemes
+                            </Link>
+                          </Button>
+                      </CardFooter>
                     </Card>
                   ))}
                 </div>
@@ -169,10 +194,8 @@ export default function MyCropsPage() {
                   <p className="text-sm">Use the form to add your first crop.</p>
                 </div>
               )}
-            </CardContent>
-          </Card>
         </div>
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 lg:sticky top-4">
           <Card>
             <CardHeader>
               <CardTitle>Add New Crop</CardTitle>
@@ -295,3 +318,5 @@ export default function MyCropsPage() {
     </div>
   );
 }
+
+    

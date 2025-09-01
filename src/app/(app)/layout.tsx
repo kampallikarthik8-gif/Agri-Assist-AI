@@ -71,6 +71,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     setIsMounted(true);
+    
+    // @ts-ignore
+    window.googleTranslateElementInit = () => {
+      // @ts-ignore
+      new window.google.translate.Element({pageLanguage: 'en', layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+    };
   }, []);
 
   if (!isMounted) {

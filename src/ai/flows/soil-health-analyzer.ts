@@ -75,7 +75,7 @@ const soilHealthAnalyzerFlow = ai.defineFlow(
     inputSchema: SoilHealthAnalyzerInputSchema,
     outputSchema: SoilHealthAnalyzerOutputSchema,
   },
-  async input => {
+  async (input) => {
     const maxRetries = 3;
     for (let i = 0; i < maxRetries; i++) {
         try {
@@ -84,15 +84,19 @@ const soilHealthAnalyzerFlow = ai.defineFlow(
             if (output) {
                 return output;
             }
-            console.warn(`Attempt ${i + 1} returned null output.`);
+            console.warn(`Attempt ${i + 1} returned null output. Retrying in ${1000 * (i + 1)}ms...`);
+            if (i < maxRetries - 1) {
+                await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1))); // Exponential backoff
+            }
         } catch (error) {
             console.error(`Error in soilHealthAnalyzerFlow on attempt ${i + 1}`, error);
             if (i === maxRetries - 1) {
                 // If it's the last retry, rethrow the error
                 throw new Error('Failed to analyze soil health after multiple attempts.');
             }
+             await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1))); // Wait before retrying on error too
         }
     }
-     throw new Error('Failed to analyze soil health.');
+     throw new Error('Failed to analyze soil health after all retries.');
   }
 );

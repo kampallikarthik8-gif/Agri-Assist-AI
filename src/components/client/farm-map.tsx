@@ -302,14 +302,16 @@ export function FarmMap() {
             const soilN = parseFloat(dialogInput.soilData.nitrogen);
             const soilP = parseFloat(dialogInput.soilData.phosphorus);
             const soilK = parseFloat(dialogInput.soilData.potassium);
-
-            if (isNaN(soilN) || isNaN(soilP) || isNaN(soilK)) {
+            
+            // Stricter validation
+            if (isNaN(soilN) || isNaN(soilP) || isNaN(soilK) || soilN === null || soilP === null || soilK === null) {
                 toast({
                     variant: "destructive",
                     title: "Invalid Soil Data",
-                    description: "Soil analysis did not return valid numbers. Please run a new soil analysis and try again."
+                    description: "Soil analysis did not return valid numbers for all nutrients. Please run a new soil analysis and try again."
                 });
                 setIsAnalysisLoading(false);
+                setAnalysisResult({ error: "Soil nutrient data is invalid or missing. Please run a new soil health analysis for this field." });
                 return;
             }
 
@@ -369,9 +371,9 @@ export function FarmMap() {
         return (
             <div className="space-y-2">
                 <p><strong>Organic Matter:</strong> {analysisResult.report.organicMatter}</p>
-                <p><strong>Nitrogen:</strong> {analysisResult.report.nitrogen}</p>
-                <p><strong>Phosphorus:</strong> {analysisResult.report.phosphorus}</p>
-                <p><strong>Potassium:</strong> {analysisResult.report.potassium}</p>
+                <p><strong>Nitrogen:</strong> {analysisResult.report.nitrogen} ppm</p>
+                <p><strong>Phosphorus:</strong> {analysisResult.report.phosphorus} ppm</p>
+                <p><strong>Potassium:</strong> {analysisResult.report.potassium} ppm</p>
                 <p><strong>pH:</strong> {analysisResult.report.ph}</p>
                 <p><strong>Moisture:</strong> {analysisResult.report.moisture}</p>
                 <p className="pt-2 border-t mt-2"><strong>Summary:</strong> {analysisResult.summary}</p>

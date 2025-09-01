@@ -37,7 +37,8 @@ export async function pestSprayingAdvisor(
   return pestSprayingAdvisorFlow(input);
 }
 
-const WeatherOutputSchema = z.object({
+// This internal schema is used for the rationale prompt and must match the data we construct.
+const RationalePromptWeatherSchema = z.object({
   locationName: z.string(),
   temperature: z.number(),
   feelsLike: z.number(),
@@ -53,11 +54,12 @@ const WeatherOutputSchema = z.object({
   chanceOfRain: z.enum(['Low', 'Medium', 'High']),
 });
 
+
 const rationalePrompt = ai.definePrompt({
   name: 'pestSprayingRationalePrompt',
   input: { schema: z.object({
       recommendation: z.string(),
-      weather: WeatherOutputSchema,
+      weather: RationalePromptWeatherSchema,
   })},
   output: { schema: z.object({ rationale: z.string() }) },
   prompt: `You are an expert agricultural advisor. Based on the following weather data and a pre-determined recommendation, provide a concise, helpful rationale (1-2 sentences) explaining *why* the recommendation was made.
@@ -83,8 +85,10 @@ const pestSprayingAdvisorFlow = ai.defineFlow(
   },
   async ({ location }) => {
     try {
+        // 1. Get the real weather data.
         const weather = await getWeather( { location });
         
+        // 2. Determine recommendation and infer chance of rain based on logic.
         let recommendation: 'Good' | 'Caution' | 'Bad' = 'Good';
         let chanceOfRain: 'Low' | 'Medium' | 'High' = 'Low';
 
@@ -98,18 +102,23 @@ const pestSprayingAdvisorFlow = ai.defineFlow(
         if (weather.windSpeed > 10) {
             recommendation = 'Bad';
         } else if (weather.windSpeed > 7) {
-            recommendation = 'Caution';
+            // If it's not already bad due to rain, set to caution for wind.
+            if (recommendation !== 'Bad') {
+                recommendation = 'Caution';
+            }
         }
 
+        // 3. Call the rationale prompt with the complete, consistent weather data.
         const { output } = await rationalePrompt({
             recommendation,
-            weather: { ...weather, chanceOfRain },
+            weather: { ...weather, chanceOfRain }, // Add the inferred chanceOfRain to the object
         });
 
         if (!output?.rationale) {
             throw new Error('Failed to generate a rationale from the AI model.');
         }
 
+        // 4. Return the final, complete output.
         return {
             recommendation,
             rationale: output.rationale,

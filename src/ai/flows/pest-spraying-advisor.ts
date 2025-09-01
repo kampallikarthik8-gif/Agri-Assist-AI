@@ -12,8 +12,6 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import { getWeather } from './weather-service';
-import type { WeatherOutput } from './weather-service';
-
 
 const PestSprayingAdvisorInputSchema = z.object({
   location: z.string().describe('The location of the field to check conditions for.'),

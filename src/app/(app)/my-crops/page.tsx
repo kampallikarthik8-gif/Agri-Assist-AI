@@ -23,9 +23,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Trash2, Leaf } from "lucide-react";
+import { Loader2, Plus, Trash2, Leaf, Edit } from "lucide-react";
 import { Icons } from "@/components/icons";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
@@ -49,10 +59,143 @@ type Crop = z.infer<typeof cropSchema> & { id: string };
 
 const LOCAL_STORAGE_KEY = "my_crops_list";
 
+function EditCropForm({ crop, onUpdate, closeDialog }: { crop: Crop, onUpdate: (updatedCrop: Crop) => void, closeDialog: () => void }) {
+    const [loading, setLoading] = useState(false);
+
+    const form = useForm<z.infer<typeof cropSchema>>({
+        resolver: zodResolver(cropSchema),
+        defaultValues: {
+            ...crop,
+            variety: crop.variety || "",
+        },
+    });
+
+    async function onSubmit(values: z.infer<typeof cropSchema>) {
+        setLoading(true);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        onUpdate({ ...crop, ...values });
+        setLoading(false);
+        closeDialog();
+    }
+
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                    control={form.control}
+                    name="cropName"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Crop Name</FormLabel>
+                        <FormControl>
+                        <Input placeholder="e.g., Wheat, Rice" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="variety"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Variety (Optional)</FormLabel>
+                        <FormControl>
+                        <Input placeholder="e.g., Sona, Basmati" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="plantingDate"
+                    render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                        <FormLabel>Planting Date</FormLabel>
+                        <Popover>
+                        <PopoverTrigger asChild>
+                            <FormControl>
+                            <Button
+                                variant={"outline"}
+                                className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                                )}
+                            >
+                                {field.value ? (
+                                format(field.value, "PPP")
+                                ) : (
+                                <span>Pick a date</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                            </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) =>
+                                date > new Date() || date < new Date("1900-01-01")
+                            }
+                            initialFocus
+                            />
+                        </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                <div className="flex gap-4">
+                    <FormField
+                    control={form.control}
+                    name="area"
+                    render={({ field }) => (
+                        <FormItem className="flex-1">
+                        <FormLabel>Area</FormLabel>
+                        <FormControl>
+                            <Input type="number" placeholder="e.g., 5" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <FormField
+                    control={form.control}
+                    name="areaUnit"
+                    render={({ field }) => (
+                        <FormItem className="flex-1">
+                        <FormLabel>Unit</FormLabel>
+                        <FormControl>
+                            <Input placeholder="e.g., acres" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                </div>
+                <DialogFooter>
+                    <DialogClose asChild>
+                        <Button type="button" variant="ghost">Cancel</Button>
+                    </DialogClose>
+                    <Button type="submit" disabled={loading}>
+                        {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        Save Changes
+                    </Button>
+                </DialogFooter>
+            </form>
+        </Form>
+    );
+}
+
 export default function MyCropsPage() {
   const [crops, setCrops] = useState<Crop[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [currentCrop, setCurrentCrop] = useState<Crop | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -124,6 +267,20 @@ export default function MyCropsPage() {
     });
   };
 
+  const openEditDialog = (crop: Crop) => {
+      setCurrentCrop(crop);
+      setIsEditDialogOpen(true);
+  }
+
+  const handleUpdateCrop = (updatedCrop: Crop) => {
+      setCrops(prev => prev.map(c => c.id === updatedCrop.id ? updatedCrop : c));
+      toast({
+          title: "Crop Updated",
+          description: `${updatedCrop.cropName} has been updated.`,
+      });
+  }
+
+
   if (!isMounted) {
     return (
       <div className="flex items-center justify-center pt-20">
@@ -158,27 +315,32 @@ export default function MyCropsPage() {
                               </CardDescription>
                            </div>
                          </div>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <Trash2 className="size-4 text-destructive" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action cannot be undone. This will permanently delete your entry for "{crop.cropName}".
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => deleteCrop(crop.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                  Delete
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+                         <div className="flex items-center">
+                            <Button variant="ghost" size="icon" onClick={() => openEditDialog(crop)}>
+                                <Edit className="size-4" />
+                            </Button>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                    <Trash2 className="size-4 text-destructive" />
+                                </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete your entry for "{crop.cropName}".
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => deleteCrop(crop.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                    Delete
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                         </div>
                       </CardHeader>
                       <CardContent className="flex-grow">
                         <div className="text-sm text-muted-foreground">
@@ -336,6 +498,23 @@ export default function MyCropsPage() {
           </Card>
         </div>
       </div>
+      
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Edit Crop</DialogTitle>
+                <DialogDescription>Update the details for your crop.</DialogDescription>
+            </DialogHeader>
+            {currentCrop && (
+                <EditCropForm 
+                    crop={currentCrop}
+                    onUpdate={handleUpdateCrop}
+                    closeDialog={() => setIsEditDialogOpen(false)}
+                />
+            )}
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }

@@ -406,6 +406,14 @@ export function FarmMap() {
                 <p><strong>Nitrogen:</strong> {analysisResult.fertilizerAmounts.nitrogen.toFixed(2)} kg</p>
                 <p><strong>Phosphorus:</strong> {analysisResult.fertilizerAmounts.phosphorus.toFixed(2)} kg</p>
                 <p><strong>Potassium:</strong> {analysisResult.fertilizerAmounts.potassium.toFixed(2)} kg</p>
+                 {analysisResult.fertilizerProducts.length > 0 && (
+                    <div className="pt-2 border-t mt-2">
+                        <p><strong>Product Suggestions:</strong></p>
+                        <ul className="list-disc pl-5">
+                            {analysisResult.fertilizerProducts.map((p, i) => <li key={i}>{p.quantity.toFixed(2)}kg of {p.productName} ({p.npkRatio})</li>)}
+                        </ul>
+                    </div>
+                )}
                 <p className="pt-2 border-t mt-2"><strong>Recommendation:</strong> {analysisResult.recommendation}</p>
             </div>
         );

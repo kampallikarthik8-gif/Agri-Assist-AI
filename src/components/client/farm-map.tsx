@@ -298,11 +298,26 @@ export function FarmMap() {
             result = await smartIrrigationPlanner({ location: locationStr, cropType: dialogInput.crop });
           } else if (dialogInput.type === 'fertilizer' && dialogInput.soilData) {
             const areaInAcres = currentShapeForAnalysis.area * 0.000247105;
+            
+            const soilN = parseFloat(dialogInput.soilData.nitrogen);
+            const soilP = parseFloat(dialogInput.soilData.phosphorus);
+            const soilK = parseFloat(dialogInput.soilData.potassium);
+
+            if (isNaN(soilN) || isNaN(soilP) || isNaN(soilK)) {
+                toast({
+                    variant: "destructive",
+                    title: "Invalid Soil Data",
+                    description: "Soil analysis did not return valid numbers. Please run a new soil analysis and try again."
+                });
+                setIsAnalysisLoading(false);
+                return;
+            }
+
             result = await fertilizerCalculator({
                 cropType: dialogInput.crop,
-                soilNitrogen: parseFloat(dialogInput.soilData.nitrogen),
-                soilPhosphorus: parseFloat(dialogInput.soilData.phosphorus),
-                soilPotassium: parseFloat(dialogInput.soilData.potassium),
+                soilNitrogen: soilN,
+                soilPhosphorus: soilP,
+                soilPotassium: soilK,
                 farmArea: areaInAcres,
                 areaUnit: 'acres'
             });

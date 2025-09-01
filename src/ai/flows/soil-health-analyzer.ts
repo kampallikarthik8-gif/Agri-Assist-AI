@@ -24,9 +24,9 @@ export type SoilHealthAnalyzerInput = z.infer<typeof SoilHealthAnalyzerInputSche
 const SoilHealthAnalyzerOutputSchema = z.object({
     report: z.object({
         organicMatter: z.string().describe('The estimated percentage of soil organic matter (e.g., "2.5%").'),
-        nitrogen: z.string().describe('The estimated nitrogen (N) level (e.g., "Medium", "25 ppm").'),
-        phosphorus: z.string().describe('The estimated phosphorus (P) level (e.g., "High", "50 ppm").'),
-        potassium: z.string().describe('The estimated potassium (K) level (e.g., "Low", "80 ppm").'),
+        nitrogen: z.string().describe('The estimated nitrogen (N) level as a numeric value in parts-per-million (e.g., "25").'),
+        phosphorus: z.string().describe('The estimated phosphorus (P) level as a numeric value in parts-per-million (e.g., "50").'),
+        potassium: z.string().describe('The estimated potassium (K) level as a numeric value in parts-per-million (e.g., "80").'),
         ph: z.number().describe('The estimated soil pH level (e.g., 6.8).'),
         moisture: z.string().describe('The estimated soil moisture content (e.g., "Optimal", "22%").'),
     }),
@@ -56,9 +56,9 @@ const prompt = ai.definePrompt({
   
   The report must include estimated values for:
   - Soil Organic Matter (%)
-  - Nitrogen (N) level (provide a qualitative assessment like High/Medium/Low and an approximate ppm value)
-  - Phosphorus (P) level
-  - Potassium (K) level
+  - Nitrogen (N) level (provide a numeric value in parts-per-million, e.g., "25")
+  - Phosphorus (P) level (provide a numeric value in parts-per-million, e.g., "50")
+  - Potassium (K) level (provide a numeric value in parts-per-million, e.g., "80")
   - Soil pH
   - Soil Moisture (%)
   

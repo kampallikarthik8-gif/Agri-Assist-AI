@@ -38,6 +38,7 @@ import {
   Warehouse,
   LineChart,
   Globe,
+  Sprout,
 } from "lucide-react";
 
 export const Icons = {
@@ -84,4 +85,5 @@ export const Icons = {
   FarmEquipment: Tractor,
   Login: LogIn,
   Translate: Globe,
+  MyCrops: Sprout,
 };

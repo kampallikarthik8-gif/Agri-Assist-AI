@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import Link from "next/link";
 import { useSearchParams } from 'next/navigation';
 import { cultivationTips, type CultivationTipsOutput } from "@/ai/flows/cultivation-tips";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,13 @@ import { Icons } from "../icons";
 const formSchema = z.object({
   cropName: z.string().min(2, "Crop name is required."),
 });
+
+const relatedTools = [
+    { href: "/mandi-prices?crop=", label: "Check Mandi Prices", icon: <Icons.MandiPrices /> },
+    { href: "/market-insights?crop=", label: "Get Market Insights", icon: <Icons.MarketInsights /> },
+    { href: "/crop-insurance?crop=", label: "Find Crop Insurance", icon: <Icons.CropInsurance /> },
+    { href: "/government-schemes?crop=", label: "Find Govt. Schemes", icon: <Icons.GovernmentSchemes /> },
+]
 
 export function CultivationTipsForm() {
   const [loading, setLoading] = useState(false);
@@ -126,36 +134,59 @@ export function CultivationTipsForm() {
         </CardContent>
       </Card>
 
-      <div className="space-y-6">
-        {loading && (
-          <div className="flex flex-col items-center justify-center pt-10 gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-muted-foreground">Fetching cultivation tips for {form.getValues('cropName')}...</p>
-          </div>
-        )}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        <div className="lg:col-span-2">
+            {loading && (
+            <div className="flex flex-col items-center justify-center pt-10 gap-4">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="text-muted-foreground">Fetching cultivation tips for {form.getValues('cropName')}...</p>
+            </div>
+            )}
+
+            {result && !loading && (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>AI Cultivation Guide for {result.cropName}</CardTitle>
+                        <CardDescription>Follow these best practices for a successful harvest.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Accordion type="single" collapsible className="w-full" defaultValue="sowing">
+                            <TipItem value="sowing" title="Sowing & Planting" content={result.tips.sowing} />
+                            <TipItem value="irrigation" title="Irrigation & Water Management" content={result.tips.irrigation} />
+                            <TipItem value="fertilization" title="Fertilization & Nutrient Management" content={result.tips.fertilization} />
+                            <TipItem value="harvesting" title="Harvesting" content={result.tips.harvesting} />
+                            <TipItem value="post-harvest" title="Post-Harvest Management" content={result.tips.postHarvest} />
+                        </Accordion>
+                    </CardContent>
+                </Card>
+            )}
+
+            {!result && !loading && (
+                <div className="text-center text-muted-foreground pt-10 lg:col-span-2">
+                    <BookOpen className="size-12 mx-auto mb-4" />
+                    <p>Enter a crop name above to get detailed cultivation tips.</p>
+                </div>
+            )}
+        </div>
 
         {result && !loading && (
-             <Card>
-                <CardHeader>
-                    <CardTitle>AI Cultivation Guide for {result.cropName}</CardTitle>
-                    <CardDescription>Follow these best practices for a successful harvest.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Accordion type="single" collapsible className="w-full" defaultValue="sowing">
-                        <TipItem value="sowing" title="Sowing & Planting" content={result.tips.sowing} />
-                        <TipItem value="irrigation" title="Irrigation & Water Management" content={result.tips.irrigation} />
-                        <TipItem value="fertilization" title="Fertilization & Nutrient Management" content={result.tips.fertilization} />
-                        <TipItem value="harvesting" title="Harvesting" content={result.tips.harvesting} />
-                        <TipItem value="post-harvest" title="Post-Harvest Management" content={result.tips.postHarvest} />
-                    </Accordion>
-                </CardContent>
-            </Card>
-        )}
-
-        {!result && !loading && (
-            <div className="text-center text-muted-foreground pt-10">
-                <BookOpen className="size-12 mx-auto mb-4" />
-                <p>Enter a crop name above to get detailed cultivation tips.</p>
+            <div className="lg:col-span-1 lg:sticky top-4">
+                 <Card>
+                    <CardHeader>
+                        <CardTitle>Related Tools for {result.cropName}</CardTitle>
+                        <CardDescription>Explore other useful features for this crop.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-col gap-2">
+                        {relatedTools.map(tool => (
+                            <Button asChild variant="outline" className="w-full justify-start" key={tool.label}>
+                                <Link href={`${tool.href}${encodeURIComponent(result.cropName)}`}>
+                                    {tool.icon}
+                                    <span className="ml-2">{tool.label}</span>
+                                </Link>
+                            </Button>
+                        ))}
+                    </CardContent>
+                </Card>
             </div>
         )}
       </div>

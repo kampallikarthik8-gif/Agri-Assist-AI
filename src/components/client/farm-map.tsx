@@ -400,7 +400,9 @@ export function FarmMap() {
             <div className="space-y-2">
                 {analysisResult.alerts.length > 0 ? analysisResult.alerts.map((alert, index) => (
                     <div key={index} className="border-l-4 pl-3 py-1" style={{ borderColor: alert.severity === 'High' ? 'red' : alert.severity === 'Medium' ? 'orange' : 'blue' }}>
-                        <p><strong>{alert.title || alert.name}</strong> - <Badge variant={alert.severity === 'High' ? "destructive" : "secondary"}>{alert.severity} Risk</Badge></p>
+                        <div className="font-semibold">
+                            <span>{alert.title || alert.name}</span> - <Badge variant={alert.severity === 'High' ? "destructive" : "secondary"}>{alert.severity} Risk</Badge>
+                        </div>
                          {alert.message && <p className="text-sm text-muted-foreground">{alert.message}</p>}
                     </div>
                 )) : <p>No immediate threats or alerts detected for this location.</p>}

@@ -19,7 +19,7 @@ import { rainfallAlert, type RainfallAlertOutput } from "@/ai/flows/rainfall-ale
 import { pestSprayingAdvisor, type PestSprayingAdvisorOutput } from "@/ai/flows/pest-spraying-advisor";
 import { sendNotification } from "@/ai/flows/notification-service";
 import { Icons } from "@/components/icons";
-import { AlertCircle, Cloud, Cloudy, CloudRain, Snowflake, Sun, SunMoon, Wind, Gauge, Eye, Sunrise, Sunset, Loader2, ShieldCheck, ShieldAlert, ShieldX } from "lucide-react";
+import { AlertCircle, Cloud, Cloudy, CloudRain, Snowflake, Sun, SunMoon, Wind, Gauge, Eye, Sunrise, Sunset, Loader2, ShieldCheck, ShieldAlert, ShieldX, Bug, Search } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -68,6 +68,9 @@ const recommendationColors: { [key: string]: string } = {
     'Bad': 'border-red-500/50 bg-red-500/10',
 };
 
+const locationFormSchema = z.object({
+  location: z.string().min(2, "Location is required."),
+});
 
 const notificationFormSchema = z.object({
   phoneNumber: z.string().min(10, "A valid phone number is required."),
@@ -181,14 +184,21 @@ export default function WeatherPage() {
   
   const highSeverityAlert = alerts?.find(a => a.severity === 'High' && a.type !== 'none');
 
-  useEffect(() => {
-    async function fetchAllWeatherData(lat?: number, lon?: number, location?: string) {
-      try {
-        setLoading(true);
-        setError(null);
+  const locationForm = useForm<z.infer<typeof locationFormSchema>>({
+    resolver: zodResolver(locationFormSchema),
+    defaultValues: {
+      location: "",
+    },
+  });
 
+  const fetchAllWeatherData = async (lat?: number, lon?: number, location?: string) => {
+      setLoading(true);
+      setError(null);
+
+      try {
         const weatherData = await getWeather({ lat, lon, location });
         setWeather(weatherData);
+        locationForm.setValue("location", weatherData.locationName);
 
         const locationName = weatherData.locationName;
 
@@ -220,11 +230,17 @@ export default function WeatherPage() {
             });
         }
         setError("Could not fetch weather data. Please try refreshing the page.");
+        setWeather(null);
+        setForecast(null);
+        setAlerts(null);
+        setSprayingAdvice(null);
       } finally {
         setLoading(false);
       }
     }
 
+
+  useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -232,173 +248,170 @@ export default function WeatherPage() {
         },
         (geoError) => {
           console.error("Geolocation error:", geoError);
-          setError("Location access denied. Showing weather for a default location.");
+          setError("Location access denied. Please enter a location manually.");
           fetchAllWeatherData(undefined, undefined, "Sunnyvale, CA");
         }
       );
     } else {
-      setError("Geolocation is not supported. Showing weather for a default location.");
+      setError("Geolocation is not supported. Please enter a location manually.");
       fetchAllWeatherData(undefined, undefined, "Sunnyvale, CA");
     }
-  }, [toast]);
+  }, []);
+
+  const onLocationSubmit = async (values: z.infer<typeof locationFormSchema>) => {
+      await fetchAllWeatherData(undefined, undefined, values.location);
+  };
 
   const WeatherIcon = weather ? weatherIconMap[weather.icon.toLowerCase()] || Sun : Sun;
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-3xl font-bold tracking-tight">Live Weather & Forecast</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Live Weather & Forecast</h1>
+            <p className="text-muted-foreground">Check real-time weather and AI-powered advisories.</p>
+          </div>
+          <div className="w-full sm:w-auto">
+            <Form {...locationForm}>
+              <form onSubmit={locationForm.handleSubmit(onLocationSubmit)} className="flex items-start gap-2">
+                <FormField
+                  control={locationForm.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel className="sr-only">Location</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter a location..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" disabled={loading} size="icon" className="flex-shrink-0">
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                </Button>
+              </form>
+            </Form>
+          </div>
+      </div>
 
-        {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Skeleton className="h-48 w-full" />
-                <Skeleton className="h-48 w-full" />
-            </div>
-        ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {highSeverityAlert ? (
-                    <NotificationSender alertMessage={`Weather Alert: ${highSeverityAlert.title}. ${highSeverityAlert.message}`} />
-                ) : alerts && alerts.length > 0 ? (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><AlertCircle className="text-destructive" /> Weather Alerts</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            {alerts.map((alert, index) => (
-                                <Alert key={index} className={cn(alertSeverityColors[alert.severity])}>
-                                    <AlertCircle className="h-4 w-4" />
-                                    <AlertTitle>{alert.title} ({alert.severity})</AlertTitle>
-                                    <AlertDescription>
-                                        {alert.message}
-                                    </AlertDescription>
-                                </Alert>
-                            ))}
-                        </CardContent>
-                    </Card>
-                ) : <div />}
-                
-                {sprayingAdvice && (
-                     <Card className={cn("flex flex-col", recommendationColors[sprayingAdvice.recommendation])}>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                {recommendationIcons[sprayingAdvice.recommendation]}
-                                Spraying Conditions
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="flex-grow flex flex-col justify-center items-center text-center gap-2">
-                            <p className="text-xl font-bold">It's a {sprayingAdvice.recommendation.toUpperCase()} time to spray</p>
-                            <p className="text-sm text-muted-foreground">{sprayingAdvice.rationale}</p>
-                        </CardContent>
-                    </Card>
-                )}
+       {loading && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                 <Skeleton className="h-48 w-full" />
+                 <Skeleton className="h-48 w-full lg:col-span-2" />
             </div>
         )}
+        
+        {error && !loading && (
+            <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+            </Alert>
+        )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Current Conditions</CardTitle>
-          <CardDescription>
-            {loading && "Loading location..."}
-            {weather && !loading && weather.locationName}
-            {error && !weather && error}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {loading ? (
-                <>
-                    <div className="flex flex-col items-center justify-center gap-2 lg:col-span-1">
-                        <Skeleton className="size-24 rounded-full" />
-                        <Skeleton className="h-14 w-32" />
-                        <Skeleton className="h-6 w-20" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 text-lg lg:col-span-2">
-                        {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-8 w-40" />)}
-                    </div>
-                </>
-            ) : weather ? (
-                 <>
-                    <div className="flex flex-col items-center justify-center gap-2 border-b md:border-b-0 md:border-r pb-6 md:pb-0 md:pr-6">
-                        <WeatherIcon className="size-24 text-warning" />
-                        <span className="text-6xl font-bold">{weather.temperature}°F</span>
-                        <span className="text-muted-foreground capitalize">{weather.description}</span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-6 text-lg lg:col-span-2">
-                        <p className="flex items-center gap-3">
-                            <Icons.Thermometer className="size-6 text-muted-foreground" />
-                            <span>Feels like: {weather.feelsLike}°F</span>
-                        </p>
-                         <p className="flex items-center gap-3">
-                            <Wind className="size-6 text-muted-foreground" />
-                            <span>Wind: {weather.windSpeed} mph</span>
-                        </p>
-                        <p className="flex items-center gap-3">
-                            <Icons.Cloud className="size-6 text-muted-foreground" />
-                            <span>Humidity: {weather.humidity}%</span>
-                        </p>
-                        <p className="flex items-center gap-3">
-                            <Icons.UV className="size-6 text-muted-foreground" />
-                            <span>UV Index: {weather.uvIndex}</span>
-                        </p>
-                         <p className="flex items-center gap-3">
-                            <Eye className="size-6 text-muted-foreground" />
-                            <span>Visibility: {weather.visibility} mi</span>
-                        </p>
-                        <p className="flex items-center gap-3">
-                            <Gauge className="size-6 text-muted-foreground" />
-                            <span>Pressure: {weather.pressure} hPa</span>
-                        </p>
-                        <p className="flex items-center gap-3">
-                            <Sunrise className="size-6 text-muted-foreground" />
-                            <span>Sunrise: {weather.sunrise}</span>
-                        </p>
-                         <p className="flex items-center gap-3">
-                            <Sunset className="size-6 text-muted-foreground" />
-                            <span>Sunset: {weather.sunset}</span>
-                        </p>
-                    </div>
-                </>
-            ) : (
-                <div className="col-span-full text-center text-muted-foreground">
-                    <p>{error}</p>
-                </div>
-            )}
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-            <CardTitle>7-Day AI Forecast</CardTitle>
-            <CardDescription>AI-generated forecast based on current conditions.</CardDescription>
-        </CardHeader>
-        <CardContent>
-            {loading && (
-                <div className="flex justify-around gap-4">
-                    {[...Array(7)].map((_, i) => (
-                        <div key={i} className="flex flex-col items-center gap-2">
-                            <Skeleton className="h-6 w-12" />
-                            <Skeleton className="size-10 rounded-full" />
-                            <Skeleton className="h-6 w-16" />
-                        </div>
-                    ))}
-                </div>
-            )}
-            {forecast && forecast.length > 0 && !loading && (
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
-                    {forecast.map((day, index) => {
-                        const DailyWeatherIcon = weatherIconMap[day.condition.toLowerCase()] || Sun;
-                        return (
-                            <div key={index} className="flex flex-col items-center p-2 rounded-lg bg-muted/50">
-                                <p className="font-semibold">{day.day}</p>
-                                <DailyWeatherIcon className="size-10 my-2 text-primary" />
-                                <p className="font-medium">{day.high}° / {day.low}°</p>
+        {weather && !loading && (
+            <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <Card className="lg:col-span-1">
+                        <CardHeader>
+                        <CardTitle>Current Conditions</CardTitle>
+                        <CardDescription>
+                            {weather.locationName}
+                        </CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex flex-col items-center justify-center gap-4">
+                            <div className="flex flex-col items-center gap-2">
+                                <WeatherIcon className="size-24 text-warning" />
+                                <span className="text-6xl font-bold">{weather.temperature}°F</span>
+                                <span className="text-muted-foreground capitalize">{weather.description}</span>
                             </div>
-                        )
-                    })}
+                             <div className="w-full grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                                <p className="flex items-center gap-2"><Icons.Thermometer className="size-4 text-muted-foreground" /> Feels like: {weather.feelsLike}°F</p>
+                                <p className="flex items-center gap-2"><Wind className="size-4 text-muted-foreground" /> Wind: {weather.windSpeed} mph</p>
+                                <p className="flex items-center gap-2"><Icons.Cloud className="size-4 text-muted-foreground" /> Humidity: {weather.humidity}%</p>
+                                <p className="flex items-center gap-2"><Icons.UV className="size-4 text-muted-foreground" /> UV Index: {weather.uvIndex}</p>
+                                <p className="flex items-center gap-2"><Eye className="size-4 text-muted-foreground" /> Visibility: {weather.visibility} mi</p>
+                                <p className="flex items-center gap-2"><Gauge className="size-4 text-muted-foreground" /> Pressure: {weather.pressure} hPa</p>
+                                <p className="flex items-center gap-2"><Sunrise className="size-4 text-muted-foreground" /> Sunrise: {weather.sunrise}</p>
+                                <p className="flex items-center gap-2"><Sunset className="size-4 text-muted-foreground" /> Sunset: {weather.sunset}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card className="lg:col-span-2">
+                        <CardHeader>
+                            <CardTitle>7-Day AI Forecast</CardTitle>
+                            <CardDescription>AI-generated forecast based on current conditions.</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                             {forecast && forecast.length > 0 ? (
+                                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
+                                    {forecast.map((day, index) => {
+                                        const DailyWeatherIcon = weatherIconMap[day.condition.toLowerCase()] || Sun;
+                                        return (
+                                            <div key={index} className="flex flex-col items-center p-2 rounded-lg bg-muted/50">
+                                                <p className="font-semibold">{day.day}</p>
+                                                <DailyWeatherIcon className="size-10 my-2 text-primary" />
+                                                <p className="font-medium">{day.high}° / {day.low}°</p>
+                                                <p className="text-xs text-muted-foreground">{day.condition}</p>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            ) : (
+                                <p className="text-muted-foreground text-center">Could not generate a forecast at this time.</p>
+                            )}
+                        </CardContent>
+                    </Card>
                 </div>
-            )}
-             {(!forecast || forecast.length === 0) && !loading && (
-                <p className="text-muted-foreground text-center">Could not generate a forecast at this time.</p>
-            )}
-        </CardContent>
-      </Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {highSeverityAlert ? (
+                        <NotificationSender alertMessage={`Weather Alert: ${highSeverityAlert.title}. ${highSeverityAlert.message}`} />
+                    ) : alerts && alerts.length > 0 ? (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2"><AlertCircle className="text-destructive" /> Weather Alerts</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                {alerts.map((alert, index) => (
+                                    <Alert key={index} className={cn(alertSeverityColors[alert.severity])}>
+                                        <AlertCircle className="h-4 w-4" />
+                                        <AlertTitle>{alert.title} ({alert.severity})</AlertTitle>
+                                        <AlertDescription>
+                                            {alert.message}
+                                        </AlertDescription>
+                                    </Alert>
+                                ))}
+                            </CardContent>
+                        </Card>
+                    ) : (
+                         <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2"><AlertCircle className="text-primary" /> Weather Alerts</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground">No significant rainfall alerts for this location.</p>
+                            </CardContent>
+                        </Card>
+                    )}
+                    
+                    {sprayingAdvice && (
+                        <Card className={cn("flex flex-col", recommendationColors[sprayingAdvice.recommendation])}>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    {recommendationIcons[sprayingAdvice.recommendation]}
+                                    Spraying Conditions
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="flex-grow flex flex-col justify-center items-center text-center gap-2">
+                                <p className="text-xl font-bold">It's a {sprayingAdvice.recommendation.toUpperCase()} time to spray</p>
+                                <p className="text-sm text-muted-foreground">{sprayingAdvice.rationale}</p>
+                            </CardContent>
+                        </Card>
+                    )}
+                </div>
+            </>
+        )}
     </div>
   );
 }

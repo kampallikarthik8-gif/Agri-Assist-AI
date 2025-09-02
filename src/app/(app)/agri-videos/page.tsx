@@ -47,7 +47,7 @@ export default function AgriVideosPage() {
       }
     } catch (error: any) {
       console.error(error);
-      if (error.message && error.message.includes('YOUTUBE_API_KEY')) {
+      if (error.message && (error.message.includes('YOUTUBE_API_KEY') || error.message.includes('API key not valid'))) {
           toast({
               variant: "destructive",
               title: "YouTube API Key Error",
@@ -57,7 +57,7 @@ export default function AgriVideosPage() {
         toast({
             variant: "destructive",
             title: "Error",
-            description: error.message || "Failed to search for videos. Please try again.",
+            description: "Failed to search for YouTube videos. Please check the console for details.",
         });
       }
     } finally {

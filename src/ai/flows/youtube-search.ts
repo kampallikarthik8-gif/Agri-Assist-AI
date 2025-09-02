@@ -58,7 +58,11 @@ const youtubeSearchFlow = ai.defineFlow(
         if (!response.ok) {
             const errorData = await response.json();
             console.error("YouTube API Error:", errorData);
-            throw new Error(`Failed to fetch YouTube videos: ${errorData.error.message}`);
+            // Throw a more specific error that the frontend can catch
+            if (errorData?.error?.message) {
+                 throw new Error(`YouTube API Error: ${errorData.error.message}`);
+            }
+            throw new Error(`Failed to fetch YouTube videos with status: ${response.status}`);
         }
         const data = await response.json();
 
@@ -74,7 +78,8 @@ const youtubeSearchFlow = ai.defineFlow(
 
     } catch (error: any) {
         console.error("Error in youtubeSearchFlow", error);
-        throw new Error('Failed to search for YouTube videos.');
+        // Re-throw the error to be caught by the client
+        throw error;
     }
   }
 );

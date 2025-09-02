@@ -256,6 +256,7 @@ export default function WeatherPage() {
       setError("Geolocation is not supported. Please enter a location manually.");
       fetchAllWeatherData(undefined, undefined, "Sunnyvale, CA");
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onLocationSubmit = async (values: z.infer<typeof locationFormSchema>) => {

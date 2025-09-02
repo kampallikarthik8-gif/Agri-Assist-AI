@@ -51,7 +51,7 @@ const youtubeSearchFlow = ai.defineFlow(
     }
 
     const finalQuery = `${query} agriculture`;
-    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(finalQuery)}&maxResults=12&type=video&key=${apiKey}`;
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(finalQuery)}&maxResults=12&type=video&relevanceLanguage=te&regionCode=IN&key=${apiKey}`;
 
     try {
         const response = await fetch(url);

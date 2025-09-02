@@ -24,7 +24,7 @@ const newsFeed = [
     {
         title: "పీఎం-కిసాన్ లబ్ధిదారుని స్థితిని తనిఖీ చేయండి",
         summary: "అధికారిక ప్రభుత్వ పోర్టల్‌లో మీ పీఎం-కిసాన్ లబ్ధిదారుని స్థితి మరియు చెల్లింపు వివరాలను నేరుగా తనిఖీ చేయండి.",
-        image: "https://picsum.photos/seed/pmkisan-gov/600/400",
+        image: "https://indiaeducationdiary.in/wp-content/uploads/2024/07/PM-KISAN-Achieves-Milestone-19th-Installment-Released-to-9.8-Crore-Farmers-1024x576.webp",
         link: "https://pmkisan.gov.in/BeneficiaryStatus_New.aspx",
         aiHint: "government document"
     },
@@ -191,7 +191,7 @@ export default function DashboardPage() {
                     <p className="text-sm text-muted-foreground">{locationError || "Could not load weather data."}</p>
                 )}
             </CardContent>
-        </Card>>
+        </Card>
         
         <Card>
           <CardHeader>

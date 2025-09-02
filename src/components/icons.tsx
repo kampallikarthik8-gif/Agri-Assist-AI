@@ -39,6 +39,7 @@ import {
   LineChart,
   Globe,
   Sprout,
+  Video,
 } from "lucide-react";
 
 export const Icons = {
@@ -86,4 +87,5 @@ export const Icons = {
   Login: LogIn,
   Translate: Globe,
   MyCrops: Sprout,
+  Video,
 };

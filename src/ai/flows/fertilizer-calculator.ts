@@ -46,15 +46,6 @@ export async function fertilizerCalculator(
   return fertilizerCalculatorFlow(input);
 }
 
-// Internal schema for the AI prompt, which works with standardized units (acres).
-const StandardizedInputSchema = z.object({
-    cropType: z.string(),
-    soilNitrogen: z.number(),
-    soilPhosphorus: z.number(),
-    soilPotassium: z.number(),
-    farmAreaAcres: z.number(),
-});
-
 const IdealNutrientsSchema = z.object({
     idealNitrogen: z.number().describe('The ideal amount of nitrogen (N) in kg per acre for the crop.'),
     idealPhosphorus: z.number().describe('The ideal amount of phosphorus (P2O5) in kg per acre for the crop.'),
@@ -64,18 +55,15 @@ const IdealNutrientsSchema = z.object({
 
 const getIdealNutrientsPrompt = ai.definePrompt({
   name: 'idealNutrientFinderPrompt',
-  input: {schema: z.object({ cropType: z.string(), soilNitrogen: z.number(), soilPhosphorus: z.number(), soilPotassium: z.number()})},
+  input: {schema: z.object({ cropType: z.string() })},
   output: {schema: IdealNutrientsSchema},
   prompt: `You are an expert agronomist specializing in crop nutrition for Indian agriculture.
 
-Based on the provided crop type and soil nutrient levels, determine the IDEAL total amount of Nitrogen (N), Phosphorus (as P2O5), and Potassium (as K2O) required in **kg per acre** for a healthy harvest.
+Based on the provided crop type, determine the IDEAL total amount of Nitrogen (N), Phosphorus (as P2O5), and Potassium (as K2O) required in **kg per acre** for a healthy harvest.
 
 - Crop Type: {{{cropType}}}
-- Soil Nitrogen: {{{soilNitrogen}}} ppm
-- Soil Phosphorus: {{{soilPhosphorus}}} ppm
-- Soil Potassium: {{{soilPotassium}}} ppm
 
-Do not consider the provided soil levels in your calculation for the ideal amounts, but use them to inform your rationale. Your primary task is to provide the standard, recommended nutrient dosage per acre for the specified crop.
+Your primary task is to provide the standard, recommended nutrient dosage per acre for the specified crop.
 
 Also provide a concise rationale explaining why these amounts are recommended and general advice on application timing (e.g., basal dose, top dressing).`,
 });
@@ -121,9 +109,6 @@ const fertilizerCalculatorFlow = ai.defineFlow(
         // 2. Get ideal nutrient requirements per acre from the AI
         const { output: idealNutrients } = await getIdealNutrientsPrompt({
             cropType: input.cropType,
-            soilNitrogen: input.soilNitrogen,
-            soilPhosphorus: input.soilPhosphorus,
-            soilPotassium: input.soilPotassium,
         });
 
         if (!idealNutrients) {

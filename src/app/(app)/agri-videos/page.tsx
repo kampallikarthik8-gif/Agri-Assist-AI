@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from "react";
@@ -144,7 +145,7 @@ export default function AgriVideosPage() {
                 {result.videos.length > 0 ? (
                     result.videos.map((video) => (
                         <Card key={video.videoId} className="flex flex-col overflow-hidden">
-                            <Link href={`https://www.youtube.com/watch?v=${video.videoId}`} target="_blank" rel="noopener noreferrer" className="block relative">
+                            <Link href={`https://www.youtube.com/watch?v=${video.videoId}`} target="_blank" rel="noopener noreferrer" className="block relative group">
                                 <Image
                                     src={video.thumbnailUrl}
                                     alt={video.title}

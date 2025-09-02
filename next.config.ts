@@ -26,6 +26,12 @@ const nextConfig = {
         hostname: 'indiaeducationdiary.in',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.ytimg.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },

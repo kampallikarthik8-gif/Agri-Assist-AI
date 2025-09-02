@@ -47,11 +47,25 @@ export default function AgriVideosPage() {
       }
     } catch (error: any) {
       console.error(error);
-      if (error.message && (error.message.includes('YOUTUBE_API_KEY') || error.message.includes('API key not valid'))) {
+      if (error.message && (error.message.includes('API key not valid'))) {
           toast({
               variant: "destructive",
               title: "YouTube API Key Error",
               description: "The YouTube API key is missing or invalid. Please check your .env file.",
+          });
+      } else if (error.message && (error.message.includes('YouTube Data API v3 is not enabled'))) {
+           toast({
+              variant: "destructive",
+              title: "API Not Enabled",
+              duration: 10000,
+              description: (
+                <div>
+                  <p>The YouTube Data API v3 needs to be enabled in your Google Cloud project.</p>
+                  <Button asChild variant="link" className="p-0 h-auto text-destructive-foreground">
+                    <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noopener noreferrer">Click here to enable it.</a>
+                  </Button>
+                </div>
+              )
           });
       } else {
         toast({

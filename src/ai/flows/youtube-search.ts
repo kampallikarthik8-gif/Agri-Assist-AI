@@ -55,16 +55,17 @@ const youtubeSearchFlow = ai.defineFlow(
 
     try {
         const response = await fetch(url);
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error("YouTube API Error:", errorData);
-            // Throw a more specific error that the frontend can catch
-            if (errorData?.error?.message) {
-                 throw new Error(`YouTube API Error: ${errorData.error.message}`);
-            }
-            throw new Error(`Failed to fetch YouTube videos with status: ${response.status}`);
-        }
         const data = await response.json();
+
+        if (!response.ok) {
+            console.error("YouTube API Error:", data);
+            const errorMessage = data?.error?.message || `Failed to fetch YouTube videos with status: ${response.status}`;
+            
+            if (errorMessage.includes('API_NOT_ACTIVATED') || errorMessage.includes('are blocked')) {
+                throw new Error('The YouTube Data API v3 is not enabled for your project. Please enable it in your Google Cloud console.');
+            }
+            throw new Error(`YouTube API Error: ${errorMessage}`);
+        }
 
         const videos = data.items.map((item: any) => ({
             videoId: item.id.videoId,

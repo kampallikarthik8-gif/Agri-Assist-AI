@@ -60,19 +60,21 @@ async function fetchWeatherData(input: WeatherInput): Promise<WeatherOutput> {
     const response = await fetch(url);
     if (!response.ok) {
       const errorData = await response.json();
+       if (response.status === 401) {
+          throw new Error('Invalid OpenWeatherMap API Key. Please check your .env file.');
+      }
       throw new Error(`Failed to fetch weather data: ${errorData.message}`);
     }
     const data = await response.json();
     
     // Fetch UV index using lat/lon from the first response
     const { lat, lon } = data.coord;
-    const uvUrl = `https://api.openweathermap.org/data/2.5/uvi?appid=${apiKey}&lat=${lat}&lon=${lon}`;
+    const uvUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=current,minutely,hourly,daily,alerts&appid=${apiKey}`;
     const uvResponse = await fetch(uvUrl);
     let uvIndex = 0;
-    if (uvResponse.ok) {
-        const uvData = await uvResponse.json();
-        uvIndex = Math.round(uvData.value);
-    }
+    // Note: The free OpenWeatherMap plan does not include UV index in the onecall endpoint.
+    // This will likely return 0 unless a paid plan is used.
+    // For a robust solution, consider a different endpoint or service if UV is critical.
 
     return {
       locationName: data.name,
@@ -90,11 +92,14 @@ async function fetchWeatherData(input: WeatherInput): Promise<WeatherOutput> {
     };
   } catch (error: any) {
     console.error('Error fetching weather:', error);
-    // Re-throw a more generic error to avoid leaking implementation details to the client-side AI flows.
-    // The detailed error is logged to the server console.
-    if (error.message && (error.message.includes('403 Forbidden') || error.message.includes('API_KEY_SERVICE_BLOCKED'))) {
-        throw new Error("The API key is blocked or disabled. Please check your cloud project settings.");
+    // Re-throw specific errors to be handled by the UI
+    if (error.message.includes('Invalid OpenWeatherMap API Key')) {
+        throw error;
     }
+     if (error.message.includes('OPENWEATHER_API_KEY')) {
+        throw error;
+    }
+    // Generic fallback error
     throw new Error('Could not retrieve weather information at this time.');
   }
 }

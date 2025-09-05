@@ -228,6 +228,12 @@ export default function WeatherPage() {
                 title: "Weather API Key Missing",
                 description: "Please add your OpenWeatherMap API key to the .env file.",
             });
+        } else if (e.message && e.message.includes('Invalid OpenWeatherMap API Key')) {
+            toast({
+                variant: "destructive",
+                title: "Invalid Weather API Key",
+                description: "The OpenWeatherMap API key is invalid. Please check your .env file.",
+            });
         }
         setError("Could not fetch weather data. Please try refreshing the page.");
         setWeather(null);

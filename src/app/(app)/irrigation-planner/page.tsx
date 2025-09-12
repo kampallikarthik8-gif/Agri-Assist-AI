@@ -1,3 +1,4 @@
+
 import { IrrigationPlannerForm } from "@/components/client/irrigation-planner-form";
 
 export default function IrrigationPlannerPage() {

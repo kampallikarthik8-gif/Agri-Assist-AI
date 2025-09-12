@@ -1,3 +1,4 @@
+
 import { CropRecommendationForm } from "@/components/client/crop-recommendation-form";
 
 export default function CropRecommendationPage() {

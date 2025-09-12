@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import Image from "next/image";
@@ -45,7 +46,7 @@ const newsFeed = [
     {
         title: "ఈటీవీ ఆంధ్రప్రదేశ్ లైవ్",
         summary: "ఈటీవీ ఆంధ్రప్రదేశ్ ఛానెల్‌ను ప్రత్యక్షంగా చూడండి.",
-        image: "https://picsum.photos/seed/etv-live/600/400",
+        image: "https://i.ytimg.com/vi/Fj2yV8cW2dY/maxresdefault.jpg",
         link: "https://www.youtube.com/watch?v=Fj2yV8cW2dY",
         aiHint: "television news studio"
     },
@@ -104,13 +105,19 @@ export default function DashboardPage() {
                     toast({
                         variant: "destructive",
                         title: "API Access Error",
-                        description: "The Generative Language API is disabled or blocked by restrictions. Please check your Google Cloud project settings.",
+                        description: "The Generative Language API is disabled or blocked. Please check your Google Cloud project settings.",
                     });
                 } else if (error.message && error.message.includes('OPENWEATHER_API_KEY')) {
                     toast({
                         variant: "destructive",
                         title: "Weather API Key Missing",
                         description: "Please add your OpenWeatherMap API key to the .env file.",
+                    });
+                } else if (error.message && error.message.includes('Invalid OpenWeatherMap API Key')) {
+                     toast({
+                        variant: "destructive",
+                        title: "Invalid Weather API Key",
+                        description: "The OpenWeatherMap API key is invalid. Please check your .env file.",
                     });
                 } else {
                     setLocationError("Could not fetch dashboard data. Please check your API keys and connection.");
@@ -268,5 +275,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    

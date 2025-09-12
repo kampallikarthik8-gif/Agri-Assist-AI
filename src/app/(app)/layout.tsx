@@ -26,7 +26,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Toaster } from "@/components/ui/toaster";
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: Icons.Dashboard },
+  { href: "/dashboard", label: "Dashboard", icon: Icons.Dashboard },
   { href: "/daily-news", label: "Daily News", icon: Icons.News },
   { href: "/mandi-prices", label: "Mandi Prices", icon: Icons.MandiPrices },
   { href: "/market-insights", label: "Market Insights", icon: Icons.MarketInsights },

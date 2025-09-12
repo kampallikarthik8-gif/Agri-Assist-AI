@@ -14,7 +14,7 @@ import '@/ai/flows/pest-spraying-advisor.ts';
 import '@/ai/flows/seed-quality-scanner.ts';
 import '@/ai/flows/fertilizer-calculator.ts';
 import '@/ai/flows/rainfall-alert.ts';
-import '@/ai/flows/pest-disease-alert.ts';
+import '@/ai-flows/pest-disease-alert.ts';
 import '@/ai/flows/soil-health-analyzer.ts';
 import '@/ai/flows/notification-service.ts';
 import '@/ai/flows/cultivation-tips.ts';
@@ -24,3 +24,4 @@ import '@/ai/flows/market-insights.ts';
 import '@/ai/flows/youtube-search.ts';
 import '@/ai/flows/news-service.ts';
 import '@/ai/flows/document-locker.ts';
+

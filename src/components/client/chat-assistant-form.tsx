@@ -62,7 +62,7 @@ export function ChatAssistantForm() {
           toast({
               variant: "destructive",
               title: "API Access Error",
-              description: "The Generative Language API is disabled or blocked by restrictions. Please check your Google Cloud project settings.",
+              description: "The Generative Language API is disabled or blocked by restrictions. Please check your Google Cloud project's API key settings.",
           });
           setMessages(prev => [...prev, { role: "assistant", content: "I can't seem to connect to my AI brain right now. Please check your Google Cloud project's API key settings." }]);
       } else {

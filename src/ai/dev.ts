@@ -11,7 +11,7 @@ import '@/ai/flows/pest-weed-identification.ts';
 import '@/ai/flows/government-schemes.ts';
 import '@/ai/flows/weather-forecast.ts';
 import '@/ai/flows/pest-spraying-advisor.ts';
-import '@/aiflows/seed-quality-scanner.ts';
+import '@/ai/flows/seed-quality-scanner.ts';
 import '@/ai/flows/fertilizer-calculator.ts';
 import '@/ai/flows/rainfall-alert.ts';
 import '@/ai/flows/pest-disease-alert.ts';
@@ -22,13 +22,6 @@ import '@/ai/flows/crop-insurance-info.ts';
 import '@/ai/flows/mandi-prices.ts';
 import '@/ai/flows/market-insights.ts';
 import '@/ai/flows/youtube-search.ts';
-
-
-
-
-
-
-
-
-
+import '@/ai/flows/news-service.ts';
+import '@/ai/flows/document-locker.ts';
 

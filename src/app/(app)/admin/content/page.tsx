@@ -6,10 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Library, Tractor, Edit } from "lucide-react";
+import { Plus, Trash2, Library, Tractor, Edit, LinkIcon } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { equipmentList as initialEquipment, addEquipment, updateEquipment, deleteEquipment, type Equipment } from "@/lib/equipment-data";
 import { growthStages as initialStages, addGrowthStage, deleteGrowthStage } from "@/lib/crop-stages-data";
+import { helpfulLinks as initialLinks, addHelpfulLink, updateHelpfulLink, deleteHelpfulLink, type HelpfulLink } from "@/lib/helpful-links-data";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -59,13 +60,42 @@ function EquipmentForm({ equipment, onSave, closeDialog }: { equipment?: Equipme
     );
 }
 
+function LinksForm({ link, onSave, closeDialog }: { link?: HelpfulLink, onSave: (data: any) => void, closeDialog: () => void }) {
+    const [title, setTitle] = useState(link?.title || "");
+    const [href, setHref] = useState(link?.href || "");
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onSave({ id: link?.id, title, href });
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+                <Label htmlFor="title">Title</Label>
+                <Input id="title" value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g., PMFBY Portal" required />
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="href">URL</Label>
+                <Input id="href" value={href} onChange={e => setHref(e.target.value)} placeholder="https://example.com" required type="url" />
+            </div>
+            <DialogFooter>
+                <DialogClose asChild><Button type="button" variant="ghost">Cancel</Button></DialogClose>
+                <Button type="submit">Save</Button>
+            </DialogFooter>
+        </form>
+    );
+}
 
 export default function ContentManagementPage() {
     const [stages, setStages] = useState(initialStages);
     const [newStage, setNewStage] = useState("");
     const [equipment, setEquipment] = useState(initialEquipment);
+    const [links, setLinks] = useState(initialLinks);
     const [isEqFormOpen, setIsEqFormOpen] = useState(false);
+    const [isLinksFormOpen, setIsLinksFormOpen] = useState(false);
     const [editingEquipment, setEditingEquipment] = useState<Equipment | undefined>(undefined);
+    const [editingLink, setEditingLink] = useState<HelpfulLink | undefined>(undefined);
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
@@ -91,10 +121,10 @@ export default function ContentManagementPage() {
     };
 
     const handleSaveEquipment = (data: Omit<Equipment, 'id'> & { id?: string }) => {
-        if (data.id) { // Editing existing
+        if (data.id) {
             updateEquipment(data as Equipment);
              toast({ title: "Equipment Updated", description: `"${data.name}" has been updated.` });
-        } else { // Adding new
+        } else {
             addEquipment(data);
              toast({ title: "Equipment Added", description: `"${data.name}" has been added.` });
         }
@@ -110,6 +140,26 @@ export default function ContentManagementPage() {
         toast({ title: "Equipment Deleted", description: `"${item?.name}" has been deleted.` });
     }
 
+    const handleSaveLink = (data: Omit<HelpfulLink, 'id'> & { id?: string }) => {
+        if (data.id) {
+            updateHelpfulLink(data as HelpfulLink);
+             toast({ title: "Link Updated", description: `"${data.title}" has been updated.` });
+        } else {
+            addHelpfulLink(data);
+             toast({ title: "Link Added", description: `"${data.title}" has been added.` });
+        }
+        setLinks([...initialLinks]);
+        setEditingLink(undefined);
+        setIsLinksFormOpen(false);
+    }
+    
+    const handleDeleteLink = (id: string) => {
+        const item = links.find(l => l.id === id);
+        deleteHelpfulLink(id);
+        setLinks([...initialLinks]);
+        toast({ title: "Link Deleted", description: `"${item?.title}" has been deleted.` });
+    }
+
     if (!isMounted) {
         return null; // Or a loading spinner
     }
@@ -121,55 +171,122 @@ export default function ContentManagementPage() {
         <p className="text-muted-foreground">Manage application data like crop stages and other lists.</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2"><Library className="text-primary"/> Crop Growth Stages</CardTitle>
-          <CardDescription>
-            Manage the list of growth stages available in the "My Crops" feature.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-            <div className="flex items-center gap-2 mb-4">
-                <Input
-                    placeholder="Enter new stage name"
-                    value={newStage}
-                    onChange={(e) => setNewStage(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAddStage()}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <Card>
+            <CardHeader>
+            <CardTitle className="flex items-center gap-2"><Library className="text-primary"/> Crop Growth Stages</CardTitle>
+            <CardDescription>
+                Manage the list of growth stages available in the "My Crops" feature.
+            </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="flex items-center gap-2 mb-4">
+                    <Input
+                        placeholder="Enter new stage name"
+                        value={newStage}
+                        onChange={(e) => setNewStage(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddStage()}
+                    />
+                    <Button onClick={handleAddStage}>
+                        <Plus className="mr-2 size-4" /> Add Stage
+                    </Button>
+                </div>
+                <ul className="space-y-2 rounded-lg border p-4">
+                    {stages.map((stage, index) => (
+                        <li key={index} className="flex items-center justify-between p-2 rounded-md hover:bg-muted">
+                            <span className="font-medium">{stage}</span>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="ghost" size="icon">
+                                        <Trash2 className="size-4 text-destructive" />
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            This will permanently delete the "{stage}" stage. This might affect user data.
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                        <AlertDialogAction onClick={() => handleDeleteStage(stage)} className="bg-destructive hover:bg-destructive/90">
+                                            Delete
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </li>
+                    ))}
+                </ul>
+            </CardContent>
+        </Card>
+
+        <Dialog open={isLinksFormOpen} onOpenChange={setIsLinksFormOpen}>
+            <Card>
+                <CardHeader className="flex-row items-center justify-between">
+                    <div>
+                        <CardTitle className="flex items-center gap-2"><LinkIcon className="text-primary"/> Helpful Resources</CardTitle>
+                        <CardDescription>
+                            Manage the list of external links shown in the app.
+                        </CardDescription>
+                    </div>
+                    <DialogTrigger asChild>
+                        <Button onClick={() => setEditingLink(undefined)}>
+                            <Plus className="mr-2 size-4" /> Add Link
+                        </Button>
+                    </DialogTrigger>
+                </CardHeader>
+                <CardContent>
+                    <ul className="space-y-2 rounded-lg border p-4 max-h-[300px] overflow-y-auto">
+                        {links.map((item) => (
+                            <li key={item.id} className="flex items-center justify-between p-2 rounded-md hover:bg-muted">
+                                <span className="font-medium truncate pr-2">{item.title}</span>
+                                <div className="flex items-center gap-1 flex-shrink-0">
+                                    <DialogTrigger asChild>
+                                        <Button variant="ghost" size="icon" onClick={() => setEditingLink(item)}>
+                                            <Edit className="size-4" />
+                                        </Button>
+                                    </DialogTrigger>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="ghost" size="icon">
+                                                <Trash2 className="size-4 text-destructive" />
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    This will permanently delete "{item.title}" from the list.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDeleteLink(item.id)} className="bg-destructive hover:bg-destructive/90">
+                                                    Delete
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </CardContent>
+            </Card>
+             <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{editingLink ? "Edit Link" : "Add New Link"}</DialogTitle>
+                </DialogHeader>
+                <LinksForm
+                    link={editingLink}
+                    onSave={handleSaveLink}
+                    closeDialog={() => setIsLinksFormOpen(false)}
                 />
-                <Button onClick={handleAddStage}>
-                    <Plus className="mr-2 size-4" /> Add Stage
-                </Button>
-            </div>
-            <ul className="space-y-2 rounded-lg border p-4">
-                {stages.map((stage, index) => (
-                    <li key={index} className="flex items-center justify-between p-2 rounded-md hover:bg-muted">
-                        <span className="font-medium">{stage}</span>
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                    <Trash2 className="size-4 text-destructive" />
-                                </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        This will permanently delete the "{stage}" stage. This might affect user data.
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleDeleteStage(stage)} className="bg-destructive hover:bg-destructive/90">
-                                        Delete
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-                    </li>
-                ))}
-            </ul>
-        </CardContent>
-      </Card>
+            </DialogContent>
+        </Dialog>
+      </div>
       
        <Dialog open={isEqFormOpen} onOpenChange={setIsEqFormOpen}>
         <Card>

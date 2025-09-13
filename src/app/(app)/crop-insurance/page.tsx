@@ -4,49 +4,22 @@
 import { CropInsuranceForm } from "@/components/client/crop-insurance-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { helpfulLinks } from "@/lib/helpful-links-data";
 import { ExternalLink, LinkIcon } from "lucide-react";
 import Link from "next/link";
-
-const helpfulLinks = [
-    {
-        title: "Pradhan Mantri Fasal Bima Yojana (PMFBY) Official Portal",
-        href: "https://pmfby.gov.in/",
-    },
-    {
-        title: "National Crop Insurance Portal (NCIP)",
-        href: "https://www.agri-insurance.gov.in/",
-    },
-    {
-        title: "Weather-based Crop Insurance Scheme (WBCIS)",
-        href: "https://www.agri-insurance.gov.in/wbcis.aspx",
-    },
-    {
-        title: "Andhra Pradesh State Agriculture Department",
-        href: "https://apagrisnet.gov.in/",
-    },
-    {
-        title: "Telangana State Agriculture Department",
-        href: "https://agri.telangana.gov.in/",
-    },
-    {
-        title: "Bajaj Allianz Agriculture Insurance",
-        href: "https://www.bajajallianz.com/pradhan-mantri-fasal-bima-yojana.html",
-    },
-    {
-        title: "HDFC ERGO Agriculture Insurance",
-        href: "https://www.hdfcergo.com/rural-insurance/pradhan-mantri-fasal-bima-yojana",
-    },
-    {
-        title: "ICICI Lombard Agriculture Insurance",
-        href: "https://www.icicilombard.com/rural-insurance/fasal-bima-yojana",
-    },
-    {
-        title: "PMFBY Grievance Redressal",
-        href: "https://pmfby.gov.in/grievance",
-    }
-]
+import { useEffect, useState } from "react";
 
 export default function CropInsurancePage() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null; // Or a loading spinner
+  }
+  
   return (
     <div className="flex flex-col gap-6">
       <h1 className="text-3xl font-bold tracking-tight">Crop Insurance</h1>

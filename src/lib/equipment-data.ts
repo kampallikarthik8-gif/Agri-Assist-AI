@@ -224,7 +224,7 @@ export let equipmentList: Equipment[] = [
         types: "Gas-powered and battery-powered brush cutters.",
         buyLinks: [
             { name: "Amazon India", href: "https://www.amazon.in/s?k=brush+cutter" },
-            { name "Flipkart", href: "https://www.flipkart.com/search?q=brush+cutter" },
+            { name: "Flipkart", href: "https://www.flipkart.com/search?q=brush+cutter" },
         ]
     },
     {
@@ -289,5 +289,3 @@ export const deleteEquipment = (id: string) => {
     }
     return false;
 }
-
-    

@@ -19,37 +19,7 @@ import { pestDiseaseAlert, type PestDiseaseAlertOutput } from "@/ai/flows/pest-d
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-
-const newsFeed = [
-    {
-        title: "పీఎం-కిసాన్ లబ్ధిదారుని స్థితిని తనిఖీ చేయండి",
-        summary: "అధికారిక ప్రభుత్వ పోర్టల్‌లో మీ పీఎం-కిసాన్ లబ్ధిదారుని స్థితి మరియు చెల్లింపు వివరాలను నేరుగా తనిఖీ చేయండి.",
-        image: "https://indiaeducationdiary.in/wp-content/uploads/2024/07/PM-KISAN-Achieves-Milestone-19th-Installment-Released-to-9.8-Crore-Farmers-1024x576.webp",
-        link: "https://pmkisan.gov.in/BeneficiaryStatus_New.aspx",
-        aiHint: "government document"
-    },
-    {
-        title: "వైఎస్ఆర్ రైతు భరోసా స్థితిని తెలుసుకోండి",
-        summary: "అధికారిక పోర్టల్‌లో మీ వైఎస్ఆర్ రైతు భరోసా చెల్లింపు వివరాలు మరియు స్థితిని తనిఖీ చేయండి.",
-        image: "https://picsum.photos/seed/ysr-rythu-bharosa/600/400",
-        link: "https://ysrrythubharosa.ap.gov.in/RBApp/RB/CheckPaymentStatus",
-        aiHint: "indian government scheme"
-    },
-    {
-        title: "పీఎం-కిసాన్: మీ రిజిస్ట్రేషన్ స్థితిని తెలుసుకోండి",
-        summary: "అధికారిక పోర్టల్‌లో మీ పీఎం-కిసాన్ రిజిస్ట్రేషన్ వివరాలు మరియు స్థితిని తనిఖీ చేయండి.",
-        image: "https://picsum.photos/seed/pmkisan-registration/600/400",
-        link: "https://pmkisan.gov.in/KnowYour_Registration.aspx",
-        aiHint: "government office"
-    },
-    {
-        title: "ఈటీవీ ఆంధ్రప్రదేశ్ లైవ్",
-        summary: "ఈటీవీ ఆంధ్రప్రదేశ్ ఛానెల్‌ను ప్రత్యక్షంగా చూడండి.",
-        image: "https://i.ytimg.com/vi/Fj2yV8cW2dY/maxresdefault.jpg",
-        link: "https://www.youtube.com/watch?v=Fj2yV8cW2dY",
-        aiHint: "television news studio"
-    },
-];
+import { dashboardNews } from "@/lib/dashboard-news-data";
 
 const weatherIconMap: { [key: string]: React.FC<any> } = {
     "01d": Icons.Sun,
@@ -77,7 +47,12 @@ export default function DashboardPage() {
     const [pestAlerts, setPestAlerts] = useState<PestDiseaseAlertOutput['alerts'] | null>(null);
     const [loading, setLoading] = useState(true);
     const [locationError, setLocationError] = useState<string | null>(null);
+    const [isMounted, setIsMounted] = useState(false);
     const { toast } = useToast();
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     useEffect(() => {
         async function fetchDashboardData(lat: number, lon: number) {
@@ -145,13 +120,15 @@ export default function DashboardPage() {
 
     const WeatherIcon = weather ? weatherIconMap[weather.icon] || Icons.Sun : Icons.Sun;
 
-    const getButtonText = (item: typeof newsFeed[0]) => {
+    const getButtonText = (item: typeof dashboardNews[0]) => {
         if (item.link?.includes("youtube.com")) return "Watch Live";
         if (item.link?.includes("BeneficiaryStatus")) return "Check Beneficiary Status";
         if (item.link?.includes("ysrrythubharosa")) return "Check Rythu Bharosa Status";
         if (item.link?.includes("KnowYour_Registration")) return "Know Registration Status";
         return "Learn More";
     }
+
+    if (!isMounted) return null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -243,7 +220,7 @@ export default function DashboardPage() {
                 <CardDescription>భారతీయ రైతుల కోసం తాజా వార్తలు మరియు నవీకరణలు</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-6">
-                {newsFeed.map((item, index) => (
+                {dashboardNews.map((item, index) => (
                     <div key={index} className="flex flex-col sm:flex-row items-start gap-4">
                         <Image
                             src={item.image}
@@ -274,3 +251,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    

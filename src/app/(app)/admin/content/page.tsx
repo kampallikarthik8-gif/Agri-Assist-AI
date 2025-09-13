@@ -6,14 +6,57 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Library, Tractor, Edit, LinkIcon } from "lucide-react";
+import { Plus, Trash2, Library, Tractor, Edit, LinkIcon, Newspaper } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { equipmentList as initialEquipment, addEquipment, updateEquipment, deleteEquipment, type Equipment } from "@/lib/equipment-data";
 import { growthStages as initialStages, addGrowthStage, deleteGrowthStage } from "@/lib/crop-stages-data";
 import { helpfulLinks as initialLinks, addHelpfulLink, updateHelpfulLink, deleteHelpfulLink, type HelpfulLink } from "@/lib/helpful-links-data";
+import { dashboardNews as initialNews, addDashboardNews, updateDashboardNews, deleteDashboardNews, type DashboardNewsItem } from "@/lib/dashboard-news-data";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+
+function NewsFeedForm({ item, onSave, closeDialog }: { item?: DashboardNewsItem, onSave: (data: any) => void, closeDialog: () => void }) {
+    const [title, setTitle] = useState(item?.title || "");
+    const [summary, setSummary] = useState(item?.summary || "");
+    const [image, setImage] = useState(item?.image || "");
+    const [link, setLink] = useState(item?.link || "");
+    const [aiHint, setAiHint] = useState(item?.aiHint || "");
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onSave({ id: item?.id, title, summary, image, link, aiHint });
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+                <Label htmlFor="title">Title</Label>
+                <Input id="title" value={title} onChange={e => setTitle(e.target.value)} placeholder="News Title" required />
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="summary">Summary</Label>
+                <Textarea id="summary" value={summary} onChange={e => setSummary(e.target.value)} placeholder="A short summary of the news." required />
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="image">Image URL</Label>
+                <Input id="image" value={image} onChange={e => setImage(e.target.value)} placeholder="https://example.com/image.jpg" type="url" required />
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="link">Link URL</Label>
+                <Input id="link" value={link} onChange={e => setLink(e.target.value)} placeholder="https://example.com/article" type="url" required />
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="aiHint">AI Image Hint</Label>
+                <Input id="aiHint" value={aiHint} onChange={e => setAiHint(e.target.value)} placeholder="e.g., government document" />
+            </div>
+            <DialogFooter>
+                <DialogClose asChild><Button type="button" variant="ghost">Cancel</Button></DialogClose>
+                <Button type="submit">Save</Button>
+            </DialogFooter>
+        </form>
+    );
+}
 
 function EquipmentForm({ equipment, onSave, closeDialog }: { equipment?: Equipment, onSave: (data: any) => void, closeDialog: () => void }) {
     const [name, setName] = useState(equipment?.name || "");
@@ -92,10 +135,16 @@ export default function ContentManagementPage() {
     const [newStage, setNewStage] = useState("");
     const [equipment, setEquipment] = useState(initialEquipment);
     const [links, setLinks] = useState(initialLinks);
+    const [news, setNews] = useState(initialNews);
+
     const [isEqFormOpen, setIsEqFormOpen] = useState(false);
     const [isLinksFormOpen, setIsLinksFormOpen] = useState(false);
+    const [isNewsFormOpen, setIsNewsFormOpen] = useState(false);
+
     const [editingEquipment, setEditingEquipment] = useState<Equipment | undefined>(undefined);
     const [editingLink, setEditingLink] = useState<HelpfulLink | undefined>(undefined);
+    const [editingNewsItem, setEditingNewsItem] = useState<DashboardNewsItem | undefined>(undefined);
+
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
@@ -158,6 +207,26 @@ export default function ContentManagementPage() {
         deleteHelpfulLink(id);
         setLinks([...initialLinks]);
         toast({ title: "Link Deleted", description: `"${item?.title}" has been deleted.` });
+    }
+    
+    const handleSaveNewsItem = (data: Omit<DashboardNewsItem, 'id'> & { id?: string }) => {
+        if (data.id) {
+            updateDashboardNews(data as DashboardNewsItem);
+             toast({ title: "News Item Updated", description: `"${data.title}" has been updated.` });
+        } else {
+            addDashboardNews(data);
+             toast({ title: "News Item Added", description: `"${data.title}" has been added.` });
+        }
+        setNews([...initialNews]);
+        setEditingNewsItem(undefined);
+        setIsNewsFormOpen(false);
+    }
+
+    const handleDeleteNewsItem = (id: string) => {
+        const item = news.find(n => n.id === id);
+        deleteDashboardNews(id);
+        setNews([...initialNews]);
+        toast({ title: "News Item Deleted", description: `"${item?.title}" has been deleted.` });
     }
 
     if (!isMounted) {
@@ -287,6 +356,71 @@ export default function ContentManagementPage() {
             </DialogContent>
         </Dialog>
       </div>
+
+       <Dialog open={isNewsFormOpen} onOpenChange={setIsNewsFormOpen}>
+        <Card>
+            <CardHeader className="flex-row items-center justify-between">
+                <div>
+                    <CardTitle className="flex items-center gap-2"><Newspaper className="text-primary"/> Dashboard News Feed</CardTitle>
+                    <CardDescription>
+                        Manage the featured news items on the main dashboard.
+                    </CardDescription>
+                </div>
+                <DialogTrigger asChild>
+                    <Button onClick={() => setEditingNewsItem(undefined)}>
+                        <Plus className="mr-2 size-4" /> Add Item
+                    </Button>
+                </DialogTrigger>
+            </CardHeader>
+            <CardContent>
+                 <ul className="space-y-2 rounded-lg border p-4 max-h-[500px] overflow-y-auto">
+                    {news.map((item) => (
+                        <li key={item.id} className="flex items-center justify-between p-2 rounded-md hover:bg-muted">
+                            <span className="font-medium truncate pr-2">{item.title}</span>
+                            <div className="flex items-center gap-1">
+                                <DialogTrigger asChild>
+                                     <Button variant="ghost" size="icon" onClick={() => setEditingNewsItem(item)}>
+                                        <Edit className="size-4" />
+                                    </Button>
+                                </DialogTrigger>
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button variant="ghost" size="icon">
+                                            <Trash2 className="size-4 text-destructive" />
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                This will permanently delete "{item.title}" from the news feed.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction onClick={() => handleDeleteNewsItem(item.id)} className="bg-destructive hover:bg-destructive/90">
+                                                Delete
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </CardContent>
+        </Card>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>{editingNewsItem ? "Edit News Item" : "Add New News Item"}</DialogTitle>
+            </DialogHeader>
+            <NewsFeedForm
+                item={editingNewsItem}
+                onSave={handleSaveNewsItem}
+                closeDialog={() => setIsNewsFormOpen(false)}
+            />
+        </DialogContent>
+    </Dialog>
       
        <Dialog open={isEqFormOpen} onOpenChange={setIsEqFormOpen}>
         <Card>
@@ -358,3 +492,5 @@ export default function ContentManagementPage() {
     </div>
   );
 }
+
+    

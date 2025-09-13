@@ -44,8 +44,7 @@ import { format } from "date-fns";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-
-const growthStages = ["Sowing", "Germination", "Vegetative", "Flowering", "Fruiting", "Harvesting", "Post-Harvest"];
+import { growthStages as stagesData } from "@/lib/crop-stages-data";
 
 const cropSchema = z.object({
   cropName: z.string().min(2, "Crop name is required."),
@@ -64,6 +63,8 @@ const LOCAL_STORAGE_KEY = "my_crops_list";
 
 function EditCropForm({ crop, onUpdate, closeDialog }: { crop: Crop, onUpdate: (updatedCrop: Crop) => void, closeDialog: () => void }) {
     const [loading, setLoading] = useState(false);
+    const [growthStages, setGrowthStages] = useState(stagesData);
+
 
     const form = useForm<z.infer<typeof cropSchema>>({
         resolver: zodResolver(cropSchema),
@@ -222,6 +223,8 @@ export default function MyCropsPage() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [currentCrop, setCurrentCrop] = useState<Crop | null>(null);
   const { toast } = useToast();
+  const [growthStages, setGrowthStages] = useState(stagesData);
+
 
   useEffect(() => {
     setIsMounted(true);
@@ -256,7 +259,7 @@ export default function MyCropsPage() {
       plantingDate: undefined,
       area: 1,
       areaUnit: "acres",
-      growthStage: "Sowing",
+      growthStage: stagesData[0] || "Sowing",
     },
   });
 

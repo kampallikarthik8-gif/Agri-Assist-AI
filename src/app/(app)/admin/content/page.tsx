@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,11 +9,10 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Library, Tractor, Edit } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { equipmentList as initialEquipment, addEquipment, updateEquipment, deleteEquipment, type Equipment } from "@/lib/equipment-data";
+import { growthStages as initialStages, addGrowthStage, deleteGrowthStage } from "@/lib/crop-stages-data";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-
-const initialGrowthStages = ["Sowing", "Germination", "Vegetative", "Flowering", "Fruiting", "Harvesting", "Post-Harvest"];
 
 function EquipmentForm({ equipment, onSave, closeDialog }: { equipment?: Equipment, onSave: (data: any) => void, closeDialog: () => void }) {
     const [name, setName] = useState(equipment?.name || "");
@@ -62,17 +61,22 @@ function EquipmentForm({ equipment, onSave, closeDialog }: { equipment?: Equipme
 
 
 export default function ContentManagementPage() {
-    const [stages, setStages] = useState(initialGrowthStages);
+    const [stages, setStages] = useState(initialStages);
     const [newStage, setNewStage] = useState("");
     const [equipment, setEquipment] = useState(initialEquipment);
     const [isEqFormOpen, setIsEqFormOpen] = useState(false);
     const [editingEquipment, setEditingEquipment] = useState<Equipment | undefined>(undefined);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     const { toast } = useToast();
 
     const handleAddStage = () => {
-        if (newStage && !stages.find(s => s.toLowerCase() === newStage.toLowerCase())) {
-            setStages(prev => [...prev, newStage]);
+        if (addGrowthStage(newStage)) {
+            setStages([...initialStages]);
             toast({ title: "Stage Added", description: `"${newStage}" has been added.` });
             setNewStage("");
         } else {
@@ -81,7 +85,8 @@ export default function ContentManagementPage() {
     };
 
     const handleDeleteStage = (stageToDelete: string) => {
-        setStages(prev => prev.filter(s => s !== stageToDelete));
+        deleteGrowthStage(stageToDelete);
+        setStages([...initialStages]);
         toast({ title: "Stage Removed", description: `"${stageToDelete}" has been removed.` });
     };
 
@@ -105,6 +110,10 @@ export default function ContentManagementPage() {
         toast({ title: "Equipment Deleted", description: `"${item?.name}" has been deleted.` });
     }
 
+    if (!isMounted) {
+        return null; // Or a loading spinner
+    }
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -125,6 +134,7 @@ export default function ContentManagementPage() {
                     placeholder="Enter new stage name"
                     value={newStage}
                     onChange={(e) => setNewStage(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAddStage()}
                 />
                 <Button onClick={handleAddStage}>
                     <Plus className="mr-2 size-4" /> Add Stage
@@ -231,5 +241,3 @@ export default function ContentManagementPage() {
     </div>
   );
 }
-
-    

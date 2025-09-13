@@ -55,22 +55,21 @@ const pestSprayingAdvisorFlow = ai.defineFlow(
         const highWind = weather.windSpeed > 10;
         const moderateWind = weather.windSpeed > 7;
 
-        if (hasRain && highWind) {
-            recommendation = 'Bad';
-            rationale = 'Conditions are poor. High winds will cause spray drift, and rain will wash away the pesticide.';
-            chanceOfRain = 'High';
-        } else if (hasRain) {
+        if (hasRain) {
             recommendation = 'Bad';
             rationale = 'Conditions are poor. Upcoming rain will likely wash away the pesticide before it can be effective.';
             chanceOfRain = 'High';
+            if (highWind) {
+                 rationale = 'Conditions are poor. High winds will cause spray drift, and rain will wash away the pesticide.';
+            }
         } else if (highWind) {
             recommendation = 'Bad';
             rationale = 'Conditions are poor. Wind speeds are too high, which can cause significant spray drift and uneven application.';
-            chanceOfRain = 'Low'; // No rain, just wind
+            chanceOfRain = 'Low';
         } else if (moderateWind) {
             recommendation = 'Caution';
             rationale = 'Use caution. Moderate winds may cause some spray drift. Spraying is possible but not ideal.';
-            chanceOfRain = 'Low'; // No rain, just wind
+            chanceOfRain = 'Low';
         } else {
             recommendation = 'Good';
             rationale = 'Conditions are good for spraying. Winds are calm and there is no rain expected.';

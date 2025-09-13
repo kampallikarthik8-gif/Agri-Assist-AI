@@ -69,7 +69,7 @@ const recommendationColors: { [key: string]: string } = {
 };
 
 const locationFormSchema = z.object({
-  location: z.string().min(2, "Location is required."),
+  location: z.string().min(2, "Location or pincode is required."),
 });
 
 const notificationFormSchema = z.object({
@@ -191,12 +191,12 @@ export default function WeatherPage() {
     },
   });
 
-  const fetchAllWeatherData = async (lat?: number, lon?: number, location?: string) => {
+  const fetchAllWeatherData = async (lat?: number, lon?: number, location?: string, pincode?: string) => {
       setLoading(true);
       setError(null);
 
       try {
-        const weatherData = await getWeather({ lat, lon, location });
+        const weatherData = await getWeather({ lat, lon, location, pincode });
         setWeather(weatherData);
         locationForm.setValue("location", weatherData.locationName);
 
@@ -235,7 +235,7 @@ export default function WeatherPage() {
                 description: "The OpenWeatherMap API key is invalid. Please check your .env file.",
             });
         }
-        setError("Could not fetch weather data. Please try refreshing the page.");
+        setError("Could not fetch weather data. Please try refreshing the page or entering a different location/pincode.");
         setWeather(null);
         setForecast(null);
         setAlerts(null);
@@ -266,7 +266,12 @@ export default function WeatherPage() {
   }, []);
 
   const onLocationSubmit = async (values: z.infer<typeof locationFormSchema>) => {
-      await fetchAllWeatherData(undefined, undefined, values.location);
+      const isPincode = /^\d{6}$/.test(values.location);
+      if (isPincode) {
+        await fetchAllWeatherData(undefined, undefined, undefined, values.location);
+      } else {
+        await fetchAllWeatherData(undefined, undefined, values.location, undefined);
+      }
   };
 
   const WeatherIcon = weather ? weatherIconMap[weather.icon.toLowerCase()] || Sun : Sun;
@@ -288,7 +293,7 @@ export default function WeatherPage() {
                     <FormItem className="flex-1">
                       <FormLabel className="sr-only">Location</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter a location..." {...field} />
+                        <Input placeholder="Enter a location or pincode..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

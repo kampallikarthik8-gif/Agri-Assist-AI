@@ -16,6 +16,7 @@ const WeatherInputSchema = z.object({
   location: z.string().optional().describe('The location to fetch weather data for (e.g., "Sunnyvale, CA").'),
   lat: z.number().optional().describe('The latitude.'),
   lon: z.number().optional().describe('The longitude.'),
+  pincode: z.string().optional().describe('The pincode for the location (e.g., "500081").'),
 });
 export type WeatherInput = z.infer<typeof WeatherInputSchema>;
 
@@ -47,12 +48,14 @@ async function fetchWeatherData(input: WeatherInput): Promise<WeatherOutput> {
   }
 
   let url = 'https://api.openweathermap.org/data/2.5/weather?units=imperial&appid=' + apiKey;
-  if (input.lat && input.lon) {
+  if (input.pincode) {
+    url += `&zip=${input.pincode},in`;
+  } else if (input.lat && input.lon) {
     url += `&lat=${input.lat}&lon=${input.lon}`;
   } else if (input.location) {
     url += `&q=${encodeURIComponent(input.location)}`;
   } else {
-    throw new Error('Either location or lat/lon must be provided.');
+    throw new Error('Either location, pincode, or lat/lon must be provided.');
   }
 
 

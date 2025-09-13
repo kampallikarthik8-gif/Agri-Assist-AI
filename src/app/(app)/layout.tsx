@@ -54,6 +54,7 @@ const adminNavItems = [
   { href: "/admin", label: "Admin Dashboard", icon: Icons.AdminPanel },
   { href: "/admin/users", label: "User Management", icon: Icons.Users },
   { href: "/admin/news", label: "News Management", icon: Icons.News },
+  { href: "/admin/content", label: "Content Management", icon: Icons.Library },
   { href: "/admin/settings", label: "Settings", icon: Icons.Settings },
 ];
 

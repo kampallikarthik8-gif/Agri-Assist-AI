@@ -40,6 +40,7 @@ import {
   Globe,
   Sprout,
   Video,
+  Library,
 } from "lucide-react";
 
 export const Icons = {
@@ -88,4 +89,5 @@ export const Icons = {
   Translate: Globe,
   MyCrops: Sprout,
   Video,
+  Library,
 };

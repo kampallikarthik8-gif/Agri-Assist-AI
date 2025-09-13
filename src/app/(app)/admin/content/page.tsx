@@ -240,7 +240,7 @@ export default function ContentManagementPage() {
         <p className="text-muted-foreground">Manage application data like crop stages and other lists.</p>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
             <CardHeader>
             <CardTitle className="flex items-center gap-2"><Library className="text-primary"/> Crop Growth Stages</CardTitle>
@@ -260,7 +260,7 @@ export default function ContentManagementPage() {
                         <Plus className="mr-2 size-4" /> Add Stage
                     </Button>
                 </div>
-                <ul className="space-y-2 rounded-lg border p-4">
+                <ul className="space-y-2 rounded-lg border p-4 min-h-[300px]">
                     {stages.map((stage, index) => (
                         <li key={index} className="flex items-center justify-between p-2 rounded-md hover:bg-muted">
                             <span className="font-medium">{stage}</span>
@@ -307,7 +307,7 @@ export default function ContentManagementPage() {
                     </DialogTrigger>
                 </CardHeader>
                 <CardContent>
-                    <ul className="space-y-2 rounded-lg border p-4 max-h-[300px] overflow-y-auto">
+                    <ul className="space-y-2 rounded-lg border p-4 min-h-[300px] overflow-y-auto">
                         {links.map((item) => (
                             <li key={item.id} className="flex items-center justify-between p-2 rounded-md hover:bg-muted">
                                 <span className="font-medium truncate pr-2">{item.title}</span>
@@ -355,9 +355,8 @@ export default function ContentManagementPage() {
                 />
             </DialogContent>
         </Dialog>
-      </div>
-
-       <Dialog open={isNewsFormOpen} onOpenChange={setIsNewsFormOpen}>
+        
+        <Dialog open={isNewsFormOpen} onOpenChange={setIsNewsFormOpen}>
         <Card>
             <CardHeader className="flex-row items-center justify-between">
                 <div>
@@ -373,7 +372,7 @@ export default function ContentManagementPage() {
                 </DialogTrigger>
             </CardHeader>
             <CardContent>
-                 <ul className="space-y-2 rounded-lg border p-4 max-h-[500px] overflow-y-auto">
+                 <ul className="space-y-2 rounded-lg border p-4 min-h-[300px] overflow-y-auto">
                     {news.map((item) => (
                         <li key={item.id} className="flex items-center justify-between p-2 rounded-md hover:bg-muted">
                             <span className="font-medium truncate pr-2">{item.title}</span>
@@ -438,7 +437,7 @@ export default function ContentManagementPage() {
                 </DialogTrigger>
             </CardHeader>
             <CardContent>
-                 <ul className="space-y-2 rounded-lg border p-4 max-h-[500px] overflow-y-auto">
+                 <ul className="space-y-2 rounded-lg border p-4 min-h-[300px] overflow-y-auto">
                     {equipment.map((item) => (
                         <li key={item.id} className="flex items-center justify-between p-2 rounded-md hover:bg-muted">
                             <span className="font-medium">{item.name}</span>
@@ -489,8 +488,8 @@ export default function ContentManagementPage() {
             />
         </DialogContent>
     </Dialog>
+      </div>
+
     </div>
   );
 }
-
-    

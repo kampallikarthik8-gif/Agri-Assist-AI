@@ -47,9 +47,9 @@ const pestSprayingAdvisorFlow = ai.defineFlow(
         const weather = await getWeather( { location });
         
         // 2. Determine recommendation, rationale, and chance of rain based on deterministic logic.
-        let recommendation: 'Good' | 'Caution' | 'Bad' = 'Good';
-        let rationale: string = '';
-        let chanceOfRain: 'Low' | 'Medium' | 'High' = 'Low';
+        let recommendation: 'Good' | 'Caution' | 'Bad';
+        let rationale: string;
+        let chanceOfRain: 'Low' | 'Medium' | 'High';
 
         const hasRain = /rain|drizzle|thunderstorm/i.test(weather.description);
         const highWind = weather.windSpeed > 10;
@@ -66,12 +66,15 @@ const pestSprayingAdvisorFlow = ai.defineFlow(
         } else if (highWind) {
             recommendation = 'Bad';
             rationale = 'Conditions are poor. Wind speeds are too high, which can cause significant spray drift and uneven application.';
+            chanceOfRain = 'Low'; // No rain, just wind
         } else if (moderateWind) {
             recommendation = 'Caution';
             rationale = 'Use caution. Moderate winds may cause some spray drift. Spraying is possible but not ideal.';
+            chanceOfRain = 'Low'; // No rain, just wind
         } else {
             recommendation = 'Good';
             rationale = 'Conditions are good for spraying. Winds are calm and there is no rain expected.';
+            chanceOfRain = 'Low';
         }
 
         // 3. Return the final, complete output.

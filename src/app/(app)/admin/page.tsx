@@ -2,12 +2,13 @@
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Newspaper, Activity, BarChart3, UsersRound } from "lucide-react";
+import { Users, Newspaper, Activity, BarChart3, UsersRound, Library, Settings } from "lucide-react";
 import Link from "next/link";
 import { FeatureUsageChart } from "@/components/client/feature-usage-chart";
 import { UserActivityChart } from "@/components/client/user-activity-chart";
 import { users } from "@/lib/users";
 import { useEffect, useState } from "react";
+import { Icons } from "@/components/icons";
 
 export default function AdminPage() {
   const [activeUsersToday, setActiveUsersToday] = useState(0);
@@ -51,15 +52,29 @@ export default function AdminPage() {
         {
             title: "User Management",
             description: "View and manage all users in the application.",
-            icon: <Users className="size-8 text-primary" />,
+            icon: <Icons.Users className="size-8 text-primary" />,
             href: "/admin/users",
             status: "Active"
         },
         {
             title: "News Articles Management",
             description: "Manage news articles displayed in the application.",
-            icon: <Newspaper className="size-8 text-primary" />,
+            icon: <Icons.News className="size-8 text-primary" />,
             href: "/admin/news",
+            status: "Active"
+        },
+         {
+            title: "Content Management",
+            description: "Manage data for crops, equipment, and other lists.",
+            icon: <Icons.Library className="size-8 text-primary" />,
+            href: "/admin/content",
+            status: "Active"
+        },
+        {
+            title: "Application Settings",
+            description: "Configure global settings and manage API keys.",
+            icon: <Icons.Settings className="size-8 text-primary" />,
+            href: "/admin/settings",
             status: "Active"
         }
     ]
@@ -112,7 +127,7 @@ export default function AdminPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                 {adminFeatures.map((feature, index) => (
                     <Card key={index} className="hover:shadow-md transition-shadow">
                         <Link href={feature.href} className={feature.status === 'Coming Soon' ? 'pointer-events-none' : ''}>

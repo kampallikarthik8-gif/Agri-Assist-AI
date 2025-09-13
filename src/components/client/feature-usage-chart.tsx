@@ -14,7 +14,7 @@ const chartData = [
   { feature: "Crop Insurance", interactions: 1520, fill: "var(--color-insurance)" },
   { feature: "Plant Health", interactions: 1300, fill: "var(--color-health)" },
   { feature: "AI Assistant", interactions: 980, fill: "var(--color-assistant)" },
-  { feature: "Pest Alerts", interactions: 850, fill: "var(--color-pests)" },
+  { feature: "Mandi Prices", interactions: 850, fill: "var(--color-pests)" },
 ]
 
 const chartConfig = {
@@ -42,7 +42,7 @@ const chartConfig = {
       color: "hsl(var(--muted-foreground))"
   },
   pests: {
-      label: "Pest Alerts",
+      label: "Mandi Prices",
       color: "hsl(var(--chart-1))"
   }
 } satisfies ChartConfig

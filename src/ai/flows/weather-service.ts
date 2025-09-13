@@ -96,14 +96,11 @@ async function fetchWeatherData(input: WeatherInput): Promise<WeatherOutput> {
   } catch (error: any) {
     console.error('Error fetching weather:', error);
     // Re-throw specific errors to be handled by the UI
-    if (error.message.includes('Invalid OpenWeatherMap API Key')) {
+    if (error.message.includes('Invalid OpenWeatherMap API Key') || error.message.includes('OPENWEATHER_API_KEY')) {
         throw error;
     }
-     if (error.message.includes('OPENWEATHER_API_KEY')) {
-        throw error;
-    }
-    // Generic fallback error
-    throw new Error('Could not retrieve weather information at this time.');
+    // Re-throw the original error for other cases to get more specific feedback in the UI
+    throw new Error(error.message || 'Could not retrieve weather information at this time.');
   }
 }
 

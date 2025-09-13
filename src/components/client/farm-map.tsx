@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
@@ -401,7 +400,7 @@ export function FarmMap() {
                 {analysisResult.alerts.length > 0 ? analysisResult.alerts.map((alert, index) => (
                     <div key={index} className="border-l-4 pl-3 py-1" style={{ borderColor: alert.severity === 'High' ? 'red' : alert.severity === 'Medium' ? 'orange' : 'blue' }}>
                         <div className="font-semibold">
-                            <span>{alert.title || alert.name}</span> - <Badge variant={alert.severity === 'High' ? "destructive" : "secondary"}>{alert.severity} Risk</Badge>
+                            <span>{alert.title || alert.name}</span> - <Badge variant={alert.severity === 'High' ? "destructive" : "secondary"}>{alert.severity || alert.riskLevel}</Badge>
                         </div>
                          {alert.message && <p className="text-sm text-muted-foreground">{alert.message}</p>}
                     </div>

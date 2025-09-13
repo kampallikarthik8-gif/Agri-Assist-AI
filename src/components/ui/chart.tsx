@@ -317,12 +317,6 @@ const ChartLegendContent = React.forwardRef<
 )
 ChartLegendContent.displayName = "ChartLegend"
 
-const ChartYAxis = RechartsPrimitive.YAxis;
-
-const ChartXAxis = RechartsPrimitive.XAxis;
-
-const ChartBar = RechartsPrimitive.Bar;
-
 // Helper to extract item config from a payload.
 function getPayloadConfigFromPayload(
   config: ChartConfig,
@@ -369,7 +363,4 @@ export {
   ChartLegend,
   ChartLegendContent,
   ChartStyle,
-  ChartYAxis,
-  ChartXAxis,
-  ChartBar,
 }

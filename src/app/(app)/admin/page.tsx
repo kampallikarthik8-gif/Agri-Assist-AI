@@ -16,9 +16,11 @@ export default function AdminPage() {
   const totalUsers = users.length;
 
   useEffect(() => {
+    // Simulate dynamic active user count
     const activeToday = Math.floor(Math.random() * (totalUsers / 2)) + Math.floor(totalUsers / 2);
     setActiveUsersToday(activeToday);
 
+    // Simulate change from yesterday
     const change = (((activeToday - (totalUsers * 0.35)) / (totalUsers * 0.35)) * 100).toFixed(1);
     setActiveUserChange(change);
   }, [totalUsers]);

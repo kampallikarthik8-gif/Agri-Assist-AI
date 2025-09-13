@@ -6,15 +6,68 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Library } from "lucide-react";
+import { Plus, Trash2, Library, Tractor, Edit } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-
+import { equipmentList as initialEquipment, addEquipment, updateEquipment, deleteEquipment, type Equipment } from "@/lib/equipment-data";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 const initialGrowthStages = ["Sowing", "Germination", "Vegetative", "Flowering", "Fruiting", "Harvesting", "Post-Harvest"];
+
+function EquipmentForm({ equipment, onSave, closeDialog }: { equipment?: Equipment, onSave: (data: any) => void, closeDialog: () => void }) {
+    const [name, setName] = useState(equipment?.name || "");
+    const [purpose, setPurpose] = useState(equipment?.purpose || "");
+    const [types, setTypes] = useState(equipment?.types || "");
+    const [details, setDetails] = useState(equipment?.details || "");
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const equipmentData = {
+            id: equipment?.id,
+            name,
+            purpose,
+            types: types || undefined,
+            details: details || undefined,
+            // buyLinks are not editable in this simple form
+        };
+        onSave(equipmentData);
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
+                <Input id="name" value={name} onChange={e => setName(e.target.value)} placeholder="e.g., Tractor" required />
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="purpose">Purpose</Label>
+                <Textarea id="purpose" value={purpose} onChange={e => setPurpose(e.target.value)} placeholder="What is this equipment used for?" required />
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="types">Common Types (Optional)</Label>
+                <Input id="types" value={types} onChange={e => setTypes(e.target.value)} placeholder="e.g., Rotary, disc, and tine cultivators" />
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="details">Key Features (Optional)</Label>
+                <Textarea id="details" value={details} onChange={e => setDetails(e.target.value)} placeholder="e.g., Increases efficiency by performing multiple tasks at once" />
+            </div>
+            <DialogFooter>
+                <DialogClose asChild><Button type="button" variant="ghost">Cancel</Button></DialogClose>
+                <Button type="submit">Save</Button>
+            </DialogFooter>
+        </form>
+    );
+}
+
 
 export default function ContentManagementPage() {
     const [stages, setStages] = useState(initialGrowthStages);
     const [newStage, setNewStage] = useState("");
+    const [equipment, setEquipment] = useState(initialEquipment);
+    const [isEqFormOpen, setIsEqFormOpen] = useState(false);
+    const [editingEquipment, setEditingEquipment] = useState<Equipment | undefined>(undefined);
+
     const { toast } = useToast();
 
     const handleAddStage = () => {
@@ -31,6 +84,26 @@ export default function ContentManagementPage() {
         setStages(prev => prev.filter(s => s !== stageToDelete));
         toast({ title: "Stage Removed", description: `"${stageToDelete}" has been removed.` });
     };
+
+    const handleSaveEquipment = (data: Omit<Equipment, 'id'> & { id?: string }) => {
+        if (data.id) { // Editing existing
+            updateEquipment(data as Equipment);
+             toast({ title: "Equipment Updated", description: `"${data.name}" has been updated.` });
+        } else { // Adding new
+            addEquipment(data);
+             toast({ title: "Equipment Added", description: `"${data.name}" has been added.` });
+        }
+        setEquipment([...initialEquipment]);
+        setEditingEquipment(undefined);
+        setIsEqFormOpen(false);
+    }
+    
+    const handleDeleteEquipment = (id: string) => {
+        const item = equipment.find(e => e.id === id);
+        deleteEquipment(id);
+        setEquipment([...initialEquipment]);
+        toast({ title: "Equipment Deleted", description: `"${item?.name}" has been deleted.` });
+    }
 
   return (
     <div className="flex flex-col gap-6">
@@ -87,7 +160,76 @@ export default function ContentManagementPage() {
             </ul>
         </CardContent>
       </Card>
+      
+       <Dialog open={isEqFormOpen} onOpenChange={setIsEqFormOpen}>
+        <Card>
+            <CardHeader className="flex-row items-center justify-between">
+                <div>
+                    <CardTitle className="flex items-center gap-2"><Tractor className="text-primary"/> Farm Equipment Guide</CardTitle>
+                    <CardDescription>
+                        Manage the list of equipment in the guide.
+                    </CardDescription>
+                </div>
+                <DialogTrigger asChild>
+                    <Button onClick={() => setEditingEquipment(undefined)}>
+                        <Plus className="mr-2 size-4" /> Add Equipment
+                    </Button>
+                </DialogTrigger>
+            </CardHeader>
+            <CardContent>
+                 <ul className="space-y-2 rounded-lg border p-4 max-h-[500px] overflow-y-auto">
+                    {equipment.map((item) => (
+                        <li key={item.id} className="flex items-center justify-between p-2 rounded-md hover:bg-muted">
+                            <span className="font-medium">{item.name}</span>
+                            <div className="flex items-center gap-1">
+                                <DialogTrigger asChild>
+                                     <Button variant="ghost" size="icon" onClick={() => setEditingEquipment(item)}>
+                                        <Edit className="size-4" />
+                                    </Button>
+                                </DialogTrigger>
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button variant="ghost" size="icon">
+                                            <Trash2 className="size-4 text-destructive" />
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                This will permanently delete "{item.name}" from the guide.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction onClick={() => handleDeleteEquipment(item.id)} className="bg-destructive hover:bg-destructive/90">
+                                                Delete
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </CardContent>
+        </Card>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>{editingEquipment ? "Edit Equipment" : "Add New Equipment"}</DialogTitle>
+                <DialogDescription>
+                    {editingEquipment ? "Update the details for this piece of equipment." : "Add a new piece of equipment to the guide."}
+                </DialogDescription>
+            </DialogHeader>
+            <EquipmentForm
+                equipment={editingEquipment}
+                onSave={handleSaveEquipment}
+                closeDialog={() => setIsEqFormOpen(false)}
+            />
+        </DialogContent>
+    </Dialog>
     </div>
   );
 }
 
+    

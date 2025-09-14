@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -33,14 +33,13 @@ export default function MarketInsightsPage() {
     },
   });
   
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = useCallback(async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     setResult(null);
     try {
       const res = await marketInsights(values);
       setResult(res);
-    } catch (error: any) {
+    } catch (error: any) => {
       console.error(error);
       toast({
           variant: "destructive",
@@ -50,7 +49,7 @@ export default function MarketInsightsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [toast]);
 
   useEffect(() => {
     const cropFromUrl = searchParams.get('crop');
@@ -196,3 +195,5 @@ function InfoCard({ icon, title, value }: { icon: React.ReactNode; title: string
         </div>
     )
 }
+
+    

@@ -73,7 +73,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <Card>
           <CardHeader className="text-center">
-             <Link href="/" className="flex justify-center items-center gap-2 mb-4">
+             <Link href="/dashboard" className="flex justify-center items-center gap-2 mb-4">
                 <Icons.Logo className="size-8 text-primary" />
                 <h1 className="text-2xl font-semibold tracking-tight">Agri Assist Ai</h1>
              </Link>

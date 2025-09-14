@@ -20,6 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { dashboardNews } from "@/lib/dashboard-news-data";
+import { FormattedDate } from "@/components/client/formatted-date";
 
 const weatherIconMap: { [key: string]: React.FC<any> } = {
     "01d": Icons.Sun,
@@ -232,6 +233,9 @@ export default function DashboardPage() {
                         />
                         <div className="flex-1">
                             <h3 className="font-semibold">{item.title}</h3>
+                            <p className="text-sm text-muted-foreground mb-1">
+                                Published: <FormattedDate dateString={item.publishedAt} />
+                            </p>
                             <p className="text-sm text-muted-foreground">{item.summary}</p>
                             {item.link && (
                                 <Button asChild variant="outline" size="sm" className="mt-2">
@@ -251,5 +255,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    

@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2, Library, Tractor, Edit, LinkIcon, Newspaper } from "lucide-react";
+import { Plus, Trash2, Library, Tractor, Edit, LinkIcon, Newspaper, Calendar as CalendarIcon } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { equipmentList as initialEquipment, addEquipment, updateEquipment, deleteEquipment, type Equipment } from "@/lib/equipment-data";
 import { growthStages as initialStages, addGrowthStage, updateGrowthStage, deleteGrowthStage } from "@/lib/crop-stages-data";
@@ -15,6 +15,10 @@ import { dashboardNews as initialNews, addDashboardNews, updateDashboardNews, de
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 function NewsFeedForm({ item, onSave, closeDialog }: { item?: DashboardNewsItem, onSave: (data: any) => void, closeDialog: () => void }) {
     const [title, setTitle] = useState(item?.title || "");
@@ -22,10 +26,11 @@ function NewsFeedForm({ item, onSave, closeDialog }: { item?: DashboardNewsItem,
     const [image, setImage] = useState(item?.image || "");
     const [link, setLink] = useState(item?.link || "");
     const [aiHint, setAiHint] = useState(item?.aiHint || "");
+    const [publishedAt, setPublishedAt] = useState<Date | undefined>(item?.publishedAt ? new Date(item.publishedAt) : new Date());
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave({ id: item?.id, title, summary, image, link, aiHint });
+        onSave({ id: item?.id, title, summary, image, link, aiHint, publishedAt: publishedAt?.toISOString() });
     };
 
     return (
@@ -49,6 +54,31 @@ function NewsFeedForm({ item, onSave, closeDialog }: { item?: DashboardNewsItem,
              <div className="space-y-2">
                 <Label htmlFor="aiHint">AI Image Hint</Label>
                 <Input id="aiHint" value={aiHint} onChange={e => setAiHint(e.target.value)} placeholder="e.g., government document" />
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="publishedAt">Publication Date</Label>
+                 <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                            variant={"outline"}
+                            className={cn(
+                                "w-full justify-start text-left font-normal",
+                                !publishedAt && "text-muted-foreground"
+                            )}
+                        >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {publishedAt ? format(publishedAt, "PPP") : <span>Pick a date</span>}
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                        <Calendar
+                            mode="single"
+                            selected={publishedAt}
+                            onSelect={setPublishedAt}
+                            initialFocus
+                        />
+                    </PopoverContent>
+                </Popover>
             </div>
             <DialogFooter>
                 <DialogClose asChild><Button type="button" variant="ghost">Cancel</Button></DialogClose>

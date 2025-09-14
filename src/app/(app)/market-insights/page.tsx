@@ -39,7 +39,7 @@ export default function MarketInsightsPage() {
     try {
       const res = await marketInsights(values);
       setResult(res);
-    } catch (error: any) => {
+    } catch (error: any) {
       console.error(error);
       toast({
           variant: "destructive",

@@ -72,11 +72,17 @@ const marketInsightsFlow = ai.defineFlow(
             if (output) {
                 return output;
             }
-            console.warn(`Attempt ${i + 1} returned null output.`);
+            console.warn(`Attempt ${i + 1} returned null output. Retrying...`);
+            if (i < maxRetries - 1) {
+              await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1))); // Exponential backoff
+            }
         } catch (error) {
             console.error(`Error in marketInsightsFlow on attempt ${i + 1}`, error);
             if (i === maxRetries - 1) {
                 throw new Error('Failed to generate market insights after multiple attempts.');
+            }
+             if (i < maxRetries - 1) {
+              await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1))); // Wait on error too
             }
         }
     }

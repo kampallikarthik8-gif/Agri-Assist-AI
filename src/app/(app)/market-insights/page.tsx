@@ -195,5 +195,3 @@ function InfoCard({ icon, title, value }: { icon: React.ReactNode; title: string
         </div>
     )
 }
-
-    

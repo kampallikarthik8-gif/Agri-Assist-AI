@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Library, Tractor, Edit, LinkIcon, Newspaper } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { equipmentList as initialEquipment, addEquipment, updateEquipment, deleteEquipment, type Equipment } from "@/lib/equipment-data";
-import { growthStages as initialStages, addGrowthStage, deleteGrowthStage } from "@/lib/crop-stages-data";
+import { growthStages as initialStages, addGrowthStage, updateGrowthStage, deleteGrowthStage } from "@/lib/crop-stages-data";
 import { helpfulLinks as initialLinks, addHelpfulLink, updateHelpfulLink, deleteHelpfulLink, type HelpfulLink } from "@/lib/helpful-links-data";
 import { dashboardNews as initialNews, addDashboardNews, updateDashboardNews, deleteDashboardNews, type DashboardNewsItem } from "@/lib/dashboard-news-data";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
@@ -130,17 +130,40 @@ function LinksForm({ link, onSave, closeDialog }: { link?: HelpfulLink, onSave: 
     );
 }
 
+function StageForm({ stage, onSave, closeDialog }: { stage?: string, onSave: (originalStage: string | undefined, newStage: string) => void, closeDialog: () => void }) {
+    const [name, setName] = useState(stage || "");
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onSave(stage, name);
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+                <Label htmlFor="name">Stage Name</Label>
+                <Input id="name" value={name} onChange={e => setName(e.target.value)} placeholder="e.g., Sowing" required />
+            </div>
+            <DialogFooter>
+                <DialogClose asChild><Button type="button" variant="ghost">Cancel</Button></DialogClose>
+                <Button type="submit">Save</Button>
+            </DialogFooter>
+        </form>
+    );
+}
+
 export default function ContentManagementPage() {
     const [stages, setStages] = useState(initialStages);
-    const [newStage, setNewStage] = useState("");
     const [equipment, setEquipment] = useState(initialEquipment);
     const [links, setLinks] = useState(initialLinks);
     const [news, setNews] = useState(initialNews);
 
+    const [isStageFormOpen, setIsStageFormOpen] = useState(false);
     const [isEqFormOpen, setIsEqFormOpen] = useState(false);
     const [isLinksFormOpen, setIsLinksFormOpen] = useState(false);
     const [isNewsFormOpen, setIsNewsFormOpen] = useState(false);
 
+    const [editingStage, setEditingStage] = useState<string | undefined>(undefined);
     const [editingEquipment, setEditingEquipment] = useState<Equipment | undefined>(undefined);
     const [editingLink, setEditingLink] = useState<HelpfulLink | undefined>(undefined);
     const [editingNewsItem, setEditingNewsItem] = useState<DashboardNewsItem | undefined>(undefined);
@@ -153,13 +176,27 @@ export default function ContentManagementPage() {
 
     const { toast } = useToast();
 
-    const handleAddStage = () => {
-        if (addGrowthStage(newStage)) {
+    const handleSaveStage = (originalStage: string | undefined, newStage: string) => {
+        let success = false;
+        if (originalStage) { // Editing
+            success = updateGrowthStage(originalStage, newStage);
+             if (success) {
+                toast({ title: "Stage Updated", description: `"${originalStage}" has been changed to "${newStage}".` });
+            } else {
+                toast({ variant: "destructive", title: "Update Failed", description: "Stage name may already exist or is invalid." });
+            }
+        } else { // Adding
+            success = addGrowthStage(newStage);
+             if (success) {
+                toast({ title: "Stage Added", description: `"${newStage}" has been added.` });
+            } else {
+                toast({ variant: "destructive", title: "Cannot Add Stage", description: "Stage is either empty or already exists." });
+            }
+        }
+        if (success) {
             setStages([...initialStages]);
-            toast({ title: "Stage Added", description: `"${newStage}" has been added.` });
-            setNewStage("");
-        } else {
-             toast({ variant: "destructive", title: "Cannot Add Stage", description: "Stage is either empty or already exists." });
+            setEditingStage(undefined);
+            setIsStageFormOpen(false);
         }
     };
 
@@ -241,55 +278,70 @@ export default function ContentManagementPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-            <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Library className="text-primary"/> Crop Growth Stages</CardTitle>
-            <CardDescription>
-                Manage the list of growth stages available in the "My Crops" feature.
-            </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="flex items-center gap-2 mb-4">
-                    <Input
-                        placeholder="Enter new stage name"
-                        value={newStage}
-                        onChange={(e) => setNewStage(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleAddStage()}
-                    />
-                    <Button onClick={handleAddStage}>
+        <Dialog open={isStageFormOpen} onOpenChange={setIsStageFormOpen}>
+            <Card>
+                <CardHeader className="flex-row items-center justify-between">
+                <div>
+                    <CardTitle className="flex items-center gap-2"><Library className="text-primary"/> Crop Growth Stages</CardTitle>
+                    <CardDescription>
+                        Manage the list of growth stages available in the "My Crops" feature.
+                    </CardDescription>
+                </div>
+                 <DialogTrigger asChild>
+                    <Button onClick={() => setEditingStage(undefined)}>
                         <Plus className="mr-2 size-4" /> Add Stage
                     </Button>
-                </div>
-                <ul className="space-y-2 rounded-lg border p-4 min-h-[300px] overflow-y-auto">
-                    {stages.map((stage, index) => (
-                        <li key={index} className="flex items-center justify-between p-2 rounded-md hover:bg-muted">
-                            <span className="font-medium">{stage}</span>
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <Button variant="ghost" size="icon">
-                                        <Trash2 className="size-4 text-destructive" />
-                                    </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            This will permanently delete the "{stage}" stage. This might affect user data.
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={() => handleDeleteStage(stage)} className="bg-destructive hover:bg-destructive/90">
-                                            Delete
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </li>
-                    ))}
-                </ul>
-            </CardContent>
-        </Card>
+                </DialogTrigger>
+                </CardHeader>
+                <CardContent>
+                    <ul className="space-y-2 rounded-lg border p-4 min-h-[300px] overflow-y-auto">
+                        {stages.map((stage, index) => (
+                            <li key={index} className="flex items-center justify-between p-2 rounded-md hover:bg-muted">
+                                <span className="font-medium">{stage}</span>
+                                <div className="flex items-center gap-1 flex-shrink-0">
+                                    <DialogTrigger asChild>
+                                        <Button variant="ghost" size="icon" onClick={() => setEditingStage(stage)}>
+                                            <Edit className="size-4" />
+                                        </Button>
+                                    </DialogTrigger>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="ghost" size="icon">
+                                                <Trash2 className="size-4 text-destructive" />
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    This will permanently delete the "{stage}" stage. This might affect user data.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDeleteStage(stage)} className="bg-destructive hover:bg-destructive/90">
+                                                    Delete
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </CardContent>
+            </Card>
+             <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>{editingStage ? "Edit Stage" : "Add New Stage"}</DialogTitle>
+                </DialogHeader>
+                <StageForm
+                    stage={editingStage}
+                    onSave={handleSaveStage}
+                    closeDialog={() => setIsStageFormOpen(false)}
+                />
+            </DialogContent>
+        </Dialog>
 
         <Dialog open={isLinksFormOpen} onOpenChange={setIsLinksFormOpen}>
             <Card>

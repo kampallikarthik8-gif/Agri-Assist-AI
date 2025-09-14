@@ -260,7 +260,7 @@ export default function ContentManagementPage() {
                         <Plus className="mr-2 size-4" /> Add Stage
                     </Button>
                 </div>
-                <ul className="space-y-2 rounded-lg border p-4 min-h-[300px]">
+                <ul className="space-y-2 rounded-lg border p-4 min-h-[300px] overflow-y-auto">
                     {stages.map((stage, index) => (
                         <li key={index} className="flex items-center justify-between p-2 rounded-md hover:bg-muted">
                             <span className="font-medium">{stage}</span>

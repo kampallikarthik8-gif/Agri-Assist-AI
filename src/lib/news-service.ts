@@ -2,7 +2,6 @@
 'use server';
 
 import { z } from 'zod';
-import Parser from 'rss-parser';
 
 const NewsArticleSchema = z.object({
     source: z.object({
@@ -19,50 +18,3 @@ const NewsArticleSchema = z.object({
 });
 
 export type NewsArticle = z.infer<typeof NewsArticleSchema>;
-
-const parser = new Parser();
-
-// A simple regex to extract the image URL from the description's img tag
-const extractImageFromDescription = (description: string): string | null => {
-    const match = description.match(/<img src="([^"]+)"/);
-    return match ? match[1] : null;
-};
-
-export async function fetchNews(query: string): Promise<{ articles?: NewsArticle[], error?: string }> {
-    // Construct the Google News RSS feed URL
-    const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-IN&gl=IN&ceid=IN:en`;
-
-    try {
-        const feed = await parser.parseURL(url);
-        
-        if (!feed.items) {
-            return { articles: [] };
-        }
-
-        const articles: NewsArticle[] = feed.items.map(item => ({
-            source: {
-                id: item.source?.url || null,
-                name: item.source?.value || item.creator || 'Google News',
-            },
-            author: item.creator || null,
-            title: item.title || 'No title',
-            description: item.contentSnippet || null,
-            url: item.link || '',
-            urlToImage: extractImageFromDescription(item.content || ''),
-            publishedAt: item.isoDate || new Date().toISOString(),
-            content: item.content || null,
-        })).filter(article => article.title && article.title !== 'No title' && article.url);
-
-        return { articles };
-
-    } catch (error: any) {
-        console.error('Error fetching or parsing RSS feed:', error);
-        return { error: `Could not connect to the news service. Details: ${error.message}` };
-    }
-}
-
-// Mock function for admin panel
-export async function getNewsForAdmin(): Promise<NewsArticle[]> {
-    const newsResponse = await fetchNews("agriculture India");
-    return newsResponse.articles?.slice(0, 20) || [];
-}

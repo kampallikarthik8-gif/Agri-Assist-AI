@@ -5,7 +5,8 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { fetchNews, type NewsArticle } from "@/lib/news-service";
+import { fetchAndParseNews } from "@/ai/flows/news-service";
+import type { NewsArticle } from "@/lib/news-service";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -38,9 +39,9 @@ export default function DailyNewsPage() {
         setLoading(true);
         setArticles(null);
         try {
-            const res = await fetchNews(region);
+            const res = await fetchAndParseNews(region);
             if (res.articles) {
-                setArticles(res.articles);
+                setArticles(res.articles as NewsArticle[]);
             } else {
                  toast({
                     variant: "default",

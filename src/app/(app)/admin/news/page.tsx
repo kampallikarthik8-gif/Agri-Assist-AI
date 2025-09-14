@@ -1,11 +1,13 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { NewsDataTable } from "@/components/client/news-data-table";
-import { getNewsForAdmin } from "@/lib/news-service";
+import { fetchAndParseNews } from "@/ai/flows/news-service";
+import type { NewsArticle } from "@/lib/news-service";
 
 export default async function NewsManagementPage() {
 
-  const articles = await getNewsForAdmin();
+  const newsResponse = await fetchAndParseNews("agriculture India");
+  const articles: NewsArticle[] = (newsResponse.articles?.slice(0, 20) || []) as NewsArticle[];
 
   return (
     <div className="flex flex-col gap-6">

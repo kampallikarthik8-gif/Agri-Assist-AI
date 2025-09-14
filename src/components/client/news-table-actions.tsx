@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
-import { NewsArticle } from "@/lib/news-service";
+import type { NewsArticle } from "@/lib/news-service";
 
 export function NewsTableActions({ article }: { article: NewsArticle }) {
   const { toast } = useToast();

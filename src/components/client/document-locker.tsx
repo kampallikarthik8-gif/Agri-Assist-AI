@@ -38,6 +38,7 @@ import { Upload, FileText, Trash2, Eye, Loader2, ExternalLink, LinkIcon } from "
 import { Icons } from "../icons";
 import Link from "next/link";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "../ui/alert-dialog";
+import { landRecordsLinks } from "@/lib/land-records-data";
 
 const formSchema = z.object({
   name: z.string().min(3, "Document name must be at least 3 characters."),
@@ -61,14 +62,6 @@ const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) 
 });
 
 const LOCAL_STORAGE_KEY = 'document_locker_files';
-
-const externalLinks = [
-    {
-        title: "మీ అడంగల్ (గ్రామ లెక్కలు 3)",
-        description: "Access your village Adangal/Pahani records from the official Andhra Pradesh Meebhoomi portal.",
-        href: "https://meebhoomi.ap.gov.in/VAdangal/Index",
-    }
-]
 
 export function DocumentLocker() {
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -292,30 +285,34 @@ export function DocumentLocker() {
                 <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <LinkIcon className="size-6 text-primary" />
-                    Official Document Services
+                    Official Land Record Services
                 </CardTitle>
                 <CardDescription>
-                    Download official government documents from these verified portals.
+                    Access official government documents from these verified portals.
                 </CardDescription>
                 </CardHeader>
-                <CardContent>
-                    <ul className="space-y-4">
-                        {externalLinks.map((link, index) => (
-                        <li key={index}>
-                           <h4 className="font-semibold">{link.title}</h4>
-                           <p className="text-sm text-muted-foreground mb-2">{link.description}</p>
-                            <Button asChild size="sm" variant="outline">
-                            <Link href={link.href} target="_blank" rel="noopener noreferrer">
-                                Visit Site
-                                <ExternalLink className="ml-2 size-4" />
-                            </Link>
-                            </Button>
-                        </li>
-                        ))}
-                    </ul>
+                <CardContent className="space-y-4">
+                    {landRecordsLinks.map((link, index) => (
+                        <Card key={index} className="bg-muted/50">
+                            <CardHeader>
+                                <CardTitle className="text-lg">{link.title}</CardTitle>
+                                <CardDescription>{link.description}</CardDescription>
+                            </CardHeader>
+                            <CardFooter>
+                                <Button asChild size="sm" variant="outline">
+                                    <Link href={link.href} target="_blank" rel="noopener noreferrer">
+                                        Visit Site
+                                        <ExternalLink className="ml-2 size-4" />
+                                    </Link>
+                                </Button>
+                            </CardFooter>
+                        </Card>
+                    ))}
                 </CardContent>
             </Card>
         </div>
     </div>
   );
 }
+
+    

@@ -27,6 +27,7 @@ import { Toaster } from "@/components/ui/toaster";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: Icons.Dashboard },
+  { href: "/my-crops", label: "My Crops", icon: Icons.MyCrops },
   { href: "/daily-news", label: "Daily News", icon: Icons.News },
   { href: "/mandi-prices", label: "Mandi Prices", icon: Icons.MandiPrices },
   { href: "/market-insights", label: "Market Insights", icon: Icons.MarketInsights },
@@ -36,7 +37,6 @@ const navItems = [
   { href: "/pest-disease-alerts", label: "Pest & Disease Alerts", icon: Icons.Pest },
   { href: "/pest-spraying-advisor", label: "Pest Spraying Advisor", icon: Icons.Wind },
   { href: "/farm-map", label: "Farm Map", icon: Icons.FarmMap },
-  { href: "/my-crops", label: "My Crops", icon: Icons.MyCrops },
   { href: "/document-locker", label: "Document Locker", icon: Icons.DocumentLocker },
   { href: "/irrigation-planner", label: "Irrigation Planner", icon: Icons.Irrigation },
   { href: "/plant-health", label: "AI Vision", icon: Icons.PlantHealth },

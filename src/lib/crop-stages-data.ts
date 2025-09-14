@@ -1,5 +1,4 @@
 
-
 // This acts as our "database" for crop growth stages.
 export let growthStages: string[] = [
     "Sowing",

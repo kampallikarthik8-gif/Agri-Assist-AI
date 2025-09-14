@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, Camera, Trash2 } from "lucide-react";
 import { Icons } from "../icons";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const formSchema = z.object({
   photoDataUri: z.string().refine(val => val.startsWith('data:image/'), {
@@ -35,7 +36,7 @@ export function PlantHealthForm() {
   const [result, setResult] = useState<PlantHealthDiagnosticsOutput | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [showCamera, setShowCamera] = useState(false);
-  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
@@ -48,15 +49,45 @@ export function PlantHealthForm() {
     },
   });
   
-  useEffect(() => {
+ useEffect(() => {
+    if (!showCamera) {
+        if (videoRef.current?.srcObject) {
+            const stream = videoRef.current.srcObject as MediaStream;
+            stream.getTracks().forEach(track => track.stop());
+            videoRef.current.srcObject = null;
+        }
+        return;
+    }
+
+    const getCameraPermission = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        setHasCameraPermission(true);
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setHasCameraPermission(false);
+        toast({
+          variant: 'destructive',
+          title: 'Camera Access Denied',
+          description: 'Please enable camera permissions in your browser settings to use this feature.',
+        });
+      }
+    };
+
+    getCameraPermission();
+    
     return () => {
-      // Cleanup: stop video stream when component unmounts or camera is closed
       if (videoRef.current?.srcObject) {
         const stream = videoRef.current.srcObject as MediaStream;
         stream.getTracks().forEach(track => track.stop());
       }
     };
-  }, []);
+  }, [showCamera, toast]);
+
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -76,30 +107,9 @@ export function PlantHealthForm() {
       setShowCamera(true);
       setPreview(null);
       form.setValue("photoDataUri", "");
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-        setHasCameraPermission(true);
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-      } catch (error) {
-        console.error('Error accessing camera:', error);
-        setHasCameraPermission(false);
-        setShowCamera(false);
-        toast({
-          variant: 'destructive',
-          title: 'Camera Access Denied',
-          description: 'Please enable camera permissions in your browser settings.',
-        });
-      }
   };
 
   const stopCamera = () => {
-    if (videoRef.current?.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-        videoRef.current.srcObject = null;
-    }
     setShowCamera(false);
   }
 
@@ -208,6 +218,14 @@ export function PlantHealthForm() {
                            </>
                         )}
                        </div>
+                        {showCamera && !hasCameraPermission && (
+                            <Alert variant="destructive">
+                                <AlertTitle>Camera Access Required</AlertTitle>
+                                <AlertDescription>
+                                    Please allow camera access in your browser settings to use this feature.
+                                </AlertDescription>
+                            </Alert>
+                        )}
                     </div>
                     <FormMessage />
                   </FormItem>

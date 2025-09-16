@@ -37,16 +37,15 @@ const prompt = ai.definePrompt({
   input: { schema: PestDiseaseAlertInputSchema },
   output: { schema: PestDiseaseAlertOutputSchema },
   tools: [getWeather],
-  prompt: `You are an expert agricultural entomologist and plant pathologist. 
-  
-  First, get the current weather for the user's location: {{{location}}}.
-  
-  Based on the location and the current weather conditions (temperature, humidity), identify the top 2-3 most likely pests or plant diseases that could be a threat right now. 
-  
-  For each potential threat, provide its common name and a risk level (High, Medium, or Low).
+  prompt: `You are an expert agricultural entomologist and plant pathologist.
 
-  If conditions are not favorable for any common pests or diseases, return an empty list of alerts.
-  `,
+Get the current weather for the user's location: {{{location}}}.
+
+Based on the location and current weather (temperature, humidity), identify the top 2-3 most likely pests or plant diseases that could be a threat right now.
+
+Return ONLY valid JSON matching this schema exactly: { "alerts": [{ "name": string, "riskLevel": "High"|"Medium"|"Low" }, ... ] }
+If no threats are likely, return { "alerts": [] }.
+`,
 });
 
 const pestDiseaseAlertFlow = ai.defineFlow(
@@ -58,15 +57,16 @@ const pestDiseaseAlertFlow = ai.defineFlow(
   async input => {
     try {
       const {output} = await prompt(input);
-      if (!output) {
-        // If the prompt returns no output, assume no alerts are needed.
+
+      // Guard: handle null/invalid outputs gracefully
+      if (!output || typeof output !== 'object' || !Array.isArray((output as any).alerts)) {
         return { alerts: [] };
       }
-      return output;
-    } catch (error) {
-      console.error("Error in pestDiseaseAlertFlow, returning empty alerts.", error);
-      // Instead of throwing an error, return an empty list to prevent crashes.
-      // The UI can handle displaying a "no threats" message.
+
+      return output as PestDiseaseAlertOutput;
+    } catch (error: any) {
+      // Downgrade to warning to avoid noisy stack traces in dev logs
+      console.warn("pestDiseaseAlertFlow: returning empty alerts due to model/schema issue:", error?.message || error);
       return { alerts: [] };
     }
   }

@@ -41,6 +41,10 @@ import {
   Sprout,
   Video,
   Library,
+  Bookmark,
+  Calendar,
+  Wallet,
+  BadgePercent,
 } from "lucide-react";
 
 export const Icons = {
@@ -57,6 +61,8 @@ export const Icons = {
   Cloud,
   Wind,
   Leaf,
+  // Aliases for clarity/consistency with usage across the app
+  Bell, // Notifications
   Assistant: Bot,
   Pest: Bug,
   GovernmentSchemes: Landmark,
@@ -64,6 +70,7 @@ export const Icons = {
   DocumentLocker: FolderKanban,
   Thermometer: Thermometer,
   Pressure: Gauge,
+  Gauge, // Yield Estimator
   Visibility: Eye,
   AlertIcon: Cloudy,
   UV: (props: LucideProps) => (
@@ -90,6 +97,10 @@ export const Icons = {
   MyCrops: Sprout,
   Video,
   Library,
+  Bookmark,
+  Calendar,
+  Wallet,
+  BadgePercent,
 };
 
     

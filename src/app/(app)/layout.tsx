@@ -24,30 +24,54 @@ import { Icons } from "@/components/icons";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Toaster } from "@/components/ui/toaster";
+import { AppBreadcrumbs } from "@/components/client/app-breadcrumbs";
 
-const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: Icons.Dashboard },
-  { href: "/my-crops", label: "My Crops", icon: Icons.MyCrops },
-  { href: "/daily-news", label: "Daily News", icon: Icons.News },
-  { href: "/mandi-prices", label: "Mandi Prices", icon: Icons.MandiPrices },
-  { href: "/market-insights", label: "Market Insights", icon: Icons.MarketInsights },
-  { href: "/government-schemes", label: "Govt. Schemes & Subsidies", icon: Icons.GovernmentSchemes },
-  { href: "/crop-insurance", label: "Crop Insurance", icon: Icons.CropInsurance },
-  { href: "/weather", label: "Weather", icon: Icons.Weather },
-  { href: "/pest-disease-alerts", label: "Pest & Disease Alerts", icon: Icons.Pest },
-  { href: "/pest-spraying-advisor", label: "Pest Spraying Advisor", icon: Icons.Wind },
-  { href: "/farm-map", label: "Farm Map", icon: Icons.FarmMap },
-  { href: "/document-locker", label: "Document Locker", icon: Icons.DocumentLocker },
-  { href: "/irrigation-planner", label: "Irrigation Planner", icon: Icons.Irrigation },
-  { href: "/plant-health", label: "AI Vision", icon: Icons.PlantHealth },
-  { href: "/soil-health", label: "Soil Health", icon: Icons.Leaf },
-  { href: "/crop-recommendation", label: "Crop Recommendation", icon: Icons.CropRecommendation },
-  { href: "/cultivation-tips", label: "Cultivation Tips", icon: Icons.CultivationTips },
-  { href: "/fertilizer-calculator", label: "Fertilizer Calculator", icon: Icons.Calculator },
-  { href: "/fertilizer-shops", label: "Fertilizer Shops", icon: Icons.Store },
-  { href: "/farm-equipment", label: "Farm Equipment", icon: Icons.FarmEquipment },
-  { href: "/agri-videos", label: "Agri Videos", icon: Icons.Video },
-  { href: "/ai-assistant", label: "AI Assistant", icon: Icons.Assistant },
+const sections = [
+  {
+    label: "Overview",
+    items: [
+      { href: "/dashboard", label: "Dashboard", icon: Icons.Dashboard },
+      { href: "/ai-assistant", label: "AI Assistant", icon: Icons.Assistant },
+      { href: "/notifications", label: "Notifications", icon: Icons.Bell },
+      { href: "/saved", label: "Saved Items", icon: Icons.Bookmark },
+    ],
+  },
+  {
+    label: "Farming",
+    items: [
+      { href: "/my-crops", label: "My Crops", icon: Icons.MyCrops },
+      { href: "/crop-recommendation", label: "Crop Recommendation", icon: Icons.CropRecommendation },
+      { href: "/soil-health", label: "Soil Health", icon: Icons.Leaf },
+      { href: "/plant-health", label: "AI Vision", icon: Icons.PlantHealth },
+      { href: "/irrigation-planner", label: "Irrigation Planner", icon: Icons.Irrigation },
+      { href: "/pest-disease-alerts", label: "Pest & Disease Alerts", icon: Icons.Pest },
+      { href: "/pest-spraying-advisor", label: "Pest Spraying Advisor", icon: Icons.Wind },
+      { href: "/weather", label: "Weather", icon: Icons.Weather },
+      { href: "/farm-map", label: "Farm Map", icon: Icons.FarmMap },
+      { href: "/tasks", label: "Tasks Planner", icon: Icons.Calendar },
+      { href: "/yield-estimator", label: "Yield Estimator", icon: Icons.Gauge },
+    ],
+  },
+  {
+    label: "Marketplace",
+    items: [
+      { href: "/mandi-prices", label: "Mandi Prices", icon: Icons.MandiPrices },
+      { href: "/market-insights", label: "Market Insights", icon: Icons.MarketInsights },
+      { href: "/fertilizer-shops", label: "Fertilizer Shops", icon: Icons.Store },
+      { href: "/farm-equipment", label: "Farm Equipment", icon: Icons.FarmEquipment },
+      { href: "/expenses", label: "Expenses", icon: Icons.Wallet },
+      { href: "/subsidies", label: "Subsidies", icon: Icons.BadgePercent },
+    ],
+  },
+  {
+    label: "Resources",
+    items: [
+      { href: "/daily-news", label: "Daily News", icon: Icons.News },
+      { href: "/government-schemes", label: "Govt. Schemes & Subsidies", icon: Icons.GovernmentSchemes },
+      { href: "/cultivation-tips", label: "Cultivation Tips", icon: Icons.CultivationTips },
+      { href: "/document-locker", label: "Document Locker", icon: Icons.DocumentLocker },
+    ],
+  },
 ];
 
 const adminNavItems = [
@@ -57,7 +81,6 @@ const adminNavItems = [
   { href: "/admin/content", label: "Content Management", icon: Icons.Library },
   { href: "/admin/settings", label: "Settings", icon: Icons.Settings },
 ];
-
 
 function AppName() {
     return (
@@ -73,7 +96,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     setIsMounted(true);
-    
     // @ts-ignore
     if (!window.googleTranslateElementInit) {
         // @ts-ignore
@@ -103,21 +125,28 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </SidebarHeader>
 
         <SidebarContent>
-          <SidebarMenu>
-            {navItems.map((item) => (
-              <SidebarMenuItem key={item.href}>
-                <Link href={item.href}>
-                  <SidebarMenuButton
-                    isActive={pathname === item.href}
-                    tooltip={item.label}
-                  >
-                    <item.icon className="size-5" />
-                    <span>{item.label}</span>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
+          {sections.map((section) => (
+            <div key={section.label}>
+              <div className="px-4 pb-2 pt-3 text-xs font-medium uppercase tracking-wide text-sidebar-foreground/70 group-data-[collapsible=icon]:hidden">
+                {section.label}
+              </div>
+              <SidebarMenu>
+                {section.items.map((item) => (
+                  <SidebarMenuItem key={item.href}>
+                    <Link href={item.href}>
+                      <SidebarMenuButton
+                        isActive={pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))}
+                        tooltip={item.label}
+                      >
+                        <item.icon className="size-5" />
+                        <span>{item.label}</span>
+                      </SidebarMenuButton>
+                    </Link>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </div>
+          ))}
             <SidebarSeparator />
              <SidebarMenu>
                 {adminNavItems.map((item) => (
@@ -180,6 +209,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <SidebarInset>
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6 sm:pt-2">
             <SidebarTrigger className="md:hidden" />
+            <AppBreadcrumbs />
             <div className="ml-auto flex items-center gap-2">
                 <div id="google_translate_element"></div>
             </div>

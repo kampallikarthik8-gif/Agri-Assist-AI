@@ -21,6 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { dashboardNews } from "@/lib/dashboard-news-data";
 import { FormattedDate } from "@/components/client/formatted-date";
+import { ImageWithFallback } from "@/components/client/image-with-fallback";
 
 const weatherIconMap: { [key: string]: React.FC<any> } = {
     "01d": Icons.Sun,
@@ -223,13 +224,13 @@ export default function DashboardPage() {
             <CardContent className="grid gap-6">
                 {dashboardNews.map((item, index) => (
                     <div key={index} className="flex flex-col sm:flex-row items-start gap-4">
-                        <Image
+                        <ImageWithFallback
                             src={item.image}
                             alt={item.title}
                             width={150}
                             height={100}
                             className="rounded-lg object-cover"
-                            data-ai-hint={item.aiHint}
+                            data-ai-hint={item.aiHint as any}
                         />
                         <div className="flex-1">
                             <h3 className="font-semibold">{item.title}</h3>

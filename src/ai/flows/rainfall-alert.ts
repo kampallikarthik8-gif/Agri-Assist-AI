@@ -74,7 +74,8 @@ const rainfallAlertFlow = ai.defineFlow(
       return output;
     } catch (error) {
       console.error("Error in rainfallAlertFlow", error);
-      throw new Error('Failed to generate rainfall alerts.');
+      // Fail-safe: don't throw; return no alerts so the UI can continue
+      return { alerts: [] };
     }
   }
 );

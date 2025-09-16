@@ -18,6 +18,7 @@ import { getWeather } from "@/ai/flows/weather-service";
 import Image from "next/image";
 import Link from "next/link";
 import { FormattedDate } from "@/components/client/formatted-date";
+import { ImageWithFallback } from "@/components/client/image-with-fallback";
 
 const formSchema = z.object({
   region: z.string().min(2, "Region/State is required."),
@@ -168,7 +169,7 @@ export default function DailyNewsPage() {
                       <div className="grid grid-cols-1 md:grid-cols-4">
                         <div className="md:col-span-1">
                           <div className="relative h-48 w-full">
-                            <Image 
+                            <ImageWithFallback 
                                 src={article.urlToImage || "https://picsum.photos/seed/news-fallback/600/400"}
                                 alt={article.title}
                                 fill

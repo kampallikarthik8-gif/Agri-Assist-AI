@@ -31,6 +31,7 @@ const WeatherOutputSchema = z.object({
   uvIndex: z.number().describe('The current UV index.'),
   visibility: z.number().describe('The visibility in miles.'),
   pressure: z.number().describe('The atmospheric pressure in hPa.'),
+  rainfallMm: z.number().optional().describe('Recent rainfall volume in millimeters (last 1h if available).'),
   sunrise: z.string().describe('The time of sunrise.'),
   sunset: z.string().describe('The time of sunset.'),
 });
@@ -44,7 +45,7 @@ function formatTime(timestamp: number, timezone: number): string {
 async function fetchWeatherData(input: WeatherInput): Promise<WeatherOutput> {
   const apiKey = process.env.OPENWEATHER_API_KEY;
   if (!apiKey) {
-    throw new Error('OPENWEATHER_API_KEY is not set in the environment variables.');
+    throw new Error('OPENWEATHER_API_KEY is not set in the environment variables. Please add your OpenWeatherMap API key to the .env.local file.');
   }
 
   let url = 'https://api.openweathermap.org/data/2.5/weather?units=imperial&appid=' + apiKey;
@@ -79,6 +80,8 @@ async function fetchWeatherData(input: WeatherInput): Promise<WeatherOutput> {
     // This will likely return 0 unless a paid plan is used.
     // For a robust solution, consider a different endpoint or service if UV is critical.
 
+    const rainfallMm = (data.rain && (data.rain["1h"] || (data.rain["3h"] ? data.rain["3h"] / 3 : 0))) || 0;
+
     return {
       locationName: data.name,
       temperature: Math.round(data.main.temp),
@@ -90,6 +93,7 @@ async function fetchWeatherData(input: WeatherInput): Promise<WeatherOutput> {
       uvIndex: uvIndex,
       visibility: Math.round(data.visibility / 1609), // meters to miles
       pressure: data.main.pressure,
+      rainfallMm: Number(rainfallMm) || 0,
       sunrise: formatTime(data.sys.sunrise, data.timezone),
       sunset: formatTime(data.sys.sunset, data.timezone),
     };

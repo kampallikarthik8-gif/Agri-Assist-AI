@@ -19,6 +19,8 @@ import { rainfallAlert, type RainfallAlertOutput } from "@/ai/flows/rainfall-ale
 import { pestSprayingAdvisor, type PestSprayingAdvisorOutput } from "@/ai/flows/pest-spraying-advisor";
 import { sendNotification } from "@/ai/flows/notification-service";
 import { Icons } from "@/components/icons";
+import { usePreferences, displayTemperatureFromFahrenheit, displaySpeedFromMph, displayDistanceFromMiles } from "@/hooks/use-preferences";
+import { displayRainfallMm } from "@/hooks/use-preferences";
 import { AlertCircle, Cloud, Cloudy, CloudRain, Snowflake, Sun, SunMoon, Wind, Gauge, Eye, Sunrise, Sunset, Loader2, ShieldCheck, ShieldAlert, ShieldX, Bug, Search } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
@@ -174,6 +176,7 @@ function NotificationSender({ alertMessage }: { alertMessage: string }) {
 }
 
 export default function WeatherPage() {
+  const { preferences, isReady, setUnitSystem, setRainUnit } = usePreferences() as any;
   const [weather, setWeather] = useState<WeatherOutput | null>(null);
   const [forecast, setForecast] = useState<WeatherForecastOutput['forecast'] | null>(null);
   const [alerts, setAlerts] = useState<RainfallAlertOutput['alerts'] | null>(null);
@@ -276,14 +279,24 @@ export default function WeatherPage() {
 
   const WeatherIcon = weather ? weatherIconMap[weather.icon.toLowerCase()] || Sun : Sun;
 
+  if (!isReady) return null;
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Live Weather & Forecast</h1>
+            <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+              <Icons.Weather className="size-7 text-primary" />
+              Live Weather & Forecast
+            </h1>
             <p className="text-muted-foreground">Check real-time weather and AI-powered advisories.</p>
           </div>
-          <div className="w-full sm:w-auto">
+          <div className="w-full sm:w-auto flex flex-col gap-2 items-stretch sm:items-end">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span>Rainfall:</span>
+              <button type="button" className={`px-2 py-1 rounded ${preferences.rainUnit === 'mm' ? 'bg-secondary' : ''}`} onClick={() => setRainUnit('mm')}>mm</button>
+              <button type="button" className={`px-2 py-1 rounded ${preferences.rainUnit === 'in' ? 'bg-secondary' : ''}`} onClick={() => setRainUnit('in')}>in</button>
+            </div>
             <Form {...locationForm}>
               <form onSubmit={locationForm.handleSubmit(onLocationSubmit)} className="flex items-start gap-2">
                 <FormField
@@ -337,16 +350,16 @@ export default function WeatherPage() {
                         <CardContent className="flex flex-col items-center justify-center gap-4">
                             <div className="flex flex-col items-center gap-2">
                                 <WeatherIcon className="size-24 text-warning" />
-                                <span className="text-6xl font-bold">{weather.temperature}°F</span>
+                                <span className="text-6xl font-bold">{displayTemperatureFromFahrenheit(weather.temperature, preferences.unitSystem)}°{preferences.unitSystem === 'metric' ? 'C' : 'F'}</span>
                                 <span className="text-muted-foreground capitalize">{weather.description}</span>
                             </div>
                              <div className="w-full grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                                <p className="flex items-center gap-2"><Icons.Thermometer className="size-4 text-muted-foreground" /> Feels like: {weather.feelsLike}°F</p>
-                                <p className="flex items-center gap-2"><Wind className="size-4 text-muted-foreground" /> Wind: {weather.windSpeed} mph</p>
+                                <p className="flex items-center gap-2"><Icons.Thermometer className="size-4 text-muted-foreground" /> Feels like: {displayTemperatureFromFahrenheit(weather.feelsLike, preferences.unitSystem)}°{preferences.unitSystem === 'metric' ? 'C' : 'F'}</p>
+                                <p className="flex items-center gap-2"><Wind className="size-4 text-muted-foreground" /> Wind: {displaySpeedFromMph(weather.windSpeed, preferences.unitSystem)} {preferences.unitSystem === 'metric' ? 'km/h' : 'mph'}</p>
                                 <p className="flex items-center gap-2"><Icons.Cloud className="size-4 text-muted-foreground" /> Humidity: {weather.humidity}%</p>
                                 <p className="flex items-center gap-2"><Icons.UV className="size-4 text-muted-foreground" /> UV Index: {weather.uvIndex}</p>
-                                <p className="flex items-center gap-2"><Eye className="size-4 text-muted-foreground" /> Visibility: {weather.visibility} mi</p>
-                                <p className="flex items-center gap-2"><Gauge className="size-4 text-muted-foreground" /> Pressure: {weather.pressure} hPa</p>
+                                <p className="flex items-center gap-2"><Eye className="size-4 text-muted-foreground" /> Visibility: {displayDistanceFromMiles(weather.visibility, preferences.unitSystem)} {preferences.unitSystem === 'metric' ? 'km' : 'mi'}</p>
+                                <p className="flex items-center gap-2"><CloudRain className="size-4 text-muted-foreground" /> Rain (1h): {displayRainfallMm((weather as any).rainfallMm || 0, preferences.rainUnit)} {preferences.rainUnit}</p>
                                 <p className="flex items-center gap-2"><Sunrise className="size-4 text-muted-foreground" /> Sunrise: {weather.sunrise}</p>
                                 <p className="flex items-center gap-2"><Sunset className="size-4 text-muted-foreground" /> Sunset: {weather.sunset}</p>
                             </div>

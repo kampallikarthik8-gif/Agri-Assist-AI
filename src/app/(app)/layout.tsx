@@ -25,6 +25,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Toaster } from "@/components/ui/toaster";
 import { AppBreadcrumbs } from "@/components/client/app-breadcrumbs";
+import { usePreferences } from "@/hooks/use-preferences";
+import { ChevronDown } from "lucide-react";
+import { DropdownMenuCheckboxItem } from "@/components/ui/dropdown-menu";
 
 const sections = [
   {
@@ -34,6 +37,7 @@ const sections = [
       { href: "/ai-assistant", label: "AI Assistant", icon: Icons.Assistant },
       { href: "/notifications", label: "Notifications", icon: Icons.Bell },
       { href: "/saved", label: "Saved Items", icon: Icons.Bookmark },
+      { href: "/settings", label: "Settings", icon: Icons.Settings },
     ],
   },
   {
@@ -78,7 +82,11 @@ const adminNavItems = [
   { href: "/admin", label: "Admin Dashboard", icon: Icons.AdminPanel },
   { href: "/admin/users", label: "User Management", icon: Icons.Users },
   { href: "/admin/news", label: "News Management", icon: Icons.News },
+  { href: "/admin/prompts", label: "AI Prompts", icon: Icons.Library },
   { href: "/admin/content", label: "Content Management", icon: Icons.Library },
+  { href: "/admin/roles", label: "Roles & Permissions", icon: Icons.Shield },
+  { href: "/admin/audit", label: "Audit Logs", icon: Icons.AlertIcon },
+  { href: "/admin/announcements", label: "Announcements", icon: Icons.Bell },
   { href: "/admin/settings", label: "Settings", icon: Icons.Settings },
 ];
 
@@ -93,6 +101,7 @@ function AppName() {
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [isMounted, setIsMounted] = React.useState(false);
+  const { preferences, setUnitSystem, setPressureUnit, isReady } = usePreferences();
 
   React.useEffect(() => {
     setIsMounted(true);
@@ -106,7 +115,30 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  if (!isMounted) {
+  React.useEffect(() => {
+    if (!isMounted) return;
+    const mapPathToFeature = (path: string) => {
+      if (path.startsWith('/my-crops')) return 'my-crops';
+      if (path.startsWith('/crop-recommendation')) return 'crop-recommendation';
+      if (path.startsWith('/soil-health')) return 'soil-health';
+      if (path.startsWith('/plant-health')) return 'ai-vision';
+      if (path.startsWith('/irrigation-planner')) return 'irrigation-planner';
+      if (path.startsWith('/pest-disease-alerts')) return 'pest-disease-alerts';
+      if (path.startsWith('/pest-spraying-advisor')) return 'pest-spraying-advisor';
+      if (path.startsWith('/weather')) return 'weather';
+      if (path.startsWith('/farm-map')) return 'farm-map';
+      if (path.startsWith('/tasks')) return 'tasks-planner';
+      if (path.startsWith('/yield-estimator')) return 'yield-estimator';
+      return 'default';
+    };
+    const feature = mapPathToFeature(pathname || '/');
+    document.body.setAttribute('data-feature', feature);
+    return () => {
+      document.body.removeAttribute('data-feature');
+    };
+  }, [pathname, isMounted]);
+
+  if (!isMounted || !isReady) {
     return null;
   }
 
@@ -138,7 +170,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         isActive={pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))}
                         tooltip={item.label}
                       >
-                        <item.icon className="size-5" />
+                        {item.icon ? <item.icon className="size-5" /> : <Icons.Link className="size-5" />}
                         <span>{item.label}</span>
                       </SidebarMenuButton>
                     </Link>
@@ -156,7 +188,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                         isActive={pathname.startsWith(item.href)}
                         tooltip={item.label}
                       >
-                        <item.icon className="size-5" />
+                        {item.icon ? <item.icon className="size-5" /> : <Icons.Link className="size-5" />}
                         <span>{item.label}</span>
                       </SidebarMenuButton>
                     </Link>
@@ -211,6 +243,46 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <SidebarTrigger className="md:hidden" />
             <AppBreadcrumbs />
             <div className="ml-auto flex items-center gap-2">
+                <Link href="/ai-assistant">
+                  <Button variant="outline" size="sm" className="hidden sm:inline-flex">AI Assistant</Button>
+                </Link>
+                <Link href="/tasks">
+                  <Button variant="secondary" size="sm" className="hidden sm:inline-flex">Tasks</Button>
+                </Link>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="hidden sm:inline-flex">
+                      Units: {preferences.unitSystem === 'metric' ? 'Metric' : 'Imperial'} · Pressure: {preferences.pressureUnit}
+                      <ChevronDown className="ml-1 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuCheckboxItem
+                      checked={preferences.unitSystem === 'metric'}
+                      onCheckedChange={() => setUnitSystem('metric')}
+                    >
+                      Metric (°C, km/h)
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={preferences.unitSystem === 'imperial'}
+                      onCheckedChange={() => setUnitSystem('imperial')}
+                    >
+                      Imperial (°F, mph)
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={preferences.pressureUnit === 'hPa'}
+                      onCheckedChange={() => setPressureUnit('hPa')}
+                    >
+                      Pressure: hPa
+                    </DropdownMenuCheckboxItem>
+                    <DropdownMenuCheckboxItem
+                      checked={preferences.pressureUnit === 'inHg'}
+                      onCheckedChange={() => setPressureUnit('inHg')}
+                    >
+                      Pressure: inHg
+                    </DropdownMenuCheckboxItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
                 <div id="google_translate_element"></div>
             </div>
         </header>

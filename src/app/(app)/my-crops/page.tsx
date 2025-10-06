@@ -228,28 +228,18 @@ export default function MyCropsPage() {
 
   useEffect(() => {
     setIsMounted(true);
-    if (typeof window !== "undefined") {
-      try {
-        const savedCrops = localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (savedCrops) {
-          const parsedCrops = JSON.parse(savedCrops).map((crop: any) => ({
-            ...crop,
-            plantingDate: new Date(crop.plantingDate),
-          }));
-          setCrops(parsedCrops);
-        }
-      } catch (error) {
-        console.error("Failed to parse crops from localStorage", error);
-        setCrops([]);
-      }
-    }
+    let unsub = () => {};
+    import("@/lib/crops").then(mod => {
+      unsub = mod.observeCrops((rows) => {
+        const mapped = rows.map((r) => ({
+          ...r,
+          plantingDate: new Date(r.plantingDate),
+        })) as Crop[];
+        setCrops(mapped);
+      });
+    });
+    return () => { try { unsub(); } catch {} };
   }, []);
-
-  useEffect(() => {
-    if (isMounted) {
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(crops));
-    }
-  }, [crops, isMounted]);
 
   const form = useForm<z.infer<typeof cropSchema>>({
     resolver: zodResolver(cropSchema),
@@ -267,12 +257,19 @@ export default function MyCropsPage() {
     setLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    const newCrop: Crop = {
+    const payload = {
       ...values,
-      id: crypto.randomUUID(),
+      plantingDate: values.plantingDate,
     };
-
-    setCrops((prev) => [...prev, newCrop]);
+    const { addCrop } = await import("@/lib/crops");
+    await addCrop({
+      cropName: payload.cropName,
+      variety: payload.variety || undefined,
+      plantingDate: payload.plantingDate.toISOString(),
+      area: payload.area,
+      areaUnit: payload.areaUnit,
+      growthStage: payload.growthStage,
+    } as any);
     toast({
       title: "Crop Added",
       description: `${values.cropName} has been added to your list.`,
@@ -288,8 +285,9 @@ export default function MyCropsPage() {
     setLoading(false);
   }
 
-  const deleteCrop = (id: string) => {
-    setCrops((prev) => prev.filter((crop) => crop.id !== id));
+  const deleteCrop = async (id: string) => {
+    const { deleteCrop } = await import("@/lib/crops");
+    await deleteCrop(id);
     toast({
       title: "Crop Removed",
       variant: "destructive",
@@ -302,12 +300,49 @@ export default function MyCropsPage() {
       setIsEditDialogOpen(true);
   }
 
-  const handleUpdateCrop = (updatedCrop: Crop) => {
-      setCrops(prev => prev.map(c => c.id === updatedCrop.id ? updatedCrop : c));
+  const handleUpdateCrop = async (updatedCrop: Crop) => {
+      const { updateCrop } = await import("@/lib/crops");
+      await updateCrop(updatedCrop.id, {
+        cropName: updatedCrop.cropName,
+        variety: updatedCrop.variety,
+        plantingDate: updatedCrop.plantingDate.toISOString(),
+        area: updatedCrop.area,
+        areaUnit: updatedCrop.areaUnit,
+        growthStage: updatedCrop.growthStage,
+      } as any);
       toast({
           title: "Crop Updated",
           description: `${updatedCrop.cropName} has been updated.`,
       });
+  }
+
+  function download(filename: string, content: string, type = 'text/plain') {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function exportJSON() {
+    const data = crops.map(({ id, ...rest }) => rest);
+    download('my-crops.json', JSON.stringify(data, null, 2), 'application/json');
+  }
+
+  function exportCSV() {
+    const headers = ['cropName','variety','plantingDate','area','areaUnit','growthStage'];
+    const rows = crops.map(c => [
+      c.cropName,
+      c.variety ?? '',
+      new Date(c.plantingDate).toISOString(),
+      String(c.area),
+      c.areaUnit,
+      c.growthStage,
+    ]);
+    const csv = [headers.join(','), ...rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(','))].join('\n');
+    download('my-crops.csv', csv, 'text/csv');
   }
 
 
@@ -323,8 +358,19 @@ export default function MyCropsPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">My Crops</h1>
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+            <Icons.MyCrops className="size-7 text-primary" />
+            My Crops
+          </h1>
           <p className="text-muted-foreground">Manage your current crops and get quick access to relevant AI tools.</p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={exportCSV} disabled={crops.length === 0}>
+            <Icons.Download className="mr-2 h-4 w-4" /> CSV
+          </Button>
+          <Button variant="outline" size="sm" onClick={exportJSON} disabled={crops.length === 0}>
+            <Icons.Download className="mr-2 h-4 w-4" /> JSON
+          </Button>
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">

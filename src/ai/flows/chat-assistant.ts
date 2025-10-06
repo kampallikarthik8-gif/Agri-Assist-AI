@@ -14,6 +14,8 @@ import {z} from 'genkit';
 
 const ChatAssistantInputSchema = z.object({
   message: z.string().describe('The user\'s message or question.'),
+  summarize: z.boolean().optional().describe('If true, return a short summary first.'),
+  cite: z.boolean().optional().describe('If true, extract and include reputable sources with links.'),
 });
 
 export type ChatAssistantInput = z.infer<typeof ChatAssistantInputSchema>;
@@ -37,6 +39,14 @@ const prompt = ai.definePrompt({
   prompt: `You are Agri Assist Ai, a friendly and knowledgeable AI assistant for farmers. Your goal is to provide helpful, accurate, and concise answers to a wide range of agricultural questions.
 
 User's question: {{{message}}}
+
+{{#if summarize}}
+First provide a 2-3 bullet summary with the key actionable points, then a short explanation with specifics (rates, timings, thresholds) if relevant.
+{{/if}}
+
+{{#if cite}}
+If you reference facts, add a short "Sources:" section with up to 3 reputable links (government, universities, standards bodies). Use plain URLs.
+{{/if}}
 
 Provide a helpful response.`,
 });

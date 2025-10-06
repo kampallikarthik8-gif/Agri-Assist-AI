@@ -13,6 +13,7 @@ import {
 import { Bug, ExternalLink, Eye } from "lucide-react";
 
 import { Icons } from "@/components/icons";
+import { usePreferences, displayTemperatureFromFahrenheit, displaySpeedFromMph, displayDistanceFromMiles } from "@/hooks/use-preferences";
 import { useState, useEffect } from "react";
 import { getWeather, WeatherOutput } from "@/ai/flows/weather-service";
 import { pestDiseaseAlert, type PestDiseaseAlertOutput } from "@/ai/flows/pest-disease-alert";
@@ -22,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { dashboardNews } from "@/lib/dashboard-news-data";
 import { FormattedDate } from "@/components/client/formatted-date";
 import { ImageWithFallback } from "@/components/client/image-with-fallback";
+import { Badge } from "@/components/ui/badge";
 
 const weatherIconMap: { [key: string]: React.FC<any> } = {
     "01d": Icons.Sun,
@@ -45,6 +47,7 @@ const weatherIconMap: { [key: string]: React.FC<any> } = {
   };
 
 export default function DashboardPage() {
+    const { preferences, isReady } = usePreferences();
     const [weather, setWeather] = useState<WeatherOutput | null>(null);
     const [pestAlerts, setPestAlerts] = useState<PestDiseaseAlertOutput['alerts'] | null>(null);
     const [loading, setLoading] = useState(true);
@@ -61,18 +64,25 @@ export default function DashboardPage() {
             try {
                 setLoading(true);
                 setLocationError(null);
+                
                 const weatherData = await getWeather({ lat, lon });
                 setWeather(weatherData);
 
                 const location = weatherData.locationName;
                 
-                const pestRes = await pestDiseaseAlert({ location });
-
-                if (pestRes) {
-                    setPestAlerts(pestRes.alerts);
-                } else {
-                    setPestAlerts([]);
-                     console.error("Pest alert failed");
+                // Only try pest alerts if we have a valid location
+                if (location) {
+                    try {
+                        const pestRes = await pestDiseaseAlert({ location });
+                        if (pestRes) {
+                            setPestAlerts(pestRes.alerts);
+                        } else {
+                            setPestAlerts([]);
+                        }
+                    } catch (pestError) {
+                        console.warn("Pest alert failed:", pestError);
+                        setPestAlerts([]);
+                    }
                 }
 
             } catch (error: any) {
@@ -130,7 +140,7 @@ export default function DashboardPage() {
         return "Learn More";
     }
 
-    if (!isMounted) return null;
+    if (!isMounted || !isReady) return null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -160,16 +170,16 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-4 text-center md:text-left">
                         <WeatherIcon className="size-16 text-warning" />
                         <div>
-                          <span className="text-5xl font-bold">{weather.temperature}°F</span>
+                          <span className="text-5xl font-bold">{displayTemperatureFromFahrenheit(weather.temperature, preferences.unitSystem)}°{preferences.unitSystem === 'metric' ? 'C' : 'F'}</span>
                           <p className="text-muted-foreground capitalize">{weather.description}</p>
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
-                        <p className="flex items-center gap-2"><Icons.Thermometer className="size-4 text-muted-foreground" /> Feels like: {weather.feelsLike}°F</p>
-                        <p className="flex items-center gap-2"><Icons.Wind className="size-4 text-muted-foreground" /> Wind: {weather.windSpeed} mph</p>
+                        <p className="flex items-center gap-2"><Icons.Thermometer className="size-4 text-muted-foreground" /> Feels like: {displayTemperatureFromFahrenheit(weather.feelsLike, preferences.unitSystem)}°{preferences.unitSystem === 'metric' ? 'C' : 'F'}</p>
+                        <p className="flex items-center gap-2"><Icons.Wind className="size-4 text-muted-foreground" /> Wind: {displaySpeedFromMph(weather.windSpeed, preferences.unitSystem)} {preferences.unitSystem === 'metric' ? 'km/h' : 'mph'}</p>
                         <p className="flex items-center gap-2"><Icons.Cloud className="size-4 text-muted-foreground" /> Humidity: {weather.humidity}%</p>
                         <p className="flex items-center gap-2"><Icons.UV className="size-4 text-muted-foreground" /> UV Index: {weather.uvIndex}</p>
-                        <p className="flex items-center gap-2"><Eye className="size-4 text-muted-foreground" /> Visibility: {weather.visibility} mi</p>
+                        <p className="flex items-center gap-2"><Eye className="size-4 text-muted-foreground" /> Visibility: {displayDistanceFromMiles(weather.visibility, preferences.unitSystem)} {preferences.unitSystem === 'metric' ? 'km' : 'mi'}</p>
                     </div>
                 </>
                 ) : (
@@ -252,7 +262,108 @@ export default function DashboardPage() {
             </CardContent>
         </Card>
 
+        {/* Farmer-first widgets */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Icons.MandiPrices className="size-6 text-primary" /> Mandi Prices
+            </CardTitle>
+            <CardDescription>Nearby market rates (mock data)</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="font-medium">Wheat (Qtl)</span>
+                <span>₹ 2,250</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="font-medium">Paddy (Qtl)</span>
+                <span>₹ 2,100</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="font-medium">Cotton (Qtl)</span>
+                <span>₹ 7,200</span>
+              </div>
+            </div>
+            <Button asChild variant="outline" size="sm" className="mt-3 w-full">
+              <Link href="/mandi-prices">View all prices</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Icons.Calendar className="size-6 text-primary" /> Tasks
+            </CardTitle>
+            <CardDescription>Today & upcoming</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-3 text-sm">
+              <li className="flex items-center justify-between">
+                <span>Fertilizer: Urea (Acre 1)</span>
+                <Badge variant="secondary">Today</Badge>
+              </li>
+              <li className="flex items-center justify-between">
+                <span>Irrigation schedule</span>
+                <Badge>Tomorrow</Badge>
+              </li>
+              <li className="flex items-center justify-between">
+                <span>Weeding (Maize)</span>
+                <Badge variant="outline">Fri</Badge>
+              </li>
+            </ul>
+            <Button asChild variant="outline" size="sm" className="mt-3 w-full">
+              <Link href="/tasks">Open planner</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Icons.GovernmentSchemes className="size-6 text-primary" /> Govt. Schemes
+            </CardTitle>
+            <CardDescription>Popular shortcuts</CardDescription>
+          </CardHeader>
+          <CardContent className="grid grid-cols-2 gap-3">
+            <Button asChild variant="secondary" size="sm">
+              <Link href="/government-schemes">Schemes</Link>
+            </Button>
+            <Button asChild variant="secondary" size="sm">
+              <Link href="https://pmkisan.gov.in/BeneficiaryStatus_New.aspx" target="_blank">PM-KISAN</Link>
+            </Button>
+            <Button asChild variant="secondary" size="sm">
+              <Link href="https://ysrrythubharosa.ap.gov.in/RBApp/index.html" target="_blank">Rythu Bharosa</Link>
+            </Button>
+            <Button asChild variant="secondary" size="sm">
+              <Link href="/subsidies">Subsidies</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
       </div>
-    </div>
+    {/* Quick AI Prompts */}
+    <Card>
+      <CardHeader>
+        <CardTitle>Quick AI Help</CardTitle>
+        <CardDescription>Tap a prompt to ask the assistant</CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-wrap gap-2">
+        <Link href="/ai-assistant?prompt=Identify%20pest%20from%20leaf%20photo">
+          <Button variant="outline" size="sm">Identify pest from photo</Button>
+        </Link>
+        <Link href="/ai-assistant?prompt=Fertilizer%20mix%20for%20wheat%20acre%201">
+          <Button variant="outline" size="sm">Fertilizer mix for wheat</Button>
+        </Link>
+        <Link href="/ai-assistant?prompt=Is%20it%20good%20to%20spray%20today%3F">
+          <Button variant="outline" size="sm">Is it good to spray today?</Button>
+        </Link>
+        <Link href="/ai-assistant?prompt=Eligible%20schemes%20for%20small%20farmer">
+          <Button variant="outline" size="sm">Eligible schemes</Button>
+        </Link>
+      </CardContent>
+    </Card>
+  </div>
   );
 }

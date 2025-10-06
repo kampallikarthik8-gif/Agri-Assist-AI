@@ -4,83 +4,141 @@
 
 @layer base {
   :root {
-    --background: 48 33% 96%;
-    --foreground: 20 14% 4%;
+    /* New brand: Emerald + Amber with softer backgrounds */
+    --background: 180 20% 98%;
+    --foreground: 200 14% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 20 14% 4%;
+    --card-foreground: 200 14% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 20 14% 4%;
-    --primary: 142 60% 35%;
-    --primary-foreground: 142 20% 95%;
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 240 6% 10%;
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%;
-    --accent: 35 55% 45%;
-    --accent-foreground: 35 20% 98%;
-    --destructive: 0 84% 60%;
+    --popover-foreground: 200 14% 12%;
+    --primary: 160 84% 32%; /* emerald */
+    --primary-foreground: 160 100% 96%;
+    --secondary: 200 20% 95%;
+    --secondary-foreground: 200 25% 18%;
+    --muted: 200 20% 96%;
+    --muted-foreground: 200 10% 45%;
+    --accent: 38 92% 50%; /* amber */
+    --accent-foreground: 38 96% 10%;
+    --destructive: 0 72% 50%;
     --destructive-foreground: 0 0% 98%;
     --warning: 38 92% 50%;
-    --warning-foreground: 38 90% 10%;
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 142 60% 35%;
-    --chart-1: 142 60% 35%;
-    --chart-2: 35 55% 45%;
-    --chart-3: 142 50% 45%;
-    --chart-4: 35 45% 55%;
-    --chart-5: 142 40% 55%;
-    --radius: 0.5rem;
+    --warning-foreground: 38 96% 12%;
+    --border: 200 12% 86%;
+    --input: 200 12% 86%;
+    --ring: 160 84% 32%;
+    --chart-1: 160 70% 35%;
+    --chart-2: 38 80% 50%;
+    --chart-3: 198 75% 45%;
+    --chart-4: 271 45% 55%;
+    --chart-5: 14 70% 55%;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 224 71% 4%;
-    --sidebar-primary: 142 60% 35%;
-    --sidebar-primary-foreground: 142 20% 95%;
-    --sidebar-accent: 240 5% 96%;
-    --sidebar-accent-foreground: 240 6% 10%;
-    --sidebar-border: 240 6% 90%;
-    --sidebar-ring: 142 60% 35%;
+    --sidebar-foreground: 200 14% 12%;
+    --sidebar-primary: 160 84% 32%;
+    --sidebar-primary-foreground: 160 100% 96%;
+    --sidebar-accent: 200 20% 96%;
+    --sidebar-accent-foreground: 200 25% 18%;
+    --sidebar-border: 200 12% 86%;
+    --sidebar-ring: 160 84% 32%;
   }
 
   .dark {
-    --background: 20 14% 4%;
-    --foreground: 60 9% 98%;
-    --card: 24 10% 12%;
-    --card-foreground: 60 9% 98%;
-    --popover: 20 14% 4%;
-    --popover-foreground: 60 9% 98%;
-    --primary: 142 71% 45%;
-    --primary-foreground: 142 83% 9%;
-    --secondary: 142 18% 18%;
-    --secondary-foreground: 60 9% 98%;
-    --muted: 142 18% 18%;
-    --muted-foreground: 24 5% 65%;
-    --accent: 35 71% 55%;
-    --accent-foreground: 35 9% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 60 9% 98%;
+    --background: 210 10% 8%;
+    --foreground: 210 12% 96%;
+    --card: 210 10% 10%;
+    --card-foreground: 210 12% 96%;
+    --popover: 210 10% 10%;
+    --popover-foreground: 210 12% 96%;
+    --primary: 160 70% 45%;
+    --primary-foreground: 160 100% 10%;
+    --secondary: 210 12% 14%;
+    --secondary-foreground: 210 12% 96%;
+    --muted: 210 12% 16%;
+    --muted-foreground: 210 10% 70%;
+    --accent: 38 92% 55%;
+    --accent-foreground: 38 10% 10%;
+    --destructive: 0 63% 45%;
+    --destructive-foreground: 210 12% 96%;
     --warning: 38 92% 50%;
     --warning-foreground: 48 96% 89%;
-    --border: 142 18% 18%;
-    --input: 142 18% 18%;
-    --ring: 142 71% 45%;
+    --border: 210 12% 20%;
+    --input: 210 12% 20%;
+    --ring: 160 70% 45%;
 
-    --sidebar-background: 24 10% 12%;
-    --sidebar-foreground: 60 9% 98%;
-    --sidebar-primary: 142 71% 45%;
-    --sidebar-primary-foreground: 142 83% 9%;
-    --sidebar-accent: 142 18% 18%;
-    --sidebar-accent-foreground: 60 9% 98%;
-    --sidebar-border: 142 18% 22%;
-    --sidebar-ring: 142 71% 45%;
+    --sidebar-background: 210 10% 10%;
+    --sidebar-foreground: 210 12% 96%;
+    --sidebar-primary: 160 70% 45%;
+    --sidebar-primary-foreground: 160 100% 10%;
+    --sidebar-accent: 210 12% 16%;
+    --sidebar-accent-foreground: 210 12% 96%;
+    --sidebar-border: 210 12% 22%;
+    --sidebar-ring: 160 70% 45%;
   }
 }
 
 @layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+  }
+  h1 {
+    @apply font-headline tracking-tight leading-tight text-3xl sm:text-4xl;
+  }
+  h2 {
+    @apply font-headline tracking-tight leading-tight text-2xl sm:text-3xl;
+  }
+  h3 {
+    @apply font-headline tracking-tight leading-snug text-xl sm:text-2xl;
+  }
+  h4 {
+    @apply font-headline tracking-tight leading-snug text-lg;
+  }
+}
+
+@layer base {
+  /* Per-feature cursor styles with fallbacks */
+  body[data-feature="default"] {
+    cursor: default;
+  }
+  body[data-feature="my-crops"] {
+    cursor: url('/cursors/crop.cur'), pointer;
+  }
+  body[data-feature="crop-recommendation"] {
+    cursor: url('/cursors/recommend.cur'), pointer;
+  }
+  body[data-feature="soil-health"] {
+    cursor: url('/cursors/soil.cur'), help;
+  }
+  body[data-feature="ai-vision"] {
+    cursor: url('/cursors/vision.cur'), crosshair;
+  }
+  body[data-feature="irrigation-planner"] {
+    cursor: url('/cursors/water.cur'), pointer;
+  }
+  body[data-feature="pest-disease-alerts"] {
+    cursor: url('/cursors/pest.cur'), pointer;
+  }
+  body[data-feature="pest-spraying-advisor"] {
+    cursor: url('/cursors/spray.cur'), pointer;
+  }
+  body[data-feature="weather"] {
+    cursor: url('/cursors/weather.cur'), progress;
+  }
+  body[data-feature="farm-map"] {
+    cursor: url('/cursors/map.cur'), grab;
+  }
+  body[data-feature="tasks-planner"] {
+    cursor: url('/cursors/tasks.cur'), cell;
+  }
+  body[data-feature="yield-estimator"] {
+    cursor: url('/cursors/gauge.cur'), pointer;
   }
 }
